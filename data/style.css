@@ -1,0 +1,21 @@
+body           { background-color: #ffffff; font-size: 100% }
+#wrapper       { width: 500px; margin: 20px auto;  padding: 5px 5px 5px 5px;    text-align:center;   border: 2px solid blue;   border-radius: 15px;  }
+h2             { text-align: center;}
+h3             { margin: 0px 0px 5px 0px; }
+
+#topContainer  { display: flex; align-items: center;  justify-content: center;   Margin: 0px auto 2em auto;}
+#topContainer2 { text-align: center;  margin-right: 2em;  }
+#time          { display: inline; font-family: 'Courier New', Courier, monospace;  font-size: 150%;   }
+
+#dialContainer { display:inline-block;   margin: 0px auto 0px auto;  }
+#dial_1        { display:inline-block;  }
+#dial_2        { display:inline-block; margin: 0px 0px 0px 30px; }
+canvas         { background-color: #ffffff;    }
+.bigText       { font-size: 150%;}  
+.noMargin      { margin: 0px 0px 0px 0px; }
+
+#graphContainer { display:inline-block;  text-align:left; margin: 20px 0px 20px 0px;  }
+#key            { width: 200px;} 
+.box            { float: left;  height:15px;  width:10px;  margin: 0px 10px 0px 0px; clear: both;     }
+.red            { background-color: red; }
+.blue           { background-color: blue; }

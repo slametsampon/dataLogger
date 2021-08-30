@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html;charset=utf-8' http-equiv='Content-Type'>
+    <title>
+      IoT DATA LOGGER
+    </title>
+ 
+    <link rel="stylesheet" type="text/css" href="style.css"> 
+  </head>
+ 
+  <body >
+      <div id='wrapper'>
+ 
+        <h1>IoT DATA LOGGER</h1> 
+        <div id='topContainer'>
+            <div id='topContainer2'>
+            <div id='label'>Time : </div>
+          </div>
+          <span id='time'>16:45:41</span>
+        </div>
+ 
+         <div id='dialContainer'> 
+           <div id='dial_1'> 
+             <h3>Temperature</h3>
+             <canvas id='canvasTemp' width='200' height='150'  style='border:1px solid #000000;' > </canvas>
+             <p class='noMargin bigText'><span id='temp'>20</span> °C</p>
+           </div>    
+ 
+           <div id='dial_2'> 
+             <h3>Humidity</h3>
+             <canvas id='canvasHumid' width='200' height='150'  style='border:1px solid #000000;' > </canvas>
+             <p class='noMargin bigText'><span id='humd'>60</span> %</p>
+           </div>
+         </div>  <!--  'dialContainer'  -->
+ 
+         <div id='graphContainer'> 
+           <canvas id='graph' width='440' height='150'  style='border:1px solid #000000; background-color:white;' > </canvas>
+           <div id='key'>
+             <div> <div class='box red'></div> Temperature</div>
+             <div> <div class='box blue'></div> Humidity</div>
+           </div>   
+         </div>      
+ 
+      </div> <!--  'wrapper'  -->
+  </body>
+ 
+  <script src="script_functions.js"></script> 
+</html> 
