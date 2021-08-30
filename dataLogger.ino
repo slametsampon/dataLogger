@@ -235,8 +235,8 @@ void loop()
         if  ( URI == "/" )  
         {
             client.flush();
-            client.print( HTTP_HEADER );
-            client.print( HTML_1 ); 
+            //client.print( HTTP_HEADER );
+            //client.print( HTML_1 ); 
             if (DEBUG) { Serial.println(F("Page served\n")); } 
             // a new page means a new ws service. Reset the ws flag and wait for the ws start message
             webSocketIsOpen = false;
