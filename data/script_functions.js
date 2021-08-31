@@ -1,12 +1,6 @@
 
-function updateValues(h,t)
+function updateGraph(t,h)
 {
-
-  //drawDial('canvasTemp',  '#ffaaaa', 160, 20, -30,  50, t); 
-  drawDial('canvasTemp',  '#0b9106', 160, 20, -30,  50, t);
-  drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, h);
-  document.getElementById('temp').innerHTML = t;
-  document.getElementById('humd').innerHTML = h;
 
   var graphCanvas = 'graph';
   var graphMin = -30;
@@ -141,7 +135,7 @@ function drawGraph(canvasID, gMin, gMax, drawLines, t,h )
 
   var numySteps = gMax - gMin;
   if (numySteps > 10) { numySteps = numySteps /10; }
-  var numxSteps = 20;
+  var numxSteps = 24;
 
   var xStep = graphWidth / numxSteps;
   var yStep = graphHeight / numySteps;
@@ -179,8 +173,8 @@ function drawGraph(canvasID, gMin, gMax, drawLines, t,h )
   // draw the  values on the graph  
   if (drawLines)
   {
-      tempArray.shift();  tempArray[19] = t;
-      humdArray.shift();  humdArray[19] = h;
+      tempArray.shift();  tempArray[23] = t;
+      humdArray.shift();  humdArray[23] = h;
 
       // Temperature        
       ctx.beginPath();
@@ -253,7 +247,7 @@ function processReceivedData(evt)
   var h = parseInt(tmp[0]);
   var t = parseInt(tmp[1]);
   //updateValues(h,t);
-  updateValues(60,20);
+  //updateValues(60,20);
 }
 
 
@@ -272,19 +266,86 @@ function init()
 
   console.log('started');
   //drawDial('canvasTemp',  '#ffaaaa', 160, 20, -30,  50, 20); 
-  drawDial('canvasTemp',  '#5af067', 160, 20, -30,  50, 20);
-  drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, 60);
+  drawDial('canvasTemp',  '#0b9106', 160, 20, -30,  50, t);
+  drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, h);
   drawGraph('graph', -30, 100, false, t, h);
 
   //var myVarTime = setInterval(updateTime, 1000); 
 }
 
+//new functions
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      //document.getElementById("temperature").innerHTML = this.responseText;
+      document.getElementById('temp').innerHTML = this.responseText;
+      t = parseInt(this.responseText);
+      drawDial('canvasTemp',  '#0b9106', 160, 20, -30,  50, t);
+      updateGraph(t,h);
+    }
+  };
+  xhttp.open("GET", "/temperature", true);
+  xhttp.send();
+}, 10000 ) ;
+
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      //document.getElementById("humidity").innerHTML = this.responseText;
+      document.getElementById('humd').innerHTML = this.responseText;
+      h = parseInt(this.responseText);
+      drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, h);
+      updateGraph(t,h);
+    }
+  };
+  xhttp.open("GET", "/humidity", true);
+  xhttp.send();
+}, 10000 ) ;
 
 // arrays to hold the temperature and humidity values.
-var tempArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
-var humdArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
+var headerArray = ["Time", "Temperature", "Humidity"];
+var timeArray = [ "00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00" ];
+var tempArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
+var humdArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
+let table = document.querySelector("table");
 
-var t = -30;
-var h = 0;
+function generateReportTableHead(table, dataHeader) {
+  let thead = table.createTHead();
+  let row = thead.insertRow();
+  for (let key of dataHeader) {
+    let th = document.createElement("th");
+    let text = document.createTextNode(key);
+    th.appendChild(text);
+    row.appendChild(th);
+  }
+}
+
+function generateReportTable(table) {
+
+  let fLen = tempArray.length;
+  for (let i = 0; i < fLen; i++) {
+    let row = table.insertRow();
+
+    let cell = row.insertCell();
+    let text = document.createTextNode(timeArray[i]);
+    cell.appendChild(text);
+
+    let cell1 = row.insertCell();
+    let text1 = document.createTextNode(tempArray[i]);
+    cell1.appendChild(text1);
+
+    let cell2 = row.insertCell();
+    let text2 = document.createTextNode(humdArray[i]);
+    cell2.appendChild(text2);
+  }
+}
+
+generateReportTable(table);
+generateReportTableHead(table, headerArray);
+
+var t = 20;
+var h = 60;
 
 document.addEventListener('DOMContentLoaded', init, false);

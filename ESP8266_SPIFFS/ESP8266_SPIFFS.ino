@@ -13,15 +13,14 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <WebSocketsServer.h>
-
 #include <LittleFS.h>
-#include "DHT.h"
+#include <Wire.h>
+//#include <Adafruit_Sensor.h>
+//#include <Adafruit_BME280.h>
 
-#define DHTPIN D5     
-#define DHTTYPE DHT11   
-
-const boolean DEBUG = true;
+// Adafruit_BME280 bme; // I2C
+//Adafruit_BME280 bme(BME_CS); // hardware SPI
+//Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
 
 // Replace with your network credentials
 const char* ssid     = "Sam-Laptop";
@@ -32,15 +31,8 @@ const int ledPin = LED_BUILTIN;
 // Stores LED state
 String ledState;
 
-DHT dht(DHTPIN, DHTTYPE);
-
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
-
-WebSocketsServer webSocket = WebSocketsServer(81);
-// it takes a short while for the websocket to initise fully. If you send the data too early it will be ignored.
-// webSocketIsOpen is used to show the websocket is ready.
-boolean webSocketIsOpen = false;
 
 String getTemperature() {
   // float temperature = bme.readTemperature();
@@ -56,6 +48,13 @@ String getHumidity() {
   float humidity = random(400.0, 950)/10.0;
   Serial.println(humidity);
   return String(humidity);
+}
+
+String getPressure() {
+  //float pressure = bme.readPressure()/ 100.0F;
+  float pressure = random(9500, 10500)/10.0;
+  Serial.println(pressure);
+  return String(pressure);
 }
 
 // Replaces placeholder with LED state value
@@ -76,15 +75,15 @@ String processor(const String& var){
   }
   else if (var == "HUMIDITY"){
     return getHumidity();
+  }
+  else if (var == "PRESSURE"){
+    return getPressure();
   }  
 }
  
 void setup(){
   // Serial port for debugging purposes
   Serial.begin(115200);
-  while (!Serial) {;}
-  if (DEBUG) { Serial.print(F("\n\nSerial started at 115200\n" ));   }
-
   pinMode(ledPin, OUTPUT);
 
   // Initialize the sensor
@@ -110,18 +109,21 @@ void setup(){
     request->send(LittleFS, "/index.html", String(), false, processor);
   });
   
-  server.on("/report", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/report.html", String(), false, processor);
+  server.on("/page1", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/page1.html", String(), false, processor);
+  });
+  
+  server.on("/page2", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/page2.html", String(), false, processor);
+  });
+  
+  server.on("/page3", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/page3.html", String(), false, processor);
   });
   
   // Route to load style.css file
   server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/style.css", "text/css");
-  });
-
-  // Route to load script_functions.js file
-  server.on("/script_functions.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/script_functions.js", "text/js");
   });
 
   // Route to set GPIO to HIGH
@@ -144,6 +146,10 @@ void setup(){
     request->send_P(200, "text/plain", getHumidity().c_str());
   });
   
+  server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", getPressure().c_str());
+  });
+
   // Start server
   server.begin();
 }
