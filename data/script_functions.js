@@ -114,9 +114,6 @@ function drawDial(canvasID, dialColour, startAngle, stopAngle, minVal, maxVal, d
 
 }
 
-
-
-
 function drawGraph(canvasID, gMin, gMax, drawLines, t,h )
 {
 
@@ -234,8 +231,6 @@ function drawGraph(canvasID, gMin, gMax, drawLines, t,h )
   } // if (! initOnly)
 } // function drawGraph
 
-
-
 function processReceivedData(evt) 
 {
   var data = evt.data;
@@ -249,7 +244,6 @@ function processReceivedData(evt)
   //updateValues(h,t);
   //updateValues(60,20);
 }
-
 
 function updateTime() 
 {  
@@ -304,47 +298,8 @@ setInterval(function ( ) {
   xhttp.send();
 }, 10000 ) ;
 
-// arrays to hold the temperature and humidity values.
-var headerArray = ["Time", "Temperature", "Humidity"];
-var timeArray = [ "00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00" ];
 var tempArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
 var humdArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
-let table = document.querySelector("table");
-
-function generateReportTableHead(table, dataHeader) {
-  let thead = table.createTHead();
-  let row = thead.insertRow();
-  for (let key of dataHeader) {
-    let th = document.createElement("th");
-    let text = document.createTextNode(key);
-    th.appendChild(text);
-    row.appendChild(th);
-  }
-}
-
-function generateReportTable(table) {
-
-  let fLen = tempArray.length;
-  for (let i = 0; i < fLen; i++) {
-    let row = table.insertRow();
-
-    let cell = row.insertCell();
-    let text = document.createTextNode(timeArray[i]);
-    cell.appendChild(text);
-
-    let cell1 = row.insertCell();
-    let text1 = document.createTextNode(tempArray[i]);
-    cell1.appendChild(text1);
-
-    let cell2 = row.insertCell();
-    let text2 = document.createTextNode(humdArray[i]);
-    cell2.appendChild(text2);
-  }
-}
-
-generateReportTable(table);
-generateReportTableHead(table, headerArray);
-
 var t = 20;
 var h = 60;
 

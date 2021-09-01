@@ -1,6 +1,6 @@
 /*
   Rui Santos
-  Complete project details at https://RandomNerdTutorials.com
+  Complete project details at https://randomnerdtutorials.com/esp8266-web-server-spiffs-nodemcu/
   
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files.
@@ -15,12 +15,15 @@
 #include <ESPAsyncWebServer.h>
 #include <WebSocketsServer.h>
 
+#include    <ArduinoJson.h>
 #include <LittleFS.h>
 #include "DHT.h"
 
 #define DHTPIN D5     
 #define DHTTYPE DHT11   
 
+DynamicJsonDocument doc(1536);
+String webPage;
 const boolean DEBUG = true;
 
 // Replace with your network credentials
@@ -111,12 +114,23 @@ void setup(){
   });
   
   server.on("/report", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/report.html", String(), false, processor);
+    request->send(LittleFS, "/report.html", "text/html");
+  });
+  
+  server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request){
+    initRandomJson();
+    serializeJson(doc, webPage);
+    request->send(200, "application/json", webPage);
   });
   
   // Route to load style.css file
   server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/style.css", "text/css");
+  });
+
+  // Route to load script_functions.js file
+  server.on("/report.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/report.js", "text/js");
   });
 
   // Route to load script_functions.js file
@@ -150,4 +164,20 @@ void setup(){
  
 void loop(){
   
+}
+
+void initRandomJson(){
+  float h, t;
+  JsonArray time = doc.createNestedArray("time");
+  JsonArray temperature = doc.createNestedArray("temperature");
+  JsonArray humidity = doc.createNestedArray("humidity");
+
+  for (int i=0; i < 24; i++){
+    h = random(400.0, 950)/10.0;
+    t = random(200.0, 455)/10.0;
+
+    time.add(i);
+    temperature.add(t);
+    humidity.add(h);
+  } 
 }
