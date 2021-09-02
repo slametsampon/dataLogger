@@ -15,9 +15,10 @@
 #include <ESPAsyncWebServer.h>
 #include <WebSocketsServer.h>
 
-#include    <ArduinoJson.h>
 #include <LittleFS.h>
 #include "DHT.h"
+
+#include "model/model.h"
 
 #define DHTPIN D5     
 #define DHTTYPE DHT11   
