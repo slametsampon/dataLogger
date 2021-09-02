@@ -75,13 +75,15 @@ function generateReportTable(table) {
 
 function reportBuilding() {
   var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
+xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("json").innerHTML = this.responseText;
+      var respText = this.responseText;
+      //document.getElementById("json").innerHTML = respText;
       //initRandomDataTable();
-      fillDataTable(this.responseText);
+      fillDataTable(respText);
       generateReportTable(table);
       generateReportTableHead(table, headerArray);
+      respText = '';
 
     }
   };

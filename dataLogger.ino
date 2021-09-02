@@ -23,7 +23,6 @@
 #define DHTTYPE DHT11   
 
 DynamicJsonDocument doc(1536);
-String webPage;
 const boolean DEBUG = true;
 
 // Replace with your network credentials
@@ -118,6 +117,7 @@ void setup(){
   });
   
   server.on("/jsonData", HTTP_GET, [](AsyncWebServerRequest *request){
+    String webPage;
     initRandomJson();
     serializeJson(doc, webPage);
     request->send(200, "application/json", webPage);
