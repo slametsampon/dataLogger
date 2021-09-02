@@ -117,7 +117,7 @@ void setup(){
     request->send(LittleFS, "/report.html", "text/html");
   });
   
-  server.on("/json", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/jsonData", HTTP_GET, [](AsyncWebServerRequest *request){
     initRandomJson();
     serializeJson(doc, webPage);
     request->send(200, "application/json", webPage);
@@ -168,6 +168,7 @@ void loop(){
 
 void initRandomJson(){
   float h, t;
+  doc.clear();
   JsonArray time = doc.createNestedArray("time");
   JsonArray temperature = doc.createNestedArray("temperature");
   JsonArray humidity = doc.createNestedArray("humidity");

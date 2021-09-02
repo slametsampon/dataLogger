@@ -22,6 +22,25 @@ function initRandomDataTable(){
     }
 }
 
+function fillDataTable(data){
+  const dataJson = JSON.parse(data);
+  let dataLen = dataJson.time.length;
+
+  text = "<ul>";
+  for (let i = 0; i < dataLen; i++) {
+    if (i<10){
+      i_str = i;
+      timeArray[i] = "0" + i.toString() + ":00";
+      }
+      else{
+          timeArray[i] = i.toString() + ":00";
+      }
+      tempArray[i] = dataJson.temperature[i];
+      humdArray[i] = dataJson.humidity[i];
+  }
+  
+}
+
 let table = document.querySelector("table");
 function generateReportTableHead(table, dataHeader) {
   let thead = table.createTHead();
@@ -54,6 +73,19 @@ function generateReportTable(table) {
   }
 }
 
-initRandomDataTable();
-generateReportTable(table);
-generateReportTableHead(table, headerArray);
+function reportBuilding() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("json").innerHTML = this.responseText;
+      //initRandomDataTable();
+      fillDataTable(this.responseText);
+      generateReportTable(table);
+      generateReportTableHead(table, headerArray);
+
+    }
+  };
+  xhttp.open("GET", "/jsonData", true);
+  xhttp.send();
+}
+document.addEventListener('DOMContentLoaded', reportBuilding, false);
