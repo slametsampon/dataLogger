@@ -42,7 +42,7 @@ function init()
   drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, 90, h);
   drawGraph('graph', -30, 100, false, t, h);
 
-  //var myVarTime = setInterval(updateTime, 1000); 
+  var myVarTime = setInterval(updateTime, 1000); 
 }
 
 //new functions

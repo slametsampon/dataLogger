@@ -115,6 +115,11 @@ int humidity_23 = humidity[23]; // -9999
       dataLogsheet get(int);
       float getTemperature(int);
       float getHumidity(int);
+      void saveHourlyLogsheet(JsonObject);
+      void saveMinuteLogsheet(JsonObject);
+      JsonObject readHourlyLogsheet();
+      JsonObject readMinuteLogsheet();
+
       String toString();
       String getId();
       void info();
