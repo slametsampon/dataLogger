@@ -4,11 +4,11 @@
 AccessDataLogsheet::AccessDataLogsheet(String id):_id(id){}
 
 void AccessDataLogsheet::add(dataLogsheet data, int index){
-  this->_dataLogsheet[index] = data;
+  this->_hourlyLogsheet[index] = data;
 }
 
 dataLogsheet AccessDataLogsheet::get(int index){
-  return _dataLogsheet[index];
+  return _hourlyLogsheet[index];
 }
 
 

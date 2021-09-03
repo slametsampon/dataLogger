@@ -81,6 +81,15 @@ int humidity_23 = humidity[23]; // -9999
 #include  <ArduinoJson.h>
 
   const int HOUR_24 = 24;
+  const int MINUTE_60 = 60;
+  const int SECOND_60 = 60;
+  const int AVG_INDEX = 24;
+  const int MIN_TEMP_INDEX = 25;
+  const int MAX_TEMP_INDEX = 26;
+  const int MIN_HUMD_INDEX = 27;
+  const int MAX_HUMD_INDEX = 28;
+
+  const int HOURLY_LOGSHEET = 29;
   const int PARAMETER_VALUE = 0;
   const int PARAMETER_LOW_RANGE = 1;
   const int PARAMETER_HIGH_RANGE = 2;
@@ -111,7 +120,8 @@ int humidity_23 = humidity[23]; // -9999
       void info();
 
     private:
-      dataLogsheet  _dataLogsheet[HOUR_24];
+      dataLogsheet  _hourlyLogsheet[HOURLY_LOGSHEET];
+      dataLogsheet  _minuteLogsheet[MINUTE_60];
       String    _id;
   };//end of class
 

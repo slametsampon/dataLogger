@@ -1,5 +1,5 @@
 // arrays to hold the temperature and humidity values.
-var headerArray = ["Time", "Temp\-DegC", "Humd\-\%"];
+var headerArray = ["Time", "Tempt\-°C", "Humid\-\%"];
 var timeArray = [];
 var tempArray = [];
 var humdArray = [];

@@ -1,25 +1,20 @@
-
-function updateGraph(t,h)
-{
-
-  var graphCanvas = 'graph';
-  var graphMin = -30;
-  var graphMax = 100;
-  var drawLines = true;
-  drawGraph(graphCanvas, graphMin, graphMax, drawLines, t, h);
-}
-
-
-
 // ===========================================  DIAL  =========================================
 
-function drawDial(canvasID, dialColour, startAngle, stopAngle, minVal, maxVal, dialValue)
+function drawDial(canvasID, dialColour, startAngle, stopAngle, minVal, maxVal, almVal, dialValue)
 {
-  oneDegreeInRadians = Math.PI/180;
+    //drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, 90, h);
+    //drawDial('canvasTemp',  '#0b9106', 160, 20, -30,  50, 40, t);
+    oneDegreeInRadians = Math.PI/180;
   if (stopAngle < startAngle) { stopAngle = stopAngle + 360;}
 
-  let arcStartAngleInRadians =  oneDegreeInRadians * (startAngle-5)  ;
-  let arcStopAngleInRadians  =  oneDegreeInRadians * (stopAngle+5) ;  
+
+  // map the almVal to a degree
+  let almAngle =  (almVal-minVal) *  ((stopAngle - startAngle) / (maxVal - minVal)) + startAngle  ;
+  let arcAlarmAngleInRadians =  oneDegreeInRadians * almAngle;
+
+  let arcStartAngleInRadians =  oneDegreeInRadians * (startAngle-5);
+  let arcStopAngleInRadians  =  oneDegreeInRadians * (stopAngle+5); 
+  
 
   var c = document.getElementById(canvasID);
   var ctx = c.getContext('2d');
@@ -39,6 +34,13 @@ function drawDial(canvasID, dialColour, startAngle, stopAngle, minVal, maxVal, d
   ctx.lineCap = 'butt';
   ctx.strokeStyle = dialColour;
   ctx.arc(0, 0, radius, arcStartAngleInRadians, arcStopAngleInRadians, false);
+  ctx.stroke();
+
+
+  // draw Alarm arc
+  ctx.beginPath();
+  ctx.strokeStyle = '#ff0000';
+  ctx.arc(0, 0, radius, arcAlarmAngleInRadians, arcStopAngleInRadians, false);
   ctx.stroke();
 
 
@@ -230,77 +232,3 @@ function drawGraph(canvasID, gMin, gMax, drawLines, t,h )
 
   } // if (! initOnly)
 } // function drawGraph
-
-function processReceivedData(evt) 
-{
-  var data = evt.data;
-  console.log(data);
-
-  var tmp = data.split('|');
-
-  // convert the received string in to numbers
-  var h = parseInt(tmp[0]);
-  var t = parseInt(tmp[1]);
-  //updateValues(h,t);
-  //updateValues(60,20);
-}
-
-function updateTime() 
-{  
-   var d = new Date();
-   var t = d.toLocaleTimeString();
-   document.getElementById('time').innerHTML = t;
-}
-
-// This is executed after the document has finished loading.
-function init() 
-{
-  //Socket = new WebSocket('ws://' + window.location.hostname + ':81/');
-  //Socket.onmessage = function(event) { processReceivedData(event); };
-
-  console.log('started');
-  //drawDial('canvasTemp',  '#ffaaaa', 160, 20, -30,  50, 20); 
-  drawDial('canvasTemp',  '#0b9106', 160, 20, -30,  50, t);
-  drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, h);
-  drawGraph('graph', -30, 100, false, t, h);
-
-  //var myVarTime = setInterval(updateTime, 1000); 
-}
-
-//new functions
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      //document.getElementById("temperature").innerHTML = this.responseText;
-      document.getElementById('temp').innerHTML = this.responseText;
-      t = parseInt(this.responseText);
-      drawDial('canvasTemp',  '#0b9106', 160, 20, -30,  50, t);
-      updateGraph(t,h);
-    }
-  };
-  xhttp.open("GET", "/temperature", true);
-  xhttp.send();
-}, 10000 ) ;
-
-setInterval(function ( ) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      //document.getElementById("humidity").innerHTML = this.responseText;
-      document.getElementById('humd').innerHTML = this.responseText;
-      h = parseInt(this.responseText);
-      drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, h);
-      updateGraph(t,h);
-    }
-  };
-  xhttp.open("GET", "/humidity", true);
-  xhttp.send();
-}, 10000 ) ;
-
-var tempArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
-var humdArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
-var t = 20;
-var h = 60;
-
-document.addEventListener('DOMContentLoaded', init, false);

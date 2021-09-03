@@ -129,14 +129,19 @@ void setup(){
     request->send(LittleFS, "/style.css", "text/css");
   });
 
-  // Route to load script_functions.js file
+  // Route to load report.js file
   server.on("/report.js", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/report.js", "text/js");
   });
 
-  // Route to load script_functions.js file
-  server.on("/script_functions.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/script_functions.js", "text/js");
+  // Route to load functions.js file
+  server.on("/functions.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/functions.js", "text/js");
+  });
+
+  // Route to load widgets.js file
+  server.on("/widgets.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/widgets.js", "text/js");
   });
 
   // Route to set GPIO to HIGH
