@@ -12,6 +12,8 @@
 
 #include "model.h"
 
+const boolean SIMULATION = true;
+
     class DhtWrapper{
         public:
             DhtWrapper(DHT*);

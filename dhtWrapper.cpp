@@ -34,11 +34,17 @@ String DhtWrapper::getValues(){
     */
     String output;
     StaticJsonDocument<128> doc;
+    float t,h;
     // Read temperature as Fahrenheit (isFahrenheit = true, celsius = false)
-    //float t = _dht->readTemperature(false);
-    //float h = _dht->readHumidity();
-    float t = random(200, 455)/10.0;
-    float h = random(400.0, 950)/10.0;
+
+    if (!SIMULATION){
+        t = _dht->readTemperature(false);
+        h = _dht->readHumidity();
+    }
+    else{
+        t = random(200, 455)/10.0;
+        h = random(400.0, 950)/10.0;
+    }
 
     String statusT = "Normal";
     String statusH = "Normal";
