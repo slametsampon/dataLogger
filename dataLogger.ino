@@ -16,26 +16,25 @@
 #include <WebSocketsServer.h>
 
 #include <LittleFS.h>
-#include "DHT.h"
+#include <DHT.h>
 
-#include "model/model.h"
-
-#define DHTPIN D5     
-#define DHTTYPE DHT11   
+#include "model.h"
+#include "dataLogger.h"
+#include "SequenceTimer.h"
+#include "dhtWrapper.h"
 
 DynamicJsonDocument doc(1536);
-const boolean DEBUG = true;
+SequenceTimer   mainSequence("Sequence");
 
-// Replace with your network credentials
-const char* ssid     = "Sam-Laptop";
-const char* password = "sampon170466";
-
-// Set LED GPIO
-const int ledPin = LED_BUILTIN;
-// Stores LED state
-String ledState;
+AccessParam accessParamTemperature("accessParamTemperature");
+AccessParam accessParamHumidity("accessParamHumidity");
 
 DHT dht(DHTPIN, DHTTYPE);
+
+DhtWrapper sensorDht(&dht);
+
+// Stores LED state
+String ledState;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -91,6 +90,8 @@ void setup(){
   pinMode(ledPin, OUTPUT);
 
   // Initialize the sensor
+  setupParameter();
+  sensorDht.AttachParameter(&accessParamTemperature, &accessParamHumidity);
 
   // Initialize LittleFS
   if(!LittleFS.begin()){
@@ -98,12 +99,11 @@ void setup(){
     return;
   }
 
-  // Connect to Wi-Fi
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi..");
-  }
+  // Start WiFi
+  if (WiFiAP)
+    startWiFiAP();
+  else
+    startWiFiClient();
 
   // Print ESP32 Local IP Address
   Serial.println(WiFi.localIP());
@@ -170,6 +170,57 @@ void setup(){
  
 void loop(){
   
+}
+
+void startWiFiClient(){
+  Serial.println("Connecting to "+(String)ssid);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  
+  Serial.println("WiFi connected");
+  Serial.println("IP address: " + WiFi.localIP().toString());
+}
+
+void startWiFiAP(){
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ssid, password);
+  Serial.println("AP started");
+  Serial.println("IP address: " + WiFi.softAPIP().toString());
+}
+
+void setupParameter(){
+  param dtParam;
+  Serial.println("LocPan::_setupParameter()");
+
+  //parameter temperature
+  dtParam.unit = "°C";
+  dtParam.value = 35;
+  dtParam.highRange = 50;
+  dtParam.lowRange = -10;
+  dtParam.highLimit = 40;
+  dtParam.lowLimit = 10;
+  dtParam.alfaEma = ALFA_EMA;
+  dtParam.alarm = NO_ALARM;
+
+  accessParamTemperature.setParam(dtParam);
+
+  //parameter humidity
+  dtParam.unit = "%";
+  dtParam.value = 70;
+  dtParam.highRange = 100;
+  dtParam.lowRange = 0;
+  dtParam.highLimit = 90;
+  dtParam.lowLimit = 40;
+  dtParam.alfaEma = ALFA_EMA;
+  dtParam.alarm = NO_ALARM;
+
+  accessParamHumidity.setParam(dtParam);
 }
 
 void initRandomJson(){

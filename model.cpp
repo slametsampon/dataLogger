@@ -1,17 +1,6 @@
 #include    "model.h"
 
-//AccessDataLogsheet - Class
-AccessDataLogsheet::AccessDataLogsheet(String id):_id(id){}
 
-void AccessDataLogsheet::add(dataLogsheet data, int index){
-  this->_hourlyLogsheet[index] = data;
-}
-
-dataLogsheet AccessDataLogsheet::get(int index){
-  return _hourlyLogsheet[index];
-}
-
-//DynamicJsonDocument doc(1536);
 //AccessParam - Class
 AccessParam::AccessParam(String id):_id(id){}
 
@@ -24,6 +13,8 @@ void AccessParam::init(String id, param dtParam){
 JsonObject AccessParam::getJson(){
   /*
   {
+    "header":2,
+    "id":"Smoke-1",
     "unit":"%",
     "value":51.5,
     "highRange":100.0,
@@ -34,22 +25,27 @@ JsonObject AccessParam::getJson(){
     "alarm":2
   }
 
-    StaticJsonDocument<128> doc;
+  StaticJsonDocument<128> doc;
 
-    doc["unit"] = "%";
-    doc["value"] = 51.5;
-    doc["highRange"] = 100;
-    doc["lowRange"] = 0;
-    doc["highLimit"] = 80;
-    doc["lowLimit"] = 40;
-    doc["alarm"] = 2;
+  doc["header"] = 2;
+  doc["id"] = "Smoke-1";
+  doc["unit"] = "%";
+  doc["value"] = 51.5;
+  doc["highRange"] = 100;
+  doc["lowRange"] = 0;
+  doc["highLimit"] = 80;
+  doc["lowLimit"] = 40;
+  doc["increment"] = 1.1;
+  doc["alarm"] = 2;
 
-    serializeJson(doc, output);
+  serializeJson(doc, output);  
   */
 
   // Get a reference to the root object
   StaticJsonDocument<128> doc;
   
+  doc["header"] = DATA_PARAMETER;
+  doc["id"] = _id;
   doc["unit"] = _dataParam.unit;
   doc["value"] = _dataParam.value;
   doc["highRange"] = _dataParam.highRange;
@@ -79,22 +75,30 @@ void  AccessParam::setParamJson(JsonObject paramJson){
 
 JsonObject AccessParam::getOperation(){
   /*
-    StaticJsonDocument<64> doc;
+  {
+    "header":2,
+    "id":"Smoke-1",
+    "unit":"%",
+    "value":51.5,
+    "operationMode":2,
+    "alarm":2
+  }
 
-    doc["unit"] = "%";
-    doc["value"] = 51.5;
-    doc["alarm"] = 2;
+  StaticJsonDocument<96> doc;
 
-    serializeJson(doc, output);
-
-    doc["unit"] = "%";
-    doc["value"] = 51.5;
-    doc["alarm"] = 2;
+  doc["header"] = 2;
+  doc["id"] = "Smoke-1";
+  doc["unit"] = "%";
+  doc["value"] = 51.5;
+  doc["operationMode"] = 2;
+  doc["alarm"] = 2;
 
   serializeJson(doc, output);
   */
 
   StaticJsonDocument<96> doc;
+  doc["header"] = DATA_OPERATION;
+  doc["id"] = _id;
   doc["unit"] = _dataParam.unit;
   doc["value"] = _dataParam.value;
   doc["alarm"] = _dataParam.alarm;
@@ -106,6 +110,42 @@ param AccessParam::getParam(){
   return _dataParam;
 }
 
+float AccessParam::getParam(int idParam){
+  switch (idParam)
+  {
+    case PARAMETER_VALUE:
+      return _dataParam.value;
+      break;
+
+    case PARAMETER_LOW_RANGE:
+      return _dataParam.lowRange;
+      break;
+    
+    case PARAMETER_HIGH_RANGE:
+      return _dataParam.highRange;
+      break;
+    
+    case PARAMETER_LOW_LIMIT:
+      return _dataParam.lowLimit;
+      break;
+    
+    case PARAMETER_HIGH_LIMIT:
+      return _dataParam.highLimit;
+      break;
+    
+    case PARAMETER_ALARM:
+      return (float) _dataParam.alarm;
+      break;
+    
+    case PARAMETER_ALFA_EMA:
+      return _dataParam.alfaEma;
+      break;
+
+    default:
+      break;
+  }
+}
+
 void AccessParam::setAlarm(int val){
   _dataParam.alarm =  val;
 }
@@ -115,6 +155,27 @@ void AccessParam::setParam(param dataParam){
   _dataParam = dataParam;
 }
 
+boolean AccessParam::isChangeAble(int idParam){
+
+  boolean isChangeAble = false;
+
+  switch (idParam)
+  {
+    case PARAMETER_LOW_RANGE:
+    case PARAMETER_HIGH_RANGE:
+    case PARAMETER_LOW_LIMIT:
+    case PARAMETER_HIGH_LIMIT:
+    case PARAMETER_INCREMENT:
+    case PARAMETER_ALFA_EMA:
+      isChangeAble = true;
+      break;
+    
+    default:
+      break;
+  }
+  
+  return isChangeAble;
+}
 void AccessParam::setParam(int idParam, float val){
 
   switch (idParam)
