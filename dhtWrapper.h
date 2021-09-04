@@ -16,7 +16,7 @@
         public:
             DhtWrapper(DHT*);
             void AttachParameter(AccessParam*, AccessParam*);
-            String getDhtValues();//return string in format Json for Temp, Humidity
+            String getValues();//return string in format Json for Temp, Humidity
             void info();
         private:
             DHT *_dht;

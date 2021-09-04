@@ -10,42 +10,36 @@ void AccessParam::init(String id, param dtParam){
   this->setParam(dtParam);
 }
 
-JsonObject AccessParam::getJson(){
+String AccessParam::getJson(){
   /*
   {
-    "header":2,
-    "id":"Smoke-1",
     "unit":"%",
     "value":51.5,
     "highRange":100.0,
     "lowRange":0.0,
     "highLimit":80.0,
     "lowLimit":40.0,
-    "increment":1.1,
+    "alfaEma":80.0,
     "alarm":2
   }
+  StaticJsonDocument<192> doc;
 
-  StaticJsonDocument<128> doc;
-
-  doc["header"] = 2;
-  doc["id"] = "Smoke-1";
   doc["unit"] = "%";
   doc["value"] = 51.5;
   doc["highRange"] = 100;
   doc["lowRange"] = 0;
   doc["highLimit"] = 80;
   doc["lowLimit"] = 40;
-  doc["increment"] = 1.1;
+  doc["alfaEma"] = 80;
   doc["alarm"] = 2;
 
-  serializeJson(doc, output);  
+  serializeJson(doc, output);
   */
 
   // Get a reference to the root object
-  StaticJsonDocument<128> doc;
+  StaticJsonDocument<192> doc;
+  String output;
   
-  doc["header"] = DATA_PARAMETER;
-  doc["id"] = _id;
   doc["unit"] = _dataParam.unit;
   doc["value"] = _dataParam.value;
   doc["highRange"] = _dataParam.highRange;
@@ -55,7 +49,8 @@ JsonObject AccessParam::getJson(){
   doc["alfaEma"] = _dataParam.alfaEma;
   doc["alarm"] = _dataParam.alarm;
 
-  return doc.as<JsonObject>();
+  serializeJson(doc, output);
+  return output;
 }
 
 void  AccessParam::setParamJson(JsonObject paramJson){
@@ -76,8 +71,6 @@ void  AccessParam::setParamJson(JsonObject paramJson){
 JsonObject AccessParam::getOperation(){
   /*
   {
-    "header":2,
-    "id":"Smoke-1",
     "unit":"%",
     "value":51.5,
     "operationMode":2,
@@ -86,19 +79,14 @@ JsonObject AccessParam::getOperation(){
 
   StaticJsonDocument<96> doc;
 
-  doc["header"] = 2;
-  doc["id"] = "Smoke-1";
   doc["unit"] = "%";
   doc["value"] = 51.5;
-  doc["operationMode"] = 2;
   doc["alarm"] = 2;
 
   serializeJson(doc, output);
   */
 
   StaticJsonDocument<96> doc;
-  doc["header"] = DATA_OPERATION;
-  doc["id"] = _id;
   doc["unit"] = _dataParam.unit;
   doc["value"] = _dataParam.value;
   doc["alarm"] = _dataParam.alarm;
@@ -237,14 +225,26 @@ String AccessParam::toString(){
 }
 
 void AccessParam::info(){
+  // Get a reference to the root object
+  StaticJsonDocument<192> paramJson;
+  
+  Serial.println("AccessParam::info()");
 
-  JsonObject paramJson = this->getJson();
+  String strJson = this->getJson();
+  Serial.println(strJson);
+  /*
+  // Deserialize the JSON document in the response
+  deserializeJson(paramJson, strJson);
+  paramJson.as<JsonObject()>;
 
+  Serial.println("Info parameter from Json");
   String str;
   for (JsonPair p : paramJson) {
     str = p.key().c_str();
     str = String (str + " : ");
     str = String (str + p.value().as<String>());
     Serial.println(str);
-  }    
+  }   
+  */
+
 }

@@ -83,7 +83,7 @@ float increment = doc["increment"]; // 1.1
   public:
       AccessParam(String);
       void init(String, param);
-      JsonObject getJson();
+      String getJson();
       JsonObject getOperation();
       void setOperationJson(JsonObject);
       param getParam();

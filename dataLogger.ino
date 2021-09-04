@@ -12,6 +12,7 @@
 // Import required libraries
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
+#include <ESP8266mDNS.h>
 #include <ESPAsyncWebServer.h>
 #include <WebSocketsServer.h>
 
@@ -23,7 +24,6 @@
 #include "SequenceTimer.h"
 #include "dhtWrapper.h"
 
-DynamicJsonDocument doc(1536);
 SequenceTimer   mainSequence("Sequence");
 
 AccessParam accessParamTemperature("accessParamTemperature");
@@ -43,6 +43,141 @@ WebSocketsServer webSocket = WebSocketsServer(81);
 // it takes a short while for the websocket to initise fully. If you send the data too early it will be ignored.
 // webSocketIsOpen is used to show the websocket is ready.
 boolean webSocketIsOpen = false;
+
+void setup(){
+  // Serial port for debugging purposes
+  Serial.begin(115200);
+  while (!Serial) {;}
+  if (DEBUG) { Serial.print(F("\n\nSerial started at 115200\n" ));   }
+
+  pinMode(ledPin, OUTPUT);
+
+  // Initialize the sensor
+  setupParameter();
+  sensorDht.AttachParameter(&accessParamTemperature, &accessParamHumidity);
+  sensorDht.info();
+
+  // Initialize LittleFS
+  if(!LittleFS.begin()){
+    Serial.println("An Error has occurred while mounting LittleFS");
+    return;
+  }
+
+  // Start WiFi
+  if (WiFiAP)
+    startWiFiAP();
+  else
+    startWiFiClient();
+
+  //start mDNS
+  startMDNS();
+
+  //url controller
+  urlController();
+
+  // Start server
+  server.begin();
+}
+ 
+void loop(){
+  
+}
+
+void startWiFiClient(){
+  Serial.println("Connecting to "+(String)ssid);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  
+  Serial.println("WiFi connected");
+  Serial.println("IP address: " + WiFi.localIP().toString());
+}
+
+void startWiFiAP(){
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ssid, password);
+  Serial.println("AP started");
+  Serial.println("IP address: " + WiFi.softAPIP().toString());
+}
+
+void startMDNS() { // Start the mDNS responder
+  MDNS.begin(mdnsName);                        // start the multicast domain name server
+  Serial.print("mDNS responder started: http://");
+  Serial.print(mdnsName);
+  Serial.println(".local");
+}
+
+void urlController(){
+
+  // Route to load style.css file
+  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/style.css", "text/css");
+  });
+
+  // Route to load report.js file
+  server.on("/report.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/report.js", "text/js");
+  });
+
+  // Route to load functions.js file
+  server.on("/functions.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/functions.js", "text/js");
+  });
+
+  // Route to load widgets.js file
+  server.on("/widgets.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/widgets.js", "text/js");
+  });
+
+  // Route for root / web page
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/index.html", String(), false, processor);
+  });
+  
+  server.on("/report", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/report.html", "text/html");
+  });
+  
+  server.on("/jsonData", HTTP_GET, [](AsyncWebServerRequest *request){
+    String webPage = initRandomJson();
+    request->send(200, "application/json", webPage);
+  });
+  
+  // Route to set GPIO to HIGH
+  server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(ledPin, HIGH);    
+    request->send(LittleFS, "/index.html", String(), false, processor);
+  });
+  
+  // Route to set GPIO to LOW
+  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(ledPin, LOW);    
+    request->send(LittleFS, "/index.html", String(), false, processor);
+  });
+
+  // route to update sensor - temperature and humidity
+  server.on("/getSensor", HTTP_GET, [](AsyncWebServerRequest *request){
+    String strDhtVal = sensorDht.getValues();
+    request->send(200, "application/json", strDhtVal);
+    Serial.println(strDhtVal);
+  });
+  
+/*
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", getTemperature().c_str());
+  });
+  
+  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", getHumidity().c_str());
+  });
+
+*/
+}
 
 String getTemperature() {
   // float temperature = bme.readTemperature();
@@ -81,119 +216,6 @@ String processor(const String& var){
   }  
 }
  
-void setup(){
-  // Serial port for debugging purposes
-  Serial.begin(115200);
-  while (!Serial) {;}
-  if (DEBUG) { Serial.print(F("\n\nSerial started at 115200\n" ));   }
-
-  pinMode(ledPin, OUTPUT);
-
-  // Initialize the sensor
-  setupParameter();
-  sensorDht.AttachParameter(&accessParamTemperature, &accessParamHumidity);
-
-  // Initialize LittleFS
-  if(!LittleFS.begin()){
-    Serial.println("An Error has occurred while mounting LittleFS");
-    return;
-  }
-
-  // Start WiFi
-  if (WiFiAP)
-    startWiFiAP();
-  else
-    startWiFiClient();
-
-  // Print ESP32 Local IP Address
-  Serial.println(WiFi.localIP());
-
-  // Route for root / web page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/index.html", String(), false, processor);
-  });
-  
-  server.on("/report", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/report.html", "text/html");
-  });
-  
-  server.on("/jsonData", HTTP_GET, [](AsyncWebServerRequest *request){
-    String webPage;
-    initRandomJson();
-    serializeJson(doc, webPage);
-    request->send(200, "application/json", webPage);
-  });
-  
-  // Route to load style.css file
-  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/style.css", "text/css");
-  });
-
-  // Route to load report.js file
-  server.on("/report.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/report.js", "text/js");
-  });
-
-  // Route to load functions.js file
-  server.on("/functions.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/functions.js", "text/js");
-  });
-
-  // Route to load widgets.js file
-  server.on("/widgets.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/widgets.js", "text/js");
-  });
-
-  // Route to set GPIO to HIGH
-  server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
-    digitalWrite(ledPin, HIGH);    
-    request->send(LittleFS, "/index.html", String(), false, processor);
-  });
-  
-  // Route to set GPIO to LOW
-  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request){
-    digitalWrite(ledPin, LOW);    
-    request->send(LittleFS, "/index.html", String(), false, processor);
-  });
-
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", getTemperature().c_str());
-  });
-  
-  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", getHumidity().c_str());
-  });
-  
-  // Start server
-  server.begin();
-}
- 
-void loop(){
-  
-}
-
-void startWiFiClient(){
-  Serial.println("Connecting to "+(String)ssid);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  
-  Serial.println("WiFi connected");
-  Serial.println("IP address: " + WiFi.localIP().toString());
-}
-
-void startWiFiAP(){
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP(ssid, password);
-  Serial.println("AP started");
-  Serial.println("IP address: " + WiFi.softAPIP().toString());
-}
-
 void setupParameter(){
   param dtParam;
   Serial.println("LocPan::_setupParameter()");
@@ -207,7 +229,6 @@ void setupParameter(){
   dtParam.lowLimit = 10;
   dtParam.alfaEma = ALFA_EMA;
   dtParam.alarm = NO_ALARM;
-
   accessParamTemperature.setParam(dtParam);
 
   //parameter humidity
@@ -219,11 +240,12 @@ void setupParameter(){
   dtParam.lowLimit = 40;
   dtParam.alfaEma = ALFA_EMA;
   dtParam.alarm = NO_ALARM;
-
   accessParamHumidity.setParam(dtParam);
 }
 
-void initRandomJson(){
+String initRandomJson(){
+  String output;
+  DynamicJsonDocument doc(1536);
   float h, t;
   doc.clear();
   JsonArray time = doc.createNestedArray("time");
@@ -238,4 +260,7 @@ void initRandomJson(){
     temperature.add(t);
     humidity.add(h);
   } 
+
+  serializeJson(doc, output);
+  return output;
 }

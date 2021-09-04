@@ -13,7 +13,13 @@ void DhtWrapper::AttachParameter(AccessParam *paramTemperature,AccessParam *para
     _paramHumidity = paramHumidity;
 }
 
-String DhtWrapper::getDhtValues(){
+void DhtWrapper::info(){
+    Serial.println("DhtWrapper::info()");
+    _paramTemperature->info();
+    _paramHumidity->info(); 
+}
+
+String DhtWrapper::getValues(){
     /*
     {
         "Temperature": {
@@ -29,14 +35,16 @@ String DhtWrapper::getDhtValues(){
     String output;
     StaticJsonDocument<128> doc;
     // Read temperature as Fahrenheit (isFahrenheit = true, celsius = false)
-    float t = _dht->readTemperature(false);
-    float h = _dht->readHumidity();
+    //float t = _dht->readTemperature(false);
+    //float h = _dht->readHumidity();
+    float t = random(200, 455)/10.0;
+    float h = random(400.0, 950)/10.0;
 
     String statusT = "Normal";
     String statusH = "Normal";
 
-    float humidityAlarmH = _paramHumidity->getParam(PARAMETER_HIGH_RANGE);
-    float temperatureAlarmH = _paramTemperature->getParam(PARAMETER_HIGH_RANGE);
+    float humidityAlarmH = _paramHumidity->getParam(PARAMETER_HIGH_LIMIT);
+    float temperatureAlarmH = _paramTemperature->getParam(PARAMETER_HIGH_LIMIT);
 
     if (t >= temperatureAlarmH)statusT = "AlarmH";
     if (h >= humidityAlarmH)statusH = "AlarmH";

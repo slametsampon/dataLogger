@@ -25,6 +25,7 @@
                 "C:\\Users\\sam294\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.0.2\\variants\\nodemcu",
                 "C:\\Users\\sam294\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.0.2\\libraries\\ESP8266WiFi\\src",
                 "C:\\DATA\\Arduino\\libraries\\ESPAsyncTCP-master\\src",
+                "C:\\DATA\\Arduino\\libraries\\ESP8266mDNS\\src",
                 "C:\\DATA\\Arduino\\libraries\\ESPAsyncWebServer-master\\src",
                 "C:\\Users\\sam294\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\3.0.2\\libraries\\Hash\\src",
                 "C:\\DATA\\Arduino\\libraries\\WebSockets\\src",

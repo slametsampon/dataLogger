@@ -4,8 +4,10 @@
 const boolean DEBUG = true;
 
 // Replace with your network credentials
-const char* ssid     = "Sam-Laptop";
+//const char* ssid     = "Sam-Laptop";
+const char* ssid     = "SamMobile";
 const char* password = "sampon170466";
+const char* mdnsName = "dataLogger";
 
 // Set LED GPIO
 const int ledPin = LED_BUILTIN;
