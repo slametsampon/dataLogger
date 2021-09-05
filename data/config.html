@@ -9,7 +9,7 @@
 
         <link rel="stylesheet" type="text/css" href="style.css"> 
 
-        <title>IoT DATA LOGGER - Report</title>
+        <title>IoT DATA LOGGER - Config</title>
     </head>
 
     <body>
@@ -24,15 +24,22 @@
             </ul>
         </div>
       
-        <div class="container">
-
-            <br>
-            <h4>IoT DATA LOGGER - Report</h4>
-            <br>
-            <table>
-                <!-- here goes our data! -->
-            </table>
-            <br>
+        <div class="content">
+            <div class="card">
+                <h5>Configuration</h5>
+                <form action="/config" method="POST">
+                    <p>Sampling (ms) <input type="text" name="samplingTime" placeholder="6000"></p>
+                    <p>Alfa Ema  (%) <input type="text" name="alfaEma" placeholder="80"></p>
+                    <br>
+                    <p>Alarm High <input type="text" name="alarmH" placeholder="90"></p>
+                    <p>Alarm  Low <input type="text" name="alarmL" placeholder="50"></p>
+                    <br>
+                    <p>Indicator High <input type="text" name="indicatorH" placeholder="100"></p>
+                    <p>Indicator  Low <input type="text" name="indicatorL" placeholder="0"></p>
+                    <br>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
         </div>
     </body>
 

@@ -1,5 +1,9 @@
-#define DHTPIN D5     
+// #define DHTPIN D5     // ????
+#define DHTPIN D4     // what pin we're connected to ????
+
 #define DHTTYPE DHT11   
+#define OLED_RESET 0  // GPIO0
+ 
 
 const boolean DEBUG = true;
 
@@ -8,6 +12,10 @@ const boolean DEBUG = true;
 const char* ssid     = "SamMobile";
 const char* password = "sampon170466";
 const char* mdnsName = "dataLogger";
+
+//NTP : Network Time Protokol
+const long timezone = 6;//for jakarta time
+const byte daysavetime = 1;
 
 // Set LED GPIO
 const int ledPin = LED_BUILTIN;

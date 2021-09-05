@@ -57,3 +57,52 @@ thead th {
 tr:nth-child(even) {
     background-color: #dddddd;
 }
+
+.topnav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgb(16, 3, 133);
+  }
+  
+  .topnav ul li {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 5px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+                
+  .topnav ul li a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 5px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+  
+  .topnav ul li a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  .topnav ul li a.active {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  .content {
+    padding: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .card {
+    background-color: #F8F7F9;;
+    box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+    padding-top:10px;
+    padding-bottom:20px;
+    padding-left:20px;
+  }

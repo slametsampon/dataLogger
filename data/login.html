@@ -9,7 +9,7 @@
 
         <link rel="stylesheet" type="text/css" href="style.css"> 
 
-        <title>IoT DATA LOGGER - Report</title>
+        <title>IoT DATA LOGGER - Login</title>
     </head>
 
     <body>
@@ -24,16 +24,19 @@
             </ul>
         </div>
       
-        <div class="container">
-
-            <br>
-            <h4>IoT DATA LOGGER - Report</h4>
-            <br>
-            <table>
-                <!-- here goes our data! -->
-            </table>
-            <br>
+        <div class="content">
+            <div class="card">
+                <h5>Login Form</h5>
+                <form action="/login" method="POST">
+                    <p>Username <input type="text" name="username" placeholder="Username"></p>
+                    <br>
+                    <p>Password <input type="password" name="password" placeholder="Password"></p>
+                    <br>
+                    <input type="submit" value="Login">
+                </form>
+            </div>
         </div>
+        
     </body>
 
     <script src="report.js"></script>
