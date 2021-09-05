@@ -201,10 +201,12 @@ void urlController(){
   });
   server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/login.html", "text/html");
+    handleLogin(request);
   });
   
   server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/config.html", "text/html");
+    handleConfig(request);
   });
   
 /*  
@@ -235,11 +237,20 @@ String getHumidity() {
   return String(humidity);
 }
 
-void handleLogin(){
-
+void handleLogin(AsyncWebServerRequest *request){
+/*
+  const char* PARAM_KEY = "key";
+  String keyVal;
+  if (request->hasParam(PARAM_KEY)) {
+    keyVal= request->getParam(PARAM_KEY)->value();
+  } else {
+    //handle an incomplete request
+    keyVal = "some default value";
+  }
+*/
 }
 
-void handleConfig(){
+void handleConfig(AsyncWebServerRequest *request){
 
 }
 // Replaces placeholder with LED state value
