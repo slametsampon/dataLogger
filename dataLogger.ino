@@ -17,8 +17,6 @@
 #include <WebSocketsServer.h>
 
 #include <LittleFS.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 
 #include "model.h"
 #include "dataLogger.h"
@@ -31,9 +29,9 @@ AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
 
 DHT dht(DHTPIN, DHTTYPE);
-
-Logsheet logsheetTask(&dht);
 Adafruit_SSD1306 display(OLED_RESET);
+
+Logsheet logsheetTask("logsheetTask");
 
 // Stores LED state
 String ledState;
@@ -47,14 +45,10 @@ WebSocketsServer webSocket = WebSocketsServer(81);
 boolean webSocketIsOpen = false;
 
 //functions prototype
-void setupParameter();
 void startWiFiAP();
 void startWiFiClient();
 void startMDNS();
 void urlController();
-
-void oledDisplay(float, float);
-
 
 //LittleFS file operations
 //https://circuitdigest.com/microcontroller-projects/littlefs-with-esp8266-to-read-write-and-delete-data-on-flash-memory-of-nodemcu
@@ -71,8 +65,8 @@ void setup(){
   pinMode(ledPin, OUTPUT);
 
   // Initialize the sensor
-  setupParameter();
-  logsheetTask.AttachParameter(&accessParamTemperature, &accessParamHumidity);
+  //setupParameter();
+  logsheetTask.AttachSensor(&dht);
   logsheetTask.info();
 
   // Initialize LittleFS
@@ -290,52 +284,6 @@ String processor(const String& var){
   }  
 }
  
-void setupParameter(){
-  param dtParam;
-  Serial.println("LocPan::_setupParameter()");
-
-  //parameter temperature
-  dtParam.unit = "°C";
-  dtParam.value = 35;
-  dtParam.highRange = 50;
-  dtParam.lowRange = -10;
-  dtParam.highLimit = 40;
-  dtParam.lowLimit = 10;
-  dtParam.alfaEma = ALFA_EMA;
-  dtParam.alarm = NO_ALARM;
-  accessParamTemperature.setParam(dtParam);
-
-  //parameter humidity
-  dtParam.unit = "%";
-  dtParam.value = 70;
-  dtParam.highRange = 100;
-  dtParam.lowRange = 0;
-  dtParam.highLimit = 90;
-  dtParam.lowLimit = 40;
-  dtParam.alfaEma = ALFA_EMA;
-  dtParam.alarm = NO_ALARM;
-  accessParamHumidity.setParam(dtParam);
-}
-
-void oledDisplay(float t, float h){
-  display.clearDisplay();
-
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(0,0);
-  display.println("Humidity: ");
-  display.setCursor(1, 12);
-  display.print(h);
-  display.print(" %\t");
-  display.setCursor(1, 21);
-  display.print("Temp :");
-  display.setCursor(1, 30);
-  display.print(t);
-  display.print(" *C ");
-
-  display.display();
-}
-
 String initRandomJson(){
   String output;
   DynamicJsonDocument doc(1536);
