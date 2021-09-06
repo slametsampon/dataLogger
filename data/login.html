@@ -20,20 +20,21 @@
                 <li><a href="/report">Report</a></li>   
                 <li><a href="/config">Config</a></li>   
                 <li><a href="/login">Login</a></li>   
-                <li style="float: right;"><a href="/logout">Logout</a></li>   
+                <li><a href="/logout">Logout</a></li>   
             </ul>
         </div>
       
         <div class="content">
             <div class="card">
                 <h5>Login Form</h5>
-                    <input type="text" name="username" placeholder="Username">
-                    <p>Username</p>
-
-                    <input type="password" name="password" placeholder="Password">
-                    <p>Password</p>
-
-                    <input type="submit" value="Login">
+                <form action="/login" method="POST">
+                    <label for="username">Username</label><br>
+                    <input type="text" name="username" placeholder="Username"><br><br>
+                  
+                    <label for="password">Password</label><br>
+                    <input type="password" name="password" placeholder="Password"><br><br>
+                      
+                    <input type="submit" value="Login">    
                 </form>
             </div>
         </div>

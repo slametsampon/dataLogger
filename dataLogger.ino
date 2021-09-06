@@ -16,23 +16,9 @@
 #include <ESPAsyncWebServer.h>
 #include <WebSocketsServer.h>
 
-#include <LittleFS.h>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of 43f1631 (work on logsheet)
-#include <DHT.h>
-#include <Wire.h>  // Include Wire if you're using I2C
-#include <SPI.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
->>>>>>> parent of 43f1631 (work on logsheet)
-
-#include "model.h"
 #include "dataLogger.h"
 #include "SequenceTimer.h"
-#include "dhtWrapper.h"
+#include "logsheet.h"
 
 SequenceTimer   mainSequence("Sequence");
 
@@ -40,17 +26,9 @@ AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
 
 DHT dht(DHTPIN, DHTTYPE);
-<<<<<<< HEAD
-=======
 
-DhtWrapper sensorDht(&dht);
-<<<<<<< HEAD
->>>>>>> parent of 43f1631 (work on logsheet)
-=======
->>>>>>> parent of 43f1631 (work on logsheet)
+Logsheet logsheet("logsheet");
 Adafruit_SSD1306 display(OLED_RESET);
-
-Logsheet logsheetTask("logsheetTask");
 
 // Stores LED state
 String ledState;
@@ -70,12 +48,8 @@ void startMDNS();
 void urlController();
 void handleLogin();
 void handleConfig();
-<<<<<<< HEAD
-=======
 
 void oledDisplay(float, float);
-
->>>>>>> parent of 43f1631 (work on logsheet)
 
 //LittleFS file operations
 //https://circuitdigest.com/microcontroller-projects/littlefs-with-esp8266-to-read-write-and-delete-data-on-flash-memory-of-nodemcu
@@ -92,21 +66,10 @@ void setup(){
   pinMode(ledPin, OUTPUT);
 
   // Initialize the sensor
-<<<<<<< HEAD
-<<<<<<< HEAD
-  //setupParameter();
-  logsheetTask.AttachSensor(&dht);
-  logsheetTask.info();
-=======
-  setupParameter();
-  sensorDht.AttachParameter(&accessParamTemperature, &accessParamHumidity);
-  sensorDht.info();
->>>>>>> parent of 43f1631 (work on logsheet)
-=======
-  setupParameter();
-  sensorDht.AttachParameter(&accessParamTemperature, &accessParamHumidity);
-  sensorDht.info();
->>>>>>> parent of 43f1631 (work on logsheet)
+  logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
+  logsheet.AttachSensor(&dht);
+  logsheet.AttachDisplay(&display);
+  logsheet.info();
 
   // Initialize LittleFS
   Serial.println("Begin LittleFS");
@@ -205,7 +168,7 @@ void urlController(){
   });
   
   server.on("/jsonData", HTTP_GET, [](AsyncWebServerRequest *request){
-    String webPage = initRandomJson();
+    String webPage = logsheet.getHour24();
     request->send(200, "application/json", webPage);
   });
   
@@ -223,18 +186,39 @@ void urlController(){
 
   // route to update sensor - temperature and humidity
   server.on("/getSensor", HTTP_GET, [](AsyncWebServerRequest *request){
-    String strDhtVal = sensorDht.getValues();
+    String strDhtVal = logsheet.getValues();
     request->send(200, "application/json", strDhtVal);
     Serial.println(strDhtVal);
   });
-  server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/login.html", "text/html");
-    handleLogin(request);
-  });
   
+  server.on("/login", HTTP_GET, [](AsyncWebServerRequest * request){
+    request->send(LittleFS, "/login.html", "text/html");
+  });
+
+  server.on("/login", HTTP_ANY, [](AsyncWebServerRequest * request){
+    if(request->hasArg("username")){
+        String arg = request->arg("username");
+        Serial.print("The username is: ");
+        Serial.println(arg);
+        request->send(LittleFS, "/index.html", "text/html");
+    } else {
+        Serial.println("Post did not have a 'username' field.");
+    }
+  });
+
   server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/config.html", "text/html");
-    handleConfig(request);
+  });
+  
+  server.on("/config", HTTP_ANY, [](AsyncWebServerRequest * request){
+    if(request->hasArg("samplingTime")){
+        String arg = request->arg("samplingTime");
+        Serial.print("The samplingTime is: ");
+        Serial.println(arg);
+        request->send(LittleFS, "/config.html", "text/html");
+    } else {
+        Serial.println("Post did not have a 'samplingTime' field.");
+    }
   });
   
 /*  
@@ -302,78 +286,6 @@ String processor(const String& var){
   }  
 }
  
-String initRandomJson(){
-  String output;
-  DynamicJsonDocument doc(1536);
-  float h, t;
-  doc.clear();
-  JsonArray time = doc.createNestedArray("time");
-  JsonArray temperature = doc.createNestedArray("temperature");
-  JsonArray humidity = doc.createNestedArray("humidity");
-
-  for (int i=0; i < 24; i++){
-    h = random(400.0, 950)/10.0;
-    t = random(200.0, 455)/10.0;
-
-    time.add(i);
-    temperature.add(t);
-    humidity.add(h);
-  } 
-
-  serializeJson(doc, output);
-  return output;
-}
-
-//LittleFS - Operations
-void readFile(const char * path) {
-  Serial.printf("Reading file: %s\n", path);
-
-  File file = LittleFS.open(path, "r");
-  if (!file) {
-    Serial.println("Failed to open file for reading");
-    return;
-  }
-
-  Serial.print("Read from file: ");
-  while (file.available()) {
-    Serial.write(file.read());
-  }
-  file.close();
-}
-
-void writeFile(const char * path, const char * message) {
-  Serial.printf("Writing file: %s\n", path);
-
-  File file = LittleFS.open(path, "w");
-  if (!file) {
-    Serial.println("Failed to open file for writing");
-    return;
-  }
-  if (file.print(message)) {
-    Serial.println("File written");
-  } else {
-    Serial.println("Write failed");
-  }
-  delay(2000); // Make sure the CREATE and LASTWRITE times are different
-  file.close();
-}
-
-void appendFile(const char * path, const char * message) {
-  Serial.printf("Appending to file: %s\n", path);
-
-  File file = LittleFS.open(path, "a");
-  if (!file) {
-    Serial.println("Failed to open file for appending");
-    return;
-  }
-  if (file.print(message)) {
-    Serial.println("Message appended");
-  } else {
-    Serial.println("Append failed");
-  }
-  file.close();
-}
-
 //NTP
 bool getLocalTime(struct tm * info, uint32_t ms) {
   uint32_t count = ms / 10;
