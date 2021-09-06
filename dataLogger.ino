@@ -25,10 +25,10 @@ SequenceTimer   mainSequence("Sequence");
 AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
 
+Adafruit_SSD1306 display(OLED_RESET);
 DHT dht(DHTPIN, DHTTYPE);
 
 Logsheet logsheet("logsheet");
-Adafruit_SSD1306 display(OLED_RESET);
 
 // Stores LED state
 String ledState;
@@ -48,14 +48,7 @@ void startMDNS();
 void urlController();
 void handleLogin();
 void handleConfig();
-
-void oledDisplay(float, float);
-
-//LittleFS file operations
-//https://circuitdigest.com/microcontroller-projects/littlefs-with-esp8266-to-read-write-and-delete-data-on-flash-memory-of-nodemcu
-void readData();
-void writeData(String data);
-void deleteData();
+void loadStaticFile();//css, js
 
 void setup(){
   // Serial port for debugging purposes
@@ -136,33 +129,37 @@ void startMDNS() { // Start the mDNS responder
   Serial.println(".local");
 }
 
+//NTP
+bool getLocalTime(struct tm * info, uint32_t ms) {
+  uint32_t count = ms / 10;
+  time_t now;
+
+  time(&now);
+  localtime_r(&now, info);
+
+  if (info->tm_year > (2016 - 1900)) {
+    return true;
+  }
+
+  while (count--) {
+    delay(10);
+    time(&now);
+    localtime_r(&now, info);
+    if (info->tm_year > (2016 - 1900)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void urlController(){
 
-  // Route to load style.css file
-  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/style.css", "text/css");
-  });
-
-  // Route to load report.js file
-  server.on("/report.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/report.js", "text/js");
-  });
-
-  // Route to load functions.js file
-  server.on("/functions.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/functions.js", "text/js");
-  });
-
-  // Route to load widgets.js file
-  server.on("/widgets.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/widgets.js", "text/js");
-  });
-
+  loadStaticFile();
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/index.html", String(), false, processor);
+    request->send(LittleFS, "/index.html", "text/html");
   });
-  
+
   server.on("/report", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/report.html", "text/html");
   });
@@ -172,18 +169,6 @@ void urlController(){
     request->send(200, "application/json", webPage);
   });
   
-  // Route to set GPIO to HIGH
-  server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
-    digitalWrite(ledPin, HIGH);    
-    request->send(LittleFS, "/index.html", String(), false, processor);
-  });
-  
-  // Route to set GPIO to LOW
-  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request){
-    digitalWrite(ledPin, LOW);    
-    request->send(LittleFS, "/index.html", String(), false, processor);
-  });
-
   // route to update sensor - temperature and humidity
   server.on("/getSensor", HTTP_GET, [](AsyncWebServerRequest *request){
     String strDhtVal = logsheet.getValues();
@@ -220,8 +205,45 @@ void urlController(){
         Serial.println("Post did not have a 'samplingTime' field.");
     }
   });
-  
+}
+
+void loadStaticFile(){
+  // Route to load style.css file
+  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/style.css", "text/css");
+  });
+
+  // Route to load report.js file
+  server.on("/report.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/report.js", "text/js");
+  });
+
+  // Route to load functions.js file
+  server.on("/functions.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/functions.js", "text/js");
+  });
+
+  // Route to load widgets.js file
+  server.on("/widgets.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/widgets.js", "text/js");
+  });
+
+}
+
 /*  
+  
+  // Route to set GPIO to HIGH
+  server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(ledPin, HIGH);    
+    request->send(LittleFS, "/index.html", String(), false, processor);
+  });
+  
+  // Route to set GPIO to LOW
+  server.on("/off", HTTP_GET, [](AsyncWebServerRequest *request){
+    digitalWrite(ledPin, LOW);    
+    request->send(LittleFS, "/index.html", String(), false, processor);
+  });
+
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", getTemperature().c_str());
   });
@@ -229,9 +251,6 @@ void urlController(){
   server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", getHumidity().c_str());
   });
-
-*/
-}
 
 String getTemperature() {
   // float temperature = bme.readTemperature();
@@ -249,22 +268,6 @@ String getHumidity() {
   return String(humidity);
 }
 
-void handleLogin(AsyncWebServerRequest *request){
-/*
-  const char* PARAM_KEY = "key";
-  String keyVal;
-  if (request->hasParam(PARAM_KEY)) {
-    keyVal= request->getParam(PARAM_KEY)->value();
-  } else {
-    //handle an incomplete request
-    keyVal = "some default value";
-  }
-*/
-}
-
-void handleConfig(AsyncWebServerRequest *request){
-
-}
 // Replaces placeholder with LED state value
 String processor(const String& var){
   Serial.println(var);
@@ -286,25 +289,4 @@ String processor(const String& var){
   }  
 }
  
-//NTP
-bool getLocalTime(struct tm * info, uint32_t ms) {
-  uint32_t count = ms / 10;
-  time_t now;
-
-  time(&now);
-  localtime_r(&now, info);
-
-  if (info->tm_year > (2016 - 1900)) {
-    return true;
-  }
-
-  while (count--) {
-    delay(10);
-    time(&now);
-    localtime_r(&now, info);
-    if (info->tm_year > (2016 - 1900)) {
-      return true;
-    }
-  }
-  return false;
-}
+*/
