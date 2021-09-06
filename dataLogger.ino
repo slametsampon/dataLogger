@@ -17,11 +17,19 @@
 #include <WebSocketsServer.h>
 
 #include <LittleFS.h>
+<<<<<<< HEAD
+=======
+#include <DHT.h>
+#include <Wire.h>  // Include Wire if you're using I2C
+#include <SPI.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+>>>>>>> parent of 43f1631 (work on logsheet)
 
 #include "model.h"
 #include "dataLogger.h"
 #include "SequenceTimer.h"
-#include "logsheet.h"
+#include "dhtWrapper.h"
 
 SequenceTimer   mainSequence("Sequence");
 
@@ -29,6 +37,11 @@ AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
 
 DHT dht(DHTPIN, DHTTYPE);
+<<<<<<< HEAD
+=======
+
+DhtWrapper sensorDht(&dht);
+>>>>>>> parent of 43f1631 (work on logsheet)
 Adafruit_SSD1306 display(OLED_RESET);
 
 Logsheet logsheetTask("logsheetTask");
@@ -49,6 +62,8 @@ void startWiFiAP();
 void startWiFiClient();
 void startMDNS();
 void urlController();
+void handleLogin();
+void handleConfig();
 
 //LittleFS file operations
 //https://circuitdigest.com/microcontroller-projects/littlefs-with-esp8266-to-read-write-and-delete-data-on-flash-memory-of-nodemcu
@@ -65,9 +80,15 @@ void setup(){
   pinMode(ledPin, OUTPUT);
 
   // Initialize the sensor
+<<<<<<< HEAD
   //setupParameter();
   logsheetTask.AttachSensor(&dht);
   logsheetTask.info();
+=======
+  setupParameter();
+  sensorDht.AttachParameter(&accessParamTemperature, &accessParamHumidity);
+  sensorDht.info();
+>>>>>>> parent of 43f1631 (work on logsheet)
 
   // Initialize LittleFS
   Serial.println("Begin LittleFS");
@@ -184,41 +205,20 @@ void urlController(){
 
   // route to update sensor - temperature and humidity
   server.on("/getSensor", HTTP_GET, [](AsyncWebServerRequest *request){
-    String strDhtVal = logsheetTask.getValues();
+    String strDhtVal = sensorDht.getValues();
     request->send(200, "application/json", strDhtVal);
     Serial.println(strDhtVal);
   });
-  
-    server.on("/login", HTTP_GET, [](AsyncWebServerRequest * request){
+  server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/login.html", "text/html");
+    handleLogin(request);
   });
-
-  server.on("/login", HTTP_ANY, [](AsyncWebServerRequest * request){
-    if(request->hasArg("username")){
-        String arg = request->arg("username");
-        Serial.print("The username is: ");
-        Serial.println(arg);
-        request->send(LittleFS, "/index.html", "text/html");
-    } else {
-        Serial.println("Post did not have a 'username' field.");
-    }
-  });
-
+  
   server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/config.html", "text/html");
+    handleConfig(request);
   });
   
-  server.on("/config", HTTP_ANY, [](AsyncWebServerRequest * request){
-    if(request->hasArg("samplingTime")){
-        String arg = request->arg("samplingTime");
-        Serial.print("The samplingTime is: ");
-        Serial.println(arg);
-        request->send(LittleFS, "/config.html", "text/html");
-    } else {
-        Serial.println("Post did not have a 'samplingTime' field.");
-    }
-  });
-
 /*  
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", getTemperature().c_str());

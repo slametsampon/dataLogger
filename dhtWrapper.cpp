@@ -4,8 +4,9 @@ by : Sam 04/09/2021
 
 */
 
-#include "logsheet.h"
+#include "dhtWrapper.h"
 
+<<<<<<< HEAD:logsheet.cpp
 Logsheet::Logsheet(String id): _id(id){
     this->_setupDefaultParameter();
 }
@@ -16,15 +17,22 @@ void Logsheet::AttachSensor(DHT *dht){
 
 void Logsheet::AttachDisplay(Adafruit_SSD1306 *display){
     _display = display;
+=======
+DhtWrapper::DhtWrapper(DHT *dht): _dht(dht){}
+
+void DhtWrapper::AttachParameter(AccessParam *paramTemperature,AccessParam *paramHumidity){
+    _paramTemperature = paramTemperature;
+    _paramHumidity = paramHumidity;
+>>>>>>> parent of 43f1631 (work on logsheet):dhtWrapper.cpp
 }
 
-void Logsheet::info(){
-    Serial.println("Logsheet::info()");
+void DhtWrapper::info(){
+    Serial.println("DhtWrapper::info()");
     _paramTemperature->info();
     _paramHumidity->info(); 
 }
 
-String Logsheet::getValues(){
+String DhtWrapper::getValues(){
     /*
     {
         "Temperature": {
@@ -71,6 +79,7 @@ String Logsheet::getValues(){
     serializeJson(doc, output);
 
     return output;
+<<<<<<< HEAD:logsheet.cpp
 }
 
 void Logsheet::_setupDefaultParameter(){
@@ -118,3 +127,6 @@ void Logsheet::_oledDisplay(float t, float h){
 
   _display->display();
 }
+=======
+}
+>>>>>>> parent of 43f1631 (work on logsheet):dhtWrapper.cpp

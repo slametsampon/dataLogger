@@ -20,7 +20,7 @@
                 <li><a href="/report">Report</a></li>   
                 <li><a href="/config">Config</a></li>   
                 <li><a href="/login">Login</a></li>   
-                <li><a href="/logout">Logout</a></li>   
+                <li style="float: right;"><a href="/logout">Logout</a></li>   
             </ul>
         </div>
       
@@ -28,31 +28,23 @@
             <div class="card">
                 <h5>Configuration</h5>
                 <form action="/config" method="POST">
+                    <input type="text" name="samplingTime" placeholder="6000">
+                    <p>Sampling (ms)</p>
 
-                    <input type="radio" id="configT" name="config" value="configT">
-                    <label for="temperatureConfig">Temperature</label><br>
+                    <input type="text" name="alfaEma" placeholder="80">
+                    <p>Alfa Ema  (%)</p>
 
-                    <input type="radio" id="configH" name="config" value="configH">
-                    <label for="humidityConfig">Humidity</label><br><br>
+                    <input type="text" name="alarmH" placeholder="90">
+                    <p>Alarm High</p>
 
-                    <label for="samplingTime">Sampling (ms)</label><br>
-                    <input type="text" name="samplingTime" placeholder="6000"><br><br>
-                  
-                    <label for="alfaEma">Alfa Ema (%)</label><br>
-                    <input type="text" name="alfaEma" placeholder="80"><br><br>
-                  
-                    <label for="alarmH">Alarm High</label><br>
-                    <input type="text" name="alarmH" placeholder="90"><br><br>
-                  
-                    <label for="alarmL">Alarm Low</label><br>
-                    <input type="text" name="alarmL" placeholder="45"><br><br>
-                  
-                    <label for="indicatorH">Indicator High</label><br>
-                    <input type="text" name="indicatorH" placeholder="100"><br><br>
-                  
-                    <label for="indicatorL">Indicator Low</label><br>
-                    <input type="text" name="indicatorL" placeholder="0"><br><br>
+                    <input type="text" name="alarmL" placeholder="50">
+                    <p>Alarm  Low</p>
 
+                    <input type="text" name="indicatorH" placeholder="100">
+                    <p>Indicator High</p>
+
+                    <input type="text" name="indicatorL" placeholder="0">
+                    <p>Indicator  Low</p>
                     <input type="submit" value="Submit">
                 </form>
             </div>
