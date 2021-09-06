@@ -18,7 +18,10 @@
 
 #include <LittleFS.h>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 43f1631 (work on logsheet)
 #include <DHT.h>
 #include <Wire.h>  // Include Wire if you're using I2C
 #include <SPI.h>
@@ -41,6 +44,9 @@ DHT dht(DHTPIN, DHTTYPE);
 =======
 
 DhtWrapper sensorDht(&dht);
+<<<<<<< HEAD
+>>>>>>> parent of 43f1631 (work on logsheet)
+=======
 >>>>>>> parent of 43f1631 (work on logsheet)
 Adafruit_SSD1306 display(OLED_RESET);
 
@@ -64,6 +70,12 @@ void startMDNS();
 void urlController();
 void handleLogin();
 void handleConfig();
+<<<<<<< HEAD
+=======
+
+void oledDisplay(float, float);
+
+>>>>>>> parent of 43f1631 (work on logsheet)
 
 //LittleFS file operations
 //https://circuitdigest.com/microcontroller-projects/littlefs-with-esp8266-to-read-write-and-delete-data-on-flash-memory-of-nodemcu
@@ -81,9 +93,15 @@ void setup(){
 
   // Initialize the sensor
 <<<<<<< HEAD
+<<<<<<< HEAD
   //setupParameter();
   logsheetTask.AttachSensor(&dht);
   logsheetTask.info();
+=======
+  setupParameter();
+  sensorDht.AttachParameter(&accessParamTemperature, &accessParamHumidity);
+  sensorDht.info();
+>>>>>>> parent of 43f1631 (work on logsheet)
 =======
   setupParameter();
   sensorDht.AttachParameter(&accessParamTemperature, &accessParamHumidity);
