@@ -4,22 +4,22 @@ by : Sam 04/09/2021
 
 */
 
-#include "dhtWrapper.h"
+#include "logsheet.h"
 
-DhtWrapper::DhtWrapper(DHT *dht): _dht(dht){}
+Logsheet::Logsheet(DHT *dht): _dht(dht){}
 
-void DhtWrapper::AttachParameter(AccessParam *paramTemperature,AccessParam *paramHumidity){
+void Logsheet::AttachParameter(AccessParam *paramTemperature,AccessParam *paramHumidity){
     _paramTemperature = paramTemperature;
     _paramHumidity = paramHumidity;
 }
 
-void DhtWrapper::info(){
-    Serial.println("DhtWrapper::info()");
+void Logsheet::info(){
+    Serial.println("Logsheet::info()");
     _paramTemperature->info();
     _paramHumidity->info(); 
 }
 
-String DhtWrapper::getValues(){
+String Logsheet::getValues(){
     /*
     {
         "Temperature": {
@@ -67,3 +67,4 @@ String DhtWrapper::getValues(){
 
     return output;
 }
+
