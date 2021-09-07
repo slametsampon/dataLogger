@@ -98,7 +98,7 @@ void Logsheet::_oledDisplay(float t, float h){
   _display->print(" %\t");
   
   _display->setCursor(1, 21);
-  _display->print("Temperature ");
+  _display->print("Temperatur");
   _display->setCursor(1, 30);
   _display->print(t);
   _display->print(" *C ");
@@ -160,13 +160,15 @@ void Logsheet::execute(unsigned long samplingTime){
 	if ((currMilli - _prevMilli) >= samplingTime){
 		_prevMilli = currMilli;
 
-    //do any things here
     //get sensor data and update parameters
     this->_getSensorValue();
 
     //display to Oled
     this->_oledDisplay(_paramTemperature->getParam(PARAMETER_VALUE),
     _paramHumidity->getParam(PARAMETER_VALUE));
+
+    //recording to array logsheet data
+
 
     //save logsheet to LittleFS
 
@@ -218,6 +220,101 @@ void Logsheet::_getSensorValue(){
     if (_paramHumidity->getParam(PARAMETER_ALARM) != HIGH_ALARM) _paramHumidity->setParam(PARAMETER_ALARM, HIGH_ALARM);
   }
   else _paramHumidity->setParam(PARAMETER_ALARM, NO_ALARM);
+}
+
+void Logsheet::_recordEvent(){
+
+  //handle sampling second
+  if (_samplingSec > (SECOND_6 - 1)){
+    _samplingSec = 0;
+    _recMinuteEvent = true;
+  }
+  else _samplingSec++;
+
+  //handle sampling minute
+  if (_recMinuteEvent){
+    if (_samplingMinute > MINUTE_60){
+      _samplingMinute = 0;
+      _recHourEvent = true;
+    }
+    else _samplingMinute++;
+  }
+
+  //handle sampling hour
+  if (_recHourEvent){
+    if (_samplingHour > HOUR_24){
+      _samplingHour = 0;
+      _recDayEvent = true;
+    }
+    else _samplingHour++;
+  }
+}
+
+void Logsheet::_recordLogsheet(){
+
+  //shift record second
+  logsheetData last;
+  last.temperature = _paramTemperature->getParam(PARAMETER_VALUE);
+  last.humidity = _paramHumidity->getParam(PARAMETER_VALUE);
+
+  _shiftArray(_logsheetSecond, SECOND_6, last);
+
+  //handle record Second
+  if (_recMinuteEvent){
+    _recMinuteEvent = false;//reset
+
+    //calculate average minute
+    logsheetData avgMinute = _calculateAverage(_logsheetSecond, SECOND_6);
+
+    //shift record minute
+    _shiftArray(_logsheetMinute, MINUTE_60, avgMinute);
+  }
+
+  //handle record hour
+  if (_recHourEvent){
+    _recHourEvent = false;//reset
+
+    //calculate average minute
+    logsheetData avgHour = _calculateAverage(_logsheetMinute, MINUTE_60);
+
+    //shift record hour
+    _shiftArray(_logsheetHour, MINUTE_60, avgHour);
+
+    //calculate average hour
+    logsheetData avgDay = _calculateAverage(_logsheetHour, HOUR_24);
+
+    //shift record day
+    _shiftArray(_logsheetDay, DAY_366, avgDay);
+  }
+}
+
+void Logsheet::_shiftArray(logsheetData data[], int size, logsheetData last){
+  for (int i =0; i < (size - 1) ;i++){
+    data[i].temperature = data[i+1].temperature;
+    data[i].humidity = data[i+1].humidity;
+    data[i].time = data[i+1].time;
+  }
+  data[size - 1].temperature = last.temperature;
+  data[size - 1].humidity = last.humidity;
+  data[size - 1].time = last.time;
+}
+
+logsheetData Logsheet::_calculateAverage(logsheetData data[], int size){
+    float totalT, totalH;
+    logsheetData avg;
+
+    for (int i =0; i < size  ;i++){
+      totalT = totalT + _logsheetSecond[i].temperature;
+      totalH = totalH + _logsheetSecond[i].humidity;
+    }
+
+    float avgT = totalT / size;
+    float avgH = totalH / size;
+
+    avg.temperature = avgT;
+    avg.humidity = avgH;
+
+    return avg;
 }
 
 //LittleFS - Operations

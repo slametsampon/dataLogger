@@ -19,9 +19,10 @@
 
 const boolean SIMULATION = true;
 const int ALFA_EMA = 80;
+const int DAY_366 = 366;
 const int HOUR_24 = 24;
 const int MINUTE_60 = 60;
-const int SECOND_6 = 6;
+const int SECOND_6 = 6;//average at last one
 
     class Logsheet{
         public:
@@ -39,6 +40,12 @@ const int SECOND_6 = 6;
             void _getSensorValue();
             String _initRandomJson();
             void _oledDisplay(float, float);
+
+            void _recordEvent();
+            void _recordLogsheet();
+            void _shiftArray(logsheetData data[], int size, logsheetData last);
+            logsheetData _calculateAverage(logsheetData data[], int size);
+
             void _appendFile(const char * path, const char * message);
             void _writeFile(const char * path, const char * message);
             void _readFile(const char * path);
@@ -46,6 +53,8 @@ const int SECOND_6 = 6;
             String _id;
             float _prevT, _prevH;//temperature and humidity
 	        unsigned long _prevMilli;
+            int _samplingSec, _samplingMinute, _samplingHour;
+            boolean _recMinuteEvent, _recHourEvent, _recDayEvent;
 
             DHT *_dht;
             Adafruit_SSD1306 *_display;
@@ -53,6 +62,7 @@ const int SECOND_6 = 6;
             logsheetData _logsheetSecond[SECOND_6];
             logsheetData _logsheetMinute[MINUTE_60];
             logsheetData _logsheetHour[HOUR_24];
+            logsheetData _logsheetDay[DAY_366];
     };
 
 #endif

@@ -68,6 +68,7 @@ float increment = doc["increment"]; // 1.1
   const int LOW_ALARM = 2;
 
   typedef struct logsheetData{
+      int time;
       float temperature;
       float humidity;
   }logsheetData;
