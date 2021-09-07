@@ -6,7 +6,9 @@ by : Sam 04/09/2021
 
 #include "logsheet.h"
 
-Logsheet::Logsheet(String id): _id(id){}
+Logsheet::Logsheet(String id): _id(id){
+	_prevMilli = millis();
+}
 
 void Logsheet::AttachSensor(DHT *dht){
     _dht = dht;
@@ -15,6 +17,8 @@ void Logsheet::AttachSensor(DHT *dht){
 
 void Logsheet::AttachDisplay(Adafruit_SSD1306 *display){
     _display = display;
+    _display->begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)
+
 }
 
 void Logsheet::AttachParameter(AccessParam *paramTemperature, AccessParam *paramHumidity){
@@ -43,26 +47,20 @@ String Logsheet::getValues(){
     */
     String output;
     StaticJsonDocument<128> doc;
-    float t,h;
-    // Read temperature as Fahrenheit (isFahrenheit = true, celsius = false)
 
-    if (!SIMULATION){
-        t = _dht->readTemperature(false);
-        h = _dht->readHumidity();
-    }
-    else{
-        t = random(200, 455)/10.0;
-        h = random(400.0, 950)/10.0;
-    }
+    float t = _paramTemperature->getParam(PARAMETER_VALUE);
+    int tInt = t * 100;
+    t = tInt/100.0;//get 2 digits
+
+    float h = _paramHumidity->getParam(PARAMETER_VALUE);
+    int hInt = h * 100;
+    h = hInt/100.0;//get 2 digits
 
     String statusT = "Normal";
     String statusH = "Normal";
 
-    float humidityAlarmH = _paramHumidity->getParam(PARAMETER_HIGH_LIMIT);
-    float temperatureAlarmH = _paramTemperature->getParam(PARAMETER_HIGH_LIMIT);
-
-    if (t >= temperatureAlarmH)statusT = "AlarmH";
-    if (h >= humidityAlarmH)statusH = "AlarmH";
+    if (_paramTemperature->getParam(PARAMETER_ALARM) == HIGH_ALARM)statusT = "AlarmH";
+    if (_paramHumidity->getParam(PARAMETER_ALARM) == HIGH_ALARM)statusH = "AlarmH";
 
     JsonObject Temperature = doc.createNestedObject("Temperature");
     Temperature["value"] = t;
@@ -82,19 +80,28 @@ String Logsheet::getHour24(){
 }
 
 void Logsheet::_oledDisplay(float t, float h){
+
+    int tInt = t * 100;
+    t = tInt/100.0;//get 2 digits
+
+    int hInt = h * 100;
+    h = hInt/100.0;//get 2 digits
+
   _display->clearDisplay();
   _display->setTextSize(1);
+  
   _display->setTextColor(WHITE);
   _display->setCursor(0,0);
-  _display->println("Humidity: ");
+  _display->println("Humidity ");
   _display->setCursor(1, 12);
   _display->print(h);
   _display->print(" %\t");
+  
   _display->setCursor(1, 21);
-  _display->print("Temp :");
+  _display->print("Temperature ");
   _display->setCursor(1, 30);
   _display->print(t);
-  _display->print(" °C ");
+  _display->print(" *C ");
   _display->display();
 }
 
@@ -145,6 +152,72 @@ String Logsheet::_initRandomJson(){
 
   serializeJson(doc, output);
   return output;
+}
+
+void Logsheet::execute(unsigned long samplingTime){
+	unsigned long currMilli = millis();
+
+	if ((currMilli - _prevMilli) >= samplingTime){
+		_prevMilli = currMilli;
+
+    //do any things here
+    //get sensor data and update parameters
+    this->_getSensorValue();
+
+    //display to Oled
+    this->_oledDisplay(_paramTemperature->getParam(PARAMETER_VALUE),
+    _paramHumidity->getParam(PARAMETER_VALUE));
+
+    //save logsheet to LittleFS
+
+	}
+}
+
+void Logsheet::_getSensorValue(){
+  float tRaw,hRaw;//raw data
+
+  float alfaEmaT = _paramTemperature->getParam(PARAMETER_ALFA_EMA);
+  float alfaEmaH = _paramHumidity->getParam(PARAMETER_ALFA_EMA);
+
+  float humidityAlarmH = _paramHumidity->getParam(PARAMETER_HIGH_LIMIT);
+  float temperatureAlarmH = _paramTemperature->getParam(PARAMETER_HIGH_LIMIT);
+
+  // get raw values from sensor
+  if (!SIMULATION){
+      tRaw = _dht->readTemperature(false);
+      hRaw = _dht->readHumidity();
+  }
+  else{
+      tRaw = random(200, 455)/10.0;
+      hRaw = random(400.0, 950)/10.0;
+  }
+
+  //filtering raw value : AlfaEma filter
+  float facCurrentT = alfaEmaT/100.0;
+  float facPrevT = (100.0 - alfaEmaT)/100.0;
+  float t = tRaw * facCurrentT + facPrevT * _prevT;
+
+  float facCurrentH = alfaEmaH/100.0;
+  float facPrevH = (100.0 - alfaEmaH)/100.0;
+  float h = hRaw * facCurrentH + facPrevH * _prevH;
+
+  if (_prevT != tRaw)_prevT = t;
+  if (_prevH != hRaw)_prevH = h;
+
+  //set value
+  _paramTemperature->setParam(PARAMETER_VALUE, t);
+  _paramHumidity->setParam(PARAMETER_VALUE, h);
+
+  //set status
+  if (t >= temperatureAlarmH){
+    if (_paramTemperature->getParam(PARAMETER_ALARM) != HIGH_ALARM) _paramTemperature->setParam(PARAMETER_ALARM, HIGH_ALARM);
+  }
+  else _paramTemperature->setParam(PARAMETER_ALARM, NO_ALARM);
+
+  if (h >= humidityAlarmH){
+    if (_paramHumidity->getParam(PARAMETER_ALARM) != HIGH_ALARM) _paramHumidity->setParam(PARAMETER_ALARM, HIGH_ALARM);
+  }
+  else _paramHumidity->setParam(PARAMETER_ALARM, NO_ALARM);
 }
 
 //LittleFS - Operations

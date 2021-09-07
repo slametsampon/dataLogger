@@ -93,6 +93,9 @@ void setup(){
 }
  
 void loop(){
+
+  //Logsheet action
+  logsheet.execute(SAMPLING_TIME);
   
 }
 
