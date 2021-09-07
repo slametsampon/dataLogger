@@ -27,12 +27,13 @@ const int ALFA_EMA = 80;
             void AttachSensor(DHT*);
             void AttachDisplay(Adafruit_SSD1306*);
             String getHour24();
-
+            void execute(unsigned long);//sampling periode ms
             String getValues();//return string in format Json for Temp, Humidity
             void info();
 
         private:
             void _setupDefaultParameter();
+            void _getSensorValue();
             String _initRandomJson();
             void _oledDisplay(float, float);
             void _appendFile(const char * path, const char * message);
@@ -40,6 +41,9 @@ const int ALFA_EMA = 80;
             void _readFile(const char * path);
             
             String _id;
+            float _prevT, _prevH;//temperature and humidity
+	        unsigned long _prevMilli;
+
             DHT *_dht;
             Adafruit_SSD1306 *_display;
             AccessParam *_paramTemperature, *_paramHumidity;
