@@ -89,17 +89,19 @@ void Logsheet::_oledDisplay(float t, float h){
 
   _display->clearDisplay();
   _display->setTextSize(1);
+  
   _display->setTextColor(WHITE);
   _display->setCursor(0,0);
-  _display->println("Humidity: ");
+  _display->println("Humidity ");
   _display->setCursor(1, 12);
   _display->print(h);
   _display->print(" %\t");
+  
   _display->setCursor(1, 21);
-  _display->print("Temp :");
+  _display->print("Temperature ");
   _display->setCursor(1, 30);
   _display->print(t);
-  _display->print(" °C ");
+  _display->print(" *C ");
   _display->display();
 }
 

@@ -19,6 +19,9 @@
 
 const boolean SIMULATION = true;
 const int ALFA_EMA = 80;
+const int HOUR_24 = 24;
+const int MINUTE_60 = 60;
+const int SECOND_6 = 6;
 
     class Logsheet{
         public:
@@ -47,6 +50,9 @@ const int ALFA_EMA = 80;
             DHT *_dht;
             Adafruit_SSD1306 *_display;
             AccessParam *_paramTemperature, *_paramHumidity;
+            logsheetData _logsheetSecond[SECOND_6];
+            logsheetData _logsheetMinute[MINUTE_60];
+            logsheetData _logsheetHour[HOUR_24];
     };
 
 #endif
