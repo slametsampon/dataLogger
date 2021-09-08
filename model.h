@@ -68,7 +68,7 @@ float increment = doc["increment"]; // 1.1
   const int LOW_ALARM = 2;
 
   typedef struct logsheetData{
-      int time;
+      String time;//HH:00:00 or DD_MM_YY
       float temperature;
       float humidity;
   }logsheetData;

@@ -61,8 +61,6 @@ const int SECOND_6 = 6;//average at last one
             AccessParam *_paramTemperature, *_paramHumidity;
             logsheetData _logsheetSecond[SECOND_6];
             logsheetData _logsheetMinute[MINUTE_60];
-            logsheetData _logsheetHour[HOUR_24];
-            logsheetData _logsheetDay[DAY_366];
     };
 
 #endif

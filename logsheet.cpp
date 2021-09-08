@@ -167,10 +167,11 @@ void Logsheet::execute(unsigned long samplingTime){
     this->_oledDisplay(_paramTemperature->getParam(PARAMETER_VALUE),
     _paramHumidity->getParam(PARAMETER_VALUE));
 
-    //recording to array logsheet data
+    //record event
+    this->_recordEvent();
 
-
-    //save logsheet to LittleFS
+    //record logsheet
+    this->_recordLogsheet();
 
 	}
 }
@@ -225,7 +226,7 @@ void Logsheet::_getSensorValue(){
 void Logsheet::_recordEvent(){
 
   //handle sampling second
-  if (_samplingSec > (SECOND_6 - 1)){
+  if (_samplingSec >= (SECOND_6 - 1)){
     _samplingSec = 0;
     _recMinuteEvent = true;
   }
@@ -233,7 +234,7 @@ void Logsheet::_recordEvent(){
 
   //handle sampling minute
   if (_recMinuteEvent){
-    if (_samplingMinute > MINUTE_60){
+    if (_samplingMinute >= (MINUTE_60 - 1)){
       _samplingMinute = 0;
       _recHourEvent = true;
     }
@@ -242,7 +243,7 @@ void Logsheet::_recordEvent(){
 
   //handle sampling hour
   if (_recHourEvent){
-    if (_samplingHour > HOUR_24){
+    if (_samplingHour >= (HOUR_24 - 1)){
       _samplingHour = 0;
       _recDayEvent = true;
     }
@@ -252,6 +253,8 @@ void Logsheet::_recordEvent(){
 
 void Logsheet::_recordLogsheet(){
 
+  Serial.print("Logsheet::_recordLogsheet() => _samplingSec : ");
+  Serial.println(_samplingSec);
   //shift record second
   logsheetData last;
   last.temperature = _paramTemperature->getParam(PARAMETER_VALUE);
@@ -262,6 +265,8 @@ void Logsheet::_recordLogsheet(){
   //handle record Second
   if (_recMinuteEvent){
     _recMinuteEvent = false;//reset
+    Serial.print("Logsheet::_recordLogsheet() => _samplingMinute : ");
+    Serial.println(_samplingMinute);
 
     //calculate average minute
     logsheetData avgMinute = _calculateAverage(_logsheetSecond, SECOND_6);
@@ -273,18 +278,27 @@ void Logsheet::_recordLogsheet(){
   //handle record hour
   if (_recHourEvent){
     _recHourEvent = false;//reset
-
-    //calculate average minute
-    logsheetData avgHour = _calculateAverage(_logsheetMinute, MINUTE_60);
-
-    //shift record hour
-    _shiftArray(_logsheetHour, MINUTE_60, avgHour);
+    Serial.print("Logsheet::_recordLogsheet() => _samplingHour : ");
+    Serial.println(_samplingHour);
 
     //calculate average hour
-    logsheetData avgDay = _calculateAverage(_logsheetHour, HOUR_24);
+    logsheetData avgHour = _calculateAverage(_logsheetMinute, MINUTE_60);
 
-    //shift record day
-    _shiftArray(_logsheetDay, DAY_366, avgDay);
+    //save hourly average to file : /logsheet/ls_DD_MM_YY.csv (max 31 char) for 7 days
+
+    //save daily average to file : /logsheet/ls_YYYY.csv (max 31 char)
+
+  }
+
+  //handle daily logsheet
+  if (_recDayEvent){
+    _recDayEvent = false;//reset
+    Serial.println("Logsheet::_recordLogsheet() => _recDayEvent");
+
+    //calculate average hour
+
+    //save hourly average to file
+
   }
 }
 
@@ -293,26 +307,66 @@ void Logsheet::_shiftArray(logsheetData data[], int size, logsheetData last){
     data[i].temperature = data[i+1].temperature;
     data[i].humidity = data[i+1].humidity;
     data[i].time = data[i+1].time;
+
+    //Diagnostic
+    /*
+    Serial.print("i : ");
+    Serial.print(i);
+    Serial.print(", data[i].temperature : ");
+    Serial.print(data[i].temperature);
+    Serial.print(", data[i].humidity : ");
+    Serial.println(data[i].humidity);
+    */
   }
   data[size - 1].temperature = last.temperature;
   data[size - 1].humidity = last.humidity;
   data[size - 1].time = last.time;
+
+/*
+    Serial.print("[size - 1] : ");
+    Serial.print(size - 1);
+    Serial.print(", data[size - 1].temperature : ");
+    Serial.print(data[size - 1].temperature);
+    Serial.print(", data[size - 1].humidity : ");
+    Serial.println(data[size - 1].humidity);
+*/
 }
 
 logsheetData Logsheet::_calculateAverage(logsheetData data[], int size){
     float totalT, totalH;
     logsheetData avg;
 
+    Serial.print("Logsheet::_calculateAverage() => size : ");
+    Serial.println(size);
+
     for (int i =0; i < size  ;i++){
       totalT = totalT + _logsheetSecond[i].temperature;
       totalH = totalH + _logsheetSecond[i].humidity;
+
+      //Diagnostic
+      /*
+      Serial.print("i : ");
+      Serial.print(i);
+      Serial.print(", _logsheetSecond[i].temperature : ");
+      Serial.print(_logsheetSecond[i].temperature);
+      Serial.print(", _logsheetSecond[i].humidity : ");
+      Serial.println(_logsheetSecond[i].humidity);
+      */
     }
 
     float avgT = totalT / size;
     float avgH = totalH / size;
 
+    //Diagnostic
+    /*
+    Serial.print("avgT : ");
+    Serial.print(avgT);
+    Serial.print(", avgH : ");
+    Serial.println(avgH);
+
     avg.temperature = avgT;
     avg.humidity = avgH;
+    */
 
     return avg;
 }
