@@ -6,9 +6,8 @@
 /* Dependencies */
 #include "SequenceTimer.h"
 
-SequenceTimer::SequenceTimer(String id)
+SequenceTimer::SequenceTimer(String id): _id(id)
 {
-	_id = id;
 	_prevSetMilli = millis();
 	_PrevSetASecond = _prevSetMilli;
 	_prevSetSecond = _prevSetMilli;

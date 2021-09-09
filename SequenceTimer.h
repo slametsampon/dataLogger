@@ -16,9 +16,9 @@ class SequenceTimer
   SequenceTimer(String );
 	void setPulsePeriod(long val);
 	long getPulsePeriod();
-  void setSetingMiliSecond(long val);
+  	void setSetingMiliSecond(long val);
 	long getSetingMiliSecond();
-  void setSetingSecond(float val);
+  	void setSetingSecond(float val);
 	float getSetingSecond();
 	boolean isMiliSecondEvent();
 	boolean isSecondEvent();
@@ -26,8 +26,8 @@ class SequenceTimer
 	boolean isAMinuteEvent();
 	void execute();
   private:
-  long _SetingMiliSecond;
-  long _SetingSecond;
+  	unsigned long _SetingMiliSecond;
+  	unsigned long _SetingSecond;
 	unsigned long _prevMilli,_prevSetMilli, _PrevSetASecond,_prevSetSecond,_prevAMinute;
 	boolean		_MiliSecondEvent;
 	boolean		_SecondEvent;

@@ -31,6 +31,7 @@ const int SECOND_6 = 6;//average at last one
             void AttachSensor(DHT*);
             void AttachDisplay(Adafruit_SSD1306*);
             String getHour24();
+            void setTime(struct tm);
             void execute(unsigned long);//sampling periode ms
             String getValues();//return string in format Json for Temp, Humidity
             void info();
@@ -38,12 +39,13 @@ const int SECOND_6 = 6;//average at last one
         private:
             void _setupDefaultParameter();
             void _getSensorValue();
+            void _print(logsheetData);
             String _initRandomJson();
             void _oledDisplay(float, float);
 
             void _recordEvent();
             void _recordLogsheet();
-            void _shiftArray(logsheetData data[], int size, logsheetData last);
+            void _shiftArray(int size, logsheetData last);
             logsheetData _calculateAverage(logsheetData data[], int size);
 
             void _appendFile(const char * path, const char * message);
@@ -54,7 +56,9 @@ const int SECOND_6 = 6;//average at last one
             float _prevT, _prevH;//temperature and humidity
 	        unsigned long _prevMilli;
             int _samplingSec, _samplingMinute, _samplingHour;
-            boolean _recMinuteEvent, _recHourEvent, _recDayEvent;
+            boolean _minuteEvent, _hourEvent, _dayEvent;
+            boolean _saveHourlyEvent, _saveDailyEvent;
+            struct tm _tm;
 
             DHT *_dht;
             Adafruit_SSD1306 *_display;
