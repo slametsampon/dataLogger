@@ -24,6 +24,12 @@ const int HOUR_24 = 24;
 const int MINUTE_60 = 60;
 const int SECOND_6 = 6;//average at last one
 
+const String PATH_LS = "/logsheet/";
+const String HEADER = "TIME;TEMPERATURE;HUMIDITY";
+
+enum DayOfWeek{
+  Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
+};
     class Logsheet{
         public:
             Logsheet(String);
@@ -45,12 +51,16 @@ const int SECOND_6 = 6;//average at last one
 
             void _recordEvent();
             void _recordLogsheet();
+            String _getCsv(logsheetData data);
+            logsheetData _parseCsv(const char *);
             void _shiftArray(int size, logsheetData last);
             logsheetData _calculateAverage(logsheetData data[], int size);
 
+            String _getTimeStr(int);
+            String _getDayOfWeek(int);
             void _appendFile(const char * path, const char * message);
             void _writeFile(const char * path, const char * message);
-            void _readFile(const char * path);
+            char * _readFile(const char * path);
             
             String _id;
             float _prevT, _prevH;//temperature and humidity

@@ -4,6 +4,7 @@ by : Sam 04/09/2021
 
 */
 
+#include <CSV_Parser.h>
 #include "logsheet.h"
 
 Logsheet::Logsheet(String id): _id(id){
@@ -265,7 +266,7 @@ void Logsheet::_recordLogsheet(){
   logsheetData last;
   last.temperature = _paramTemperature->getParam(PARAMETER_VALUE);
   last.humidity = _paramHumidity->getParam(PARAMETER_VALUE);
-  last.time = String (_samplingSec);
+  last.time = _getTimeStr(_samplingSec);
 
   _shiftArray(SECOND_6, last);
 
@@ -277,7 +278,6 @@ void Logsheet::_recordLogsheet(){
 
     //calculate average minute
     logsheetData avgMinute = _calculateAverage(_logsheetSecond, SECOND_6);
-    avgMinute.time = String (_tm.tm_min);
 
     //shift record minute & put average to bottom
     _shiftArray(MINUTE_60, avgMinute);
@@ -287,33 +287,96 @@ void Logsheet::_recordLogsheet(){
   if (_hourEvent && !_saveHourlyEvent){
     _saveHourlyEvent = true;//reset
 
-    Serial.print("_saveHourlyEvent : ");
-    Serial.println(_saveHourlyEvent);
-    
     Serial.print("Logsheet::_recordLogsheet() => _samplingHour : ");
     Serial.println(_tm.tm_hour);
 
     //calculate average hour & put average to bottom
     logsheetData avgHour = _calculateAverage(_logsheetMinute, MINUTE_60);
 
-    //save hourly average to file : /logsheet/ls_DD_MM_YY.csv (max 31 char) for 7 days
+    //save hourly average to file : /logsheet/dayofweek_ls.csv (max 31 char) for 7 days
+    String dayOfWeek = _getDayOfWeek(_tm.tm_wday);
+    String fileName = dayOfWeek + "_ls.csv";
+    fileName = PATH_LS + fileName;
 
+    Serial.print("fileName : ");
+    Serial.println(fileName);
+
+    char fileNameChar[31], headerChar[50];
+    fileName.toCharArray(fileNameChar,31);
+    HEADER.toCharArray(headerChar,50);
+
+    //create new file and clear data inside
+    if (_tm.tm_hour == 0)_writeFile(fileNameChar, headerChar); 
+    else{
+      String data = _getCsv(avgHour);
+      char dataChar[50];
+      data.toCharArray(dataChar,50);
+      //check filename
+      if (!LittleFS.exists(fileNameChar)){
+        _writeFile(fileNameChar, headerChar);
+        _appendFile(fileNameChar, dataChar);
+      }
+      else _appendFile(fileNameChar, dataChar);
+
+      //Serial.println(_readFile(fileNameChar));
+    }
   }
 
   //handle daily logsheet
-  if (_dayEvent){
-    if (!_saveDailyEvent){
-      _saveDailyEvent = true;//reset
-      Serial.println("Logsheet::_recordLogsheet() => _dayEvent");
+  if (_dayEvent && !_saveDailyEvent){
+    _saveDailyEvent = true;//reset
 
-      //calculate average day
+    Serial.print("Logsheet::_recordLogsheet() => _samplingDaily : ");
+    Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (_tm.tm_year) + 1900, (_tm.tm_mon) + 1, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
+    Serial.println("");
 
-      //save daily average to file : /logsheet/ls_YYYY.csv (max 31 char)
-      Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (_tm.tm_year) + 1900, (_tm.tm_mon) + 1, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
-      Serial.println("");
-    }
-  } 
+    //read data /logsheet/dayofweek_ls.csv
+
+    //parse data
+
+    //calculate average
+
+    //save daily average to file : /logsheet/ls_YYYY.csv (max 31 char)
+  }
 }
+
+String Logsheet::_getCsv(logsheetData data){
+
+  String csv = data.time + ";";
+
+  csv = csv + String(data.temperature);
+  csv = csv + ";";
+
+  csv = csv + String(data.humidity);
+
+  return csv;
+}
+
+logsheetData Logsheet::_parseCsv(const char * csv_str){
+  logsheetData data[HOUR_24];
+  CSV_Parser cp(csv_str, /*time;temperature;humidity*/ "sff",true);
+  Serial.println("Accessing values by column number:");
+
+  //const String HEADER = "TIME;TEMPERATURE;HUMIDITY";
+  char **time = (char**)cp["TIME"];
+  float   *temperature = (float*)cp["TEMPERATURE"];
+  float   *humidity = (float*)cp["HUMIDITY"];
+  
+  for(int row = 0; row < cp.getRowsCount(); row++) {
+    Serial.print(row, DEC);
+    Serial.print(". time = ");
+    Serial.println(time[row]);
+    Serial.print(row, DEC);
+    Serial.print(". temperature = ");
+    Serial.println(temperature[row]);
+    Serial.print(". humidity = ");
+    Serial.println(humidity[row]);
+  }
+
+  logsheetData test;
+  return test;
+}
+
 
 void Logsheet::_shiftArray(int size, logsheetData last){
 
@@ -362,26 +425,35 @@ void Logsheet::_shiftArray(int size, logsheetData last){
 logsheetData Logsheet::_calculateAverage(logsheetData data[], int size){
     float totalT, totalH;
     logsheetData avg;
+    int nbrData=0;
 
     Serial.print("Logsheet::_calculateAverage() => size : ");
     Serial.println(size);
 
     for (int i =0; i < size  ;i++){
-      totalT = totalT + data[i].temperature;
-      totalH = totalH + data[i].humidity;
-
-      _print(data[i]);
-
+      if ((data[i].temperature > 0)||(data[i].humidity > 0)){
+        totalT = totalT + data[i].temperature;
+        totalH = totalH + data[i].humidity;
+        nbrData++;
+        _print(data[i]);
+      }
     }
 
-    float avgT = totalT / size;
-    float avgH = totalH / size;
+    float avgT, avgH;
+    if ((nbrData > 0) && (nbrData <= size)){
+      avgT = totalT / nbrData;
+      avgH = totalH / nbrData;
+    }
 
     avg.temperature = avgT;
     avg.humidity = avgH;
 
+    if (size == SECOND_6)avg.time = _getTimeStr(_tm.tm_min);
+    if (size == MINUTE_60)avg.time = _getTimeStr(_tm.tm_hour);
+
     Serial.println("Average : ");
     _print(avg);
+
     return avg;
 }
 
@@ -397,21 +469,72 @@ void Logsheet::_print(logsheetData data){
   Serial.println(str);
 }
 
+String Logsheet::_getTimeStr(int time){
+  String str;
+
+  if(time<10)str = "0" + String(time);
+  else str = String(time);
+
+  return str;
+}
+
+String Logsheet::_getDayOfWeek(int dayNumber){
+  String dayOfWeek;
+  switch (dayNumber)
+  {
+  case Monday:
+      dayOfWeek = "Monday";
+    break;
+  
+  case Tuesday:
+      dayOfWeek = "Tuesday";
+    break;
+  
+  case Wednesday:
+      dayOfWeek = "Wednesday";
+    break;
+  
+  case Thursday:
+      dayOfWeek = "Thursday";
+    break;
+  
+  case Friday:
+      dayOfWeek = "Friday";
+    break;
+  
+  case Saturday:
+      dayOfWeek = "Saturday";
+    break;
+  
+  case Sunday:
+      dayOfWeek = "Sunday";
+    break;
+  
+  default:
+    break;
+  }
+
+  return dayOfWeek;
+}
 //LittleFS - Operations
-void Logsheet::_readFile(const char * path) {
+char * Logsheet::_readFile(const char * path) {
+  char * message;
   Serial.printf("Reading file: %s\n", path);
 
   File file = LittleFS.open(path, "r");
   if (!file) {
     Serial.println("Failed to open file for reading");
-    return;
+    return message;
   }
 
   Serial.print("Read from file: ");
+  int i =0;
   while (file.available()) {
-    Serial.write(file.read());
+    int c = file.read();
+    message[i] = c;
+    i++;
   }
-  file.close();
+  return message;
 }
 
 void Logsheet::_writeFile(const char * path, const char * message) {
@@ -423,7 +546,9 @@ void Logsheet::_writeFile(const char * path, const char * message) {
     return;
   }
   if (file.print(message)) {
-    Serial.println("File written");
+    Serial.print("message : ");
+    Serial.print(message);
+    Serial.println(", File written");
   } else {
     Serial.println("Write failed");
   }
@@ -440,7 +565,9 @@ void Logsheet::_appendFile(const char * path, const char * message) {
     return;
   }
   if (file.print(message)) {
-    Serial.println("Message appended");
+    Serial.print("message : ");
+    Serial.print(message);
+    Serial.println(", Message appended");
   } else {
     Serial.println("Append failed");
   }

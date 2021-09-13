@@ -49,6 +49,7 @@ void urlController();
 void handleLogin();
 void handleConfig();
 void loadStaticFile();//css, js
+void listAllFilesInDir(String);//list files in all dir's
 
 void setup(){
   // Serial port for debugging purposes
@@ -70,6 +71,7 @@ void setup(){
     Serial.println("An Error has occurred while mounting LittleFS");
     return;
   }
+  listAllFilesInDir("/");
 
   // Start WiFi
   if (WiFiAP)
@@ -80,7 +82,7 @@ void setup(){
   struct tm tmstruct = getTimeNtp();
   Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct.tm_year) + 1900, (tmstruct.tm_mon) + 1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
   Serial.println("");
-  
+
   //start mDNS
   startMDNS();
 
@@ -240,6 +242,24 @@ void loadStaticFile(){
     request->send(LittleFS, "/widgets.js", "text/js");
   });
 
+}
+
+void listAllFilesInDir(String dir_path){
+	Dir dir = LittleFS.openDir(dir_path);
+	while(dir.next()) {
+		if (dir.isFile()) {
+			// print file names
+			Serial.print("File: ");
+			Serial.println(dir_path + dir.fileName());
+		}
+		if (dir.isDirectory()) {
+			// print directory names
+			Serial.print("Dir: ");
+			Serial.println(dir_path + dir.fileName() + "/");
+			// recursive file listing inside new directory
+			listAllFilesInDir(dir_path + dir.fileName() + "/");
+		}
+	}
 }
 
 /*  

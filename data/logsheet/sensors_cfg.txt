@@ -1,0 +1,18 @@
+  {
+    "Temperature": {
+      "unit":"°C",
+      "highRange":50.0,
+      "lowRange":0.0,
+      "highLimit":40.0,
+      "lowLimit":10.0,
+      "alfaEma":80.0
+    },
+    "Humidity": {
+      "unit":"%",
+      "highRange":100.0,
+      "lowRange":0.0,
+      "highLimit":90.0,
+      "lowLimit":40.0,
+      "alfaEma":80.0
+    }
+  }

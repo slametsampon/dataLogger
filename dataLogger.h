@@ -11,6 +11,9 @@ const boolean DEBUG = true;
 const char* ssid     = "Sam-Laptop";
 //const char* ssid     = "SamMobile";
 const char* password = "sampon170466";
+//const char* ssid     = "SamFamily";
+//const char* password = "muwa7x06";
+
 const char* mdnsName = "dataLogger";
 
 //NTP : Network Time Protokol
