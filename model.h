@@ -67,6 +67,33 @@ float increment = doc["increment"]; // 1.1
   const int HIGH_ALARM = 1;
   const int LOW_ALARM = 2;
 
+  const int LEVEL_ENGINEER = 0;
+  const int LEVEL_OPERATOR = 9;
+
+  typedef struct userData{
+      String username;//engineer
+      String password;//123456
+      int level;
+  }userData;
+  class AccesUser{
+  
+  public:
+      AccesUser(String);
+      String getJson();
+      userData getUser();
+      float getUser(int);
+      void setUserJson(JsonObject);
+      void setUser(userData);
+      void setUser(int, float);
+      String getId();
+      void info();
+
+  private:
+      String    _id;
+      userData _userData;
+
+  };//end of class
+
   typedef struct logsheetData{
       String time;//HH:00:00 or DD_MM_YY
       float temperature;

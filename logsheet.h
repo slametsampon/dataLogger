@@ -25,7 +25,8 @@ const int MINUTE_60 = 60;
 const int SECOND_6 = 6;//average at last one
 
 const String PATH_LS = "/logsheet/";
-const String HEADER = "TIME;TEMPERATURE;HUMIDITY";
+const String SENSOR_FILE_CFG = "sensors.cfg";
+const String HEADER = "TIME;TEMPERATURE;HUMIDITY\n";
 
 enum DayOfWeek{
   Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
@@ -44,6 +45,7 @@ enum DayOfWeek{
 
         private:
             void _setupDefaultParameter();
+            void _setupFileCfgParameter(String);
             void _getSensorValue();
             void _print(logsheetData);
             String _initRandomJson();
@@ -51,6 +53,9 @@ enum DayOfWeek{
 
             void _recordEvent();
             void _recordLogsheet();
+            void _minuteLogsheet();
+            void _hourlyLogsheet();
+            void _dailyLogsheet();
             String _getCsv(logsheetData data);
             logsheetData _parseCsv(const char *);
             void _shiftArray(int size, logsheetData last);
@@ -60,11 +65,11 @@ enum DayOfWeek{
             String _getDayOfWeek(int);
             void _appendFile(const char * path, const char * message);
             void _writeFile(const char * path, const char * message);
-            char * _readFile(const char * path);
+            String _readFile(const char * path);
             
             String _id;
             float _prevT, _prevH;//temperature and humidity
-	        unsigned long _prevMilli;
+	          unsigned long _prevMilli;
             int _samplingSec, _samplingMinute, _samplingHour;
             boolean _minuteEvent, _hourEvent, _dayEvent;
             boolean _saveHourlyEvent, _saveDailyEvent;

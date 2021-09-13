@@ -57,14 +57,6 @@ void setup(){
   while (!Serial) {;}
   if (DEBUG) { Serial.print(F("\n\nSerial started at 115200\n" ));   }
 
-  pinMode(ledPin, OUTPUT);
-
-  // Initialize the sensor
-  logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
-  logsheet.AttachSensor(&dht);
-  logsheet.AttachDisplay(&display);
-  logsheet.info();
-
   // Initialize LittleFS
   Serial.println("Begin LittleFS");
   if(!LittleFS.begin()){
@@ -73,6 +65,14 @@ void setup(){
   }
   listAllFilesInDir("/");
 
+  pinMode(ledPin, OUTPUT);
+
+  // Initialize the sensor
+  logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
+  logsheet.AttachSensor(&dht);
+  logsheet.AttachDisplay(&display);
+  logsheet.info();
+
   // Start WiFi
   if (WiFiAP)
     startWiFiAP();
@@ -80,8 +80,13 @@ void setup(){
     startWiFiClient();
 
   struct tm tmstruct = getTimeNtp();
-  Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct.tm_year) + 1900, (tmstruct.tm_mon) + 1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
+  tmstruct.tm_year += 1900;
+  tmstruct.tm_mon +=1;
+  Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", tmstruct.tm_year, tmstruct.tm_mon, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
   Serial.println("");
+
+  //logsheet setTime
+  logsheet.setTime(getTimeNtp());
 
   //start mDNS
   startMDNS();

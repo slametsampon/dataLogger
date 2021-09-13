@@ -13,7 +13,8 @@ Logsheet::Logsheet(String id): _id(id){
 
 void Logsheet::AttachSensor(DHT *dht){
     _dht = dht;
-    _setupDefaultParameter();
+    //_setupDefaultParameter();
+    _setupFileCfgParameter(SENSOR_FILE_CFG);
 }
 
 void Logsheet::AttachDisplay(Adafruit_SSD1306 *display){
@@ -82,7 +83,10 @@ String Logsheet::getHour24(){
 
 void Logsheet::setTime(struct tm tmVal){
   _tm = tmVal;
-  Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (_tm.tm_year) + 1900, (_tm.tm_mon) + 1, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
+  _tm.tm_year += 1900;
+  _tm.tm_mon +=1;
+  Serial.println("Logsheet::setTime(struct tm tmVal)");
+  Serial.printf("Now is : %d-%02d-%02d %02d:%02d:%02d\n", _tm.tm_year, _tm.tm_mon, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
   Serial.println("");
 }
 
@@ -137,6 +141,151 @@ void Logsheet::_setupDefaultParameter(){
   dtParam.alfaEma = ALFA_EMA;
   dtParam.alarm = NO_ALARM;
   _paramHumidity->setParam(dtParam);
+}
+
+void Logsheet::_setupFileCfgParameter(String fileName){
+
+  /*
+    {
+    "Temperature": {
+      "unit":"°C",
+      "value":25,
+      "highRange":50.0,
+      "lowRange":0.0,
+      "highLimit":40.0,
+      "lowLimit":10.0,
+      "alfaEma":80.0,
+      "alarm":0
+    },
+    "Humidity": {
+      "unit":"%",
+      "value":80,
+      "highRange":100.0,
+      "lowRange":0.0,
+      "highLimit":90.0,
+      "lowLimit":40.0,
+      "alfaEma":80.0,
+      "alarm":0
+    }
+  }
+
+  StaticJsonDocument<384> doc;
+
+  JsonObject Temperature = doc.createNestedObject("Temperature");
+  Temperature["unit"] = "°C";
+  Temperature["value"] = 25;
+  Temperature["highRange"] = 50;
+  Temperature["lowRange"] = 0;
+  Temperature["highLimit"] = 40;
+  Temperature["lowLimit"] = 10;
+  Temperature["alfaEma"] = 80;
+  Temperature["alarm"] = 0;
+
+  JsonObject Humidity = doc.createNestedObject("Humidity");
+  Humidity["unit"] = "%";
+  Humidity["value"] = 80;
+  Humidity["highRange"] = 100;
+  Humidity["lowRange"] = 0;
+  Humidity["highLimit"] = 90;
+  Humidity["lowLimit"] = 40;
+  Humidity["alfaEma"] = 80;
+  Humidity["alarm"] = 0;
+
+  serializeJson(doc, output);
+
+  ! Stream& input;
+
+  StaticJsonDocument<512> doc;
+
+  DeserializationError error = deserializeJson(doc, input);
+
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+
+  JsonObject Temperature = doc["Temperature"];
+  const char* Temperature_unit = Temperature["unit"]; // "°C"
+  int Temperature_value = Temperature["value"]; // 25
+  int Temperature_highRange = Temperature["highRange"]; // 50
+  int Temperature_lowRange = Temperature["lowRange"]; // 0
+  int Temperature_highLimit = Temperature["highLimit"]; // 40
+  int Temperature_lowLimit = Temperature["lowLimit"]; // 10
+  int Temperature_alfaEma = Temperature["alfaEma"]; // 80
+  int Temperature_alarm = Temperature["alarm"]; // 0
+
+  JsonObject Humidity = doc["Humidity"];
+  const char* Humidity_unit = Humidity["unit"]; // "%"
+  int Humidity_value = Humidity["value"]; // 80
+  int Humidity_highRange = Humidity["highRange"]; // 100
+  int Humidity_lowRange = Humidity["lowRange"]; // 0
+  int Humidity_highLimit = Humidity["highLimit"]; // 90
+  int Humidity_lowLimit = Humidity["lowLimit"]; // 40
+  int Humidity_alfaEma = Humidity["alfaEma"]; // 80
+  int Humidity_alarm = Humidity["alarm"]; // 0
+
+  */
+  param dtParam;
+  Serial.println("_setupFileCfgParameter(String fileName)");
+
+  String fullFileName = PATH_LS + fileName;
+
+  Serial.print("fullFileName : ");
+  Serial.println(fullFileName);
+
+  char fileNameChar[31];
+  fullFileName.toCharArray(fileNameChar,31);
+
+  File file = LittleFS.open(fileNameChar, "r");
+  if (!file) {
+    Serial.println("Failed to open file for reading");
+  }
+  else{
+    /*
+    Serial.println("Contents : ");
+    while (file.available()) {
+      Serial.write(file.read());
+    }
+    Serial.println("");
+    */
+
+    StaticJsonDocument<512> doc;
+
+    DeserializationError error = deserializeJson(doc, file);
+
+    if (error) {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.f_str());
+      return;
+    }
+
+    JsonObject Temperature = doc["Temperature"];
+    //parameter temperature
+    dtParam.unit = "°C";
+    dtParam.value = Temperature["value"];
+    dtParam.highRange = Temperature["highRange"];
+    dtParam.lowRange = Temperature["lowRange"];
+    dtParam.highLimit = Temperature["highLimit"];
+    dtParam.lowLimit = Temperature["lowLimit"];
+    dtParam.alfaEma = Temperature["alfaEma"];
+    dtParam.alarm = Temperature["alarm"];
+    _paramTemperature->setParam(dtParam);
+
+    JsonObject Humidity = doc["Humidity"];
+    //parameter humidity
+    dtParam.unit = "%";
+    dtParam.value = Humidity["value"];
+    dtParam.highRange = Humidity["highRange"];
+    dtParam.lowRange = Humidity["lowRange"];
+    dtParam.highLimit = Humidity["highLimit"];
+    dtParam.lowLimit = Humidity["lowLimit"];
+    dtParam.alfaEma = Humidity["alfaEma"];
+    dtParam.alarm = Humidity["alarm"];
+    _paramHumidity->setParam(dtParam);
+
+    file.close();
+  }
 }
 
 String Logsheet::_initRandomJson(){
@@ -271,72 +420,146 @@ void Logsheet::_recordLogsheet(){
   _shiftArray(SECOND_6, last);
 
   //handle record Second
-  if (_minuteEvent){
-    _minuteEvent = false;
-    Serial.print("Logsheet::_recordLogsheet() => _samplingMinute : ");
-    Serial.println(_tm.tm_min);
-
-    //calculate average minute
-    logsheetData avgMinute = _calculateAverage(_logsheetSecond, SECOND_6);
-
-    //shift record minute & put average to bottom
-    _shiftArray(MINUTE_60, avgMinute);
-  }
+  if (_minuteEvent) _minuteLogsheet();
 
   //handle hourly hour
-  if (_hourEvent && !_saveHourlyEvent){
-    _saveHourlyEvent = true;//reset
+  if (_hourEvent && !_saveHourlyEvent) _hourlyLogsheet();
 
-    Serial.print("Logsheet::_recordLogsheet() => _samplingHour : ");
-    Serial.println(_tm.tm_hour);
+  //handle daily logsheet
+  if (_dayEvent && !_saveDailyEvent) _dailyLogsheet();
+}
 
-    //calculate average hour & put average to bottom
-    logsheetData avgHour = _calculateAverage(_logsheetMinute, MINUTE_60);
+void Logsheet::_minuteLogsheet(){
+  _minuteEvent = false;
+  Serial.print("Logsheet::_recordLogsheet() => _samplingMinute : ");
+  Serial.println(_tm.tm_min);
 
-    //save hourly average to file : /logsheet/dayofweek_ls.csv (max 31 char) for 7 days
-    String dayOfWeek = _getDayOfWeek(_tm.tm_wday);
-    String fileName = dayOfWeek + "_ls.csv";
-    fileName = PATH_LS + fileName;
+  //calculate average minute
+  logsheetData avgMinute = _calculateAverage(_logsheetSecond, SECOND_6);
 
-    Serial.print("fileName : ");
-    Serial.println(fileName);
+  //shift record minute & put average to bottom
+  _shiftArray(MINUTE_60, avgMinute);
+}
 
-    char fileNameChar[31], headerChar[50];
-    fileName.toCharArray(fileNameChar,31);
-    HEADER.toCharArray(headerChar,50);
+void Logsheet::_hourlyLogsheet(){
+  _saveHourlyEvent = true;//reset
 
-    //create new file and clear data inside
-    if (_tm.tm_hour == 0)_writeFile(fileNameChar, headerChar); 
-    else{
-      String data = _getCsv(avgHour);
-      char dataChar[50];
-      data.toCharArray(dataChar,50);
-      //check filename
-      if (!LittleFS.exists(fileNameChar)){
-        _writeFile(fileNameChar, headerChar);
-        _appendFile(fileNameChar, dataChar);
-      }
-      else _appendFile(fileNameChar, dataChar);
+  Serial.print("Logsheet::_recordLogsheet() => _samplingHour : ");
+  Serial.println(_tm.tm_hour);
 
-      //Serial.println(_readFile(fileNameChar));
+  //calculate average hour & put average to bottom
+  logsheetData avgHour = _calculateAverage(_logsheetMinute, MINUTE_60);
+
+  //save hourly average to file : /logsheet/dayofweek_ls.csv (max 31 char) for 7 days
+  String dayOfWeek = _getDayOfWeek(_tm.tm_wday);
+  String fileName = dayOfWeek + "_ls.csv";
+  fileName = PATH_LS + fileName;
+
+  Serial.print("fileName : ");
+  Serial.println(fileName);
+
+  char fileNameChar[31], headerChar[50];
+  fileName.toCharArray(fileNameChar,31);
+  HEADER.toCharArray(headerChar,50);
+
+  //create new file and clear data inside
+  if (_tm.tm_hour == 0)_writeFile(fileNameChar, headerChar); 
+  else{
+    String data = _getCsv(avgHour);
+    char dataChar[50];
+    data.toCharArray(dataChar,50);
+    //check filename
+    if (!LittleFS.exists(fileNameChar)){
+      _writeFile(fileNameChar, headerChar);
+      _appendFile(fileNameChar, dataChar);
+    }
+    else _appendFile(fileNameChar, dataChar);
+  }
+}
+
+void Logsheet::_dailyLogsheet(){
+  _saveDailyEvent = true;//reset
+
+  Serial.print("Logsheet::_recordLogsheet() => _samplingDaily : ");
+  Serial.printf("Now is : %d-%02d-%02d %02d:%02d:%02d\n", _tm.tm_year, _tm.tm_mon, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
+  Serial.println("");
+
+  //read data /logsheet/dayofweek_ls.csv
+  String dayOfWeek = _getDayOfWeek(_tm.tm_wday);
+  String fileName = dayOfWeek + "_ls.csv";
+  fileName = PATH_LS + fileName;
+
+  Serial.print("fileName : ");
+  Serial.println(fileName);
+
+  char fileNameChar[31], headerChar[50];
+  fileName.toCharArray(fileNameChar,31);
+  HEADER.toCharArray(headerChar,50);
+  String fileContents = _readFile(fileNameChar);
+
+  Serial.println(fileContents);
+  //parse data
+  char *contentsChar;
+  fileContents.toCharArray(contentsChar,sizeof(fileContents));
+
+  CSV_Parser cp(contentsChar, /*TIME;TEMPERATURE;HUMIDITY\n*/ "sss");
+
+
+  Serial.println("Accessing values by column name:");
+  char **strTime = (char**)cp["TIME"];
+  char **strT = (char**)cp["TEMPERATURE"];
+  char **strH = (char**)cp["HUMIDITY"];
+  
+  logsheetData hourlyAvg[cp.getRowsCount()];
+  for(int row = 0; row < cp.getRowsCount(); row++) {
+    Serial.print(row, DEC);
+    Serial.print(" => ");
+    Serial.print(strTime[row]);
+    Serial.print(" ; ");
+    Serial.print(strT[row]);
+    Serial.print(" ; ");
+    Serial.print(strH[row]);
+    Serial.print(" ; ");
+    Serial.println(strT[row]);
+    if(row > 0){
+      String Ti= String(strTime[row]);
+
+      String T = String(strT[row]);
+      hourlyAvg[row-1].temperature = T.toFloat();
+
+      String H = String(strH[row]);
+      hourlyAvg[row-1].humidity = H.toFloat();
     }
   }
 
-  //handle daily logsheet
-  if (_dayEvent && !_saveDailyEvent){
-    _saveDailyEvent = true;//reset
+  //calculate average
+  logsheetData avgDay = _calculateAverage(hourlyAvg, HOUR_24);
 
-    Serial.print("Logsheet::_recordLogsheet() => _samplingDaily : ");
-    Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (_tm.tm_year) + 1900, (_tm.tm_mon) + 1, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
-    Serial.println("");
+  //save daily average to file : /logsheet/ls_YYYY.csv (max 31 char)
+  String year = _getDayOfWeek(_tm.tm_year);
+  fileName ="";
+  fileName = "ls_" + year;
+  fileName  +=  ".csv";
+  fileName = PATH_LS + fileName;
 
-    //read data /logsheet/dayofweek_ls.csv
+  Serial.print("fileName : ");
+  Serial.println(fileName);
 
-    //parse data
+  fileName.toCharArray(fileNameChar,31);
+  HEADER.toCharArray(headerChar,50);
 
-    //calculate average
-
-    //save daily average to file : /logsheet/ls_YYYY.csv (max 31 char)
+  //create new file and clear data inside
+  if (_tm.tm_hour == 0)_writeFile(fileNameChar, headerChar); 
+  else{
+    String data = _getCsv(avgDay);
+    char dataChar[50];
+    data.toCharArray(dataChar,50);
+    //check filename
+    if (!LittleFS.exists(fileNameChar)){
+      _writeFile(fileNameChar, headerChar);
+      _appendFile(fileNameChar, dataChar);
+    }
+    else _appendFile(fileNameChar, dataChar);
   }
 }
 
@@ -344,10 +567,11 @@ String Logsheet::_getCsv(logsheetData data){
 
   String csv = data.time + ";";
 
-  csv = csv + String(data.temperature);
-  csv = csv + ";";
+  csv += String(data.temperature);
+  csv += ";";
 
-  csv = csv + String(data.humidity);
+  csv += String(data.humidity);
+  csv += "\n";
 
   return csv;
 }
@@ -376,7 +600,6 @@ logsheetData Logsheet::_parseCsv(const char * csv_str){
   logsheetData test;
   return test;
 }
-
 
 void Logsheet::_shiftArray(int size, logsheetData last){
 
@@ -450,6 +673,15 @@ logsheetData Logsheet::_calculateAverage(logsheetData data[], int size){
 
     if (size == SECOND_6)avg.time = _getTimeStr(_tm.tm_min);
     if (size == MINUTE_60)avg.time = _getTimeStr(_tm.tm_hour);
+    if (size == HOUR_24){
+      //build DD_MM_YYYY
+      String date = _getTimeStr(_tm.tm_mday);
+      date += "_";
+      date += _getTimeStr(_tm.tm_mon);
+      date += "_";
+      date += _getTimeStr(_tm.tm_year);
+      avg.time = date;
+    } 
 
     Serial.println("Average : ");
     _print(avg);
@@ -517,8 +749,8 @@ String Logsheet::_getDayOfWeek(int dayNumber){
   return dayOfWeek;
 }
 //LittleFS - Operations
-char * Logsheet::_readFile(const char * path) {
-  char * message;
+String Logsheet::_readFile(const char * path) {
+  String message = "";
   Serial.printf("Reading file: %s\n", path);
 
   File file = LittleFS.open(path, "r");
@@ -527,13 +759,16 @@ char * Logsheet::_readFile(const char * path) {
     return message;
   }
 
-  Serial.print("Read from file: ");
-  int i =0;
+  int c = 0;
+  Serial.println("Contents : ");
   while (file.available()) {
-    int c = file.read();
-    message[i] = c;
-    i++;
+    c = file.read();
+    message += (char) c;
+    //Serial.write(file.read());
   }
+  Serial.println("");
+  file.close();
+
   return message;
 }
 
@@ -548,12 +783,11 @@ void Logsheet::_writeFile(const char * path, const char * message) {
   if (file.print(message)) {
     Serial.print("message : ");
     Serial.print(message);
-    Serial.println(", File written");
+    Serial.println("File written");
   } else {
     Serial.println("Write failed");
   }
   delay(2000); // Make sure the CREATE and LASTWRITE times are different
-  file.close();
 }
 
 void Logsheet::_appendFile(const char * path, const char * message) {
@@ -567,10 +801,9 @@ void Logsheet::_appendFile(const char * path, const char * message) {
   if (file.print(message)) {
     Serial.print("message : ");
     Serial.print(message);
-    Serial.println(", Message appended");
+    Serial.println("Message appended");
   } else {
     Serial.println("Append failed");
   }
   file.close();
 }
-
