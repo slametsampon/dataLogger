@@ -78,7 +78,8 @@ String Logsheet::getValues(){
 }
 
 String Logsheet::getHour24(){
-    return (this->_initRandomJson());
+  //return (this->_initRandomJson());
+  return (this->_readFileJson(_tm.tm_wday));
 }
 
 void Logsheet::setTime(struct tm tmVal){
@@ -420,10 +421,20 @@ void Logsheet::_recordLogsheet(){
   _shiftArray(SECOND_6, last);
 
   //handle record Second
-  if (_minuteEvent) _minuteLogsheet();
+  if (_minuteEvent){
+    _minuteLogsheet();
+
+    //testing
+    //_dailyLogsheet();
+  } 
 
   //handle hourly hour
-  if (_hourEvent && !_saveHourlyEvent) _hourlyLogsheet();
+  if (_hourEvent && !_saveHourlyEvent){
+    _hourlyLogsheet();
+
+    //testing
+    //_dailyLogsheet();
+  } 
 
   //handle daily logsheet
   if (_dayEvent && !_saveDailyEvent) _dailyLogsheet();
@@ -462,18 +473,20 @@ void Logsheet::_hourlyLogsheet(){
   fileName.toCharArray(fileNameChar,31);
   HEADER.toCharArray(headerChar,50);
 
-  //create new file and clear data inside
-  if (_tm.tm_hour == 0)_writeFile(fileNameChar, headerChar); 
-  else{
-    String data = _getCsv(avgHour);
-    char dataChar[50];
-    data.toCharArray(dataChar,50);
-    //check filename
-    if (!LittleFS.exists(fileNameChar)){
-      _writeFile(fileNameChar, headerChar);
-      _appendFile(fileNameChar, dataChar);
+  if(!SIMULATION){
+    //create new file and clear data inside
+    if (_tm.tm_hour == 0)_writeFile(fileNameChar, headerChar); 
+    else{
+      String data = _getCsv(avgHour);
+      char dataChar[50];
+      data.toCharArray(dataChar,50);
+      //check filename
+      if (!LittleFS.exists(fileNameChar)){
+        _writeFile(fileNameChar, headerChar);
+        _appendFile(fileNameChar, dataChar);
+      }
+      else _appendFile(fileNameChar, dataChar);
     }
-    else _appendFile(fileNameChar, dataChar);
   }
 }
 
@@ -497,46 +510,49 @@ void Logsheet::_dailyLogsheet(){
   HEADER.toCharArray(headerChar,50);
   String fileContents = _readFile(fileNameChar);
 
-  Serial.println(fileContents);
   //parse data
-  char *contentsChar;
-  fileContents.toCharArray(contentsChar,sizeof(fileContents));
+  char contentsChar[DAILY_SIZE];
+  fileContents.toCharArray(contentsChar,DAILY_SIZE);
 
-  CSV_Parser cp(contentsChar, /*TIME;TEMPERATURE;HUMIDITY\n*/ "sss");
+  //Serial.println("contentsChar : ");
+  //Serial.println(contentsChar);
 
+  CSV_Parser cp(contentsChar, /**TIME;TEMPERATURE;HUMIDITY*/ "sss",true, /*delimiter*/ ';');
 
-  Serial.println("Accessing values by column name:");
+  //Serial.println("Accessing values by column name:");
   char **strTime = (char**)cp["TIME"];
   char **strT = (char**)cp["TEMPERATURE"];
   char **strH = (char**)cp["HUMIDITY"];
   
+  //Serial.print("cp.getRowsCount() : ");
+  //Serial.println(cp.getRowsCount());
+
   logsheetData hourlyAvg[cp.getRowsCount()];
   for(int row = 0; row < cp.getRowsCount(); row++) {
-    Serial.print(row, DEC);
-    Serial.print(" => ");
-    Serial.print(strTime[row]);
-    Serial.print(" ; ");
-    Serial.print(strT[row]);
-    Serial.print(" ; ");
-    Serial.print(strH[row]);
-    Serial.print(" ; ");
-    Serial.println(strT[row]);
-    if(row > 0){
-      String Ti= String(strTime[row]);
-
-      String T = String(strT[row]);
-      hourlyAvg[row-1].temperature = T.toFloat();
-
-      String H = String(strH[row]);
-      hourlyAvg[row-1].humidity = H.toFloat();
+    if (SIMULATION){
+      Serial.print(row, DEC);
+      Serial.print(" => ");
+      Serial.print(strTime[row]);
+      Serial.print(" ; ");
+      Serial.print(strT[row]);
+      Serial.print(" ; ");
+      Serial.println(strH[row]);
     }
+    String Ti= String(strTime[row]);
+    hourlyAvg[row].time = Ti;
+
+    String T = String(strT[row]);
+    hourlyAvg[row].temperature = T.toFloat();
+
+    String H = String(strH[row]);
+    hourlyAvg[row].humidity = H.toFloat();
   }
 
   //calculate average
   logsheetData avgDay = _calculateAverage(hourlyAvg, HOUR_24);
 
   //save daily average to file : /logsheet/ls_YYYY.csv (max 31 char)
-  String year = _getDayOfWeek(_tm.tm_year);
+  String year = _getTimeStr(_tm.tm_year);
   fileName ="";
   fileName = "ls_" + year;
   fileName  +=  ".csv";
@@ -549,18 +565,15 @@ void Logsheet::_dailyLogsheet(){
   HEADER.toCharArray(headerChar,50);
 
   //create new file and clear data inside
-  if (_tm.tm_hour == 0)_writeFile(fileNameChar, headerChar); 
-  else{
-    String data = _getCsv(avgDay);
-    char dataChar[50];
-    data.toCharArray(dataChar,50);
-    //check filename
-    if (!LittleFS.exists(fileNameChar)){
-      _writeFile(fileNameChar, headerChar);
-      _appendFile(fileNameChar, dataChar);
-    }
-    else _appendFile(fileNameChar, dataChar);
+  String data = _getCsv(avgDay);
+  char dataChar[50];
+  data.toCharArray(dataChar,50);
+  //check filename
+  if (!LittleFS.exists(fileNameChar)){
+    _writeFile(fileNameChar, headerChar);
+    _appendFile(fileNameChar, dataChar);
   }
+  else _appendFile(fileNameChar, dataChar);
 }
 
 String Logsheet::_getCsv(logsheetData data){
@@ -574,31 +587,6 @@ String Logsheet::_getCsv(logsheetData data){
   csv += "\n";
 
   return csv;
-}
-
-logsheetData Logsheet::_parseCsv(const char * csv_str){
-  logsheetData data[HOUR_24];
-  CSV_Parser cp(csv_str, /*time;temperature;humidity*/ "sff",true);
-  Serial.println("Accessing values by column number:");
-
-  //const String HEADER = "TIME;TEMPERATURE;HUMIDITY";
-  char **time = (char**)cp["TIME"];
-  float   *temperature = (float*)cp["TEMPERATURE"];
-  float   *humidity = (float*)cp["HUMIDITY"];
-  
-  for(int row = 0; row < cp.getRowsCount(); row++) {
-    Serial.print(row, DEC);
-    Serial.print(". time = ");
-    Serial.println(time[row]);
-    Serial.print(row, DEC);
-    Serial.print(". temperature = ");
-    Serial.println(temperature[row]);
-    Serial.print(". humidity = ");
-    Serial.println(humidity[row]);
-  }
-
-  logsheetData test;
-  return test;
 }
 
 void Logsheet::_shiftArray(int size, logsheetData last){
@@ -772,6 +760,67 @@ String Logsheet::_readFile(const char * path) {
   return message;
 }
 
+String Logsheet::_readFileJson(int day_Week){
+  //read data /logsheet/dayofweek_ls.csv
+  String dayOfWeek = _getDayOfWeek(day_Week);
+  String fileName = dayOfWeek + "_ls.csv";
+  fileName = PATH_LS + fileName;
+
+  Serial.print("fileName : ");
+  Serial.println(fileName);
+
+  char fileNameChar[31], headerChar[50];
+  fileName.toCharArray(fileNameChar,31);
+  String fileContents = _readFile(fileNameChar);
+
+  //parse data
+  char contentsChar[DAILY_SIZE];
+  fileContents.toCharArray(contentsChar,DAILY_SIZE);
+
+  CSV_Parser cp(contentsChar, /**TIME;TEMPERATURE;HUMIDITY*/ "sss",true, /*delimiter*/ ';');
+
+  //Serial.println("Accessing values by column name:");
+  char **strTime = (char**)cp["TIME"];
+  char **strT = (char**)cp["TEMPERATURE"];
+  char **strH = (char**)cp["HUMIDITY"];
+  
+  //Serial.print("cp.getRowsCount() : ");
+  //Serial.println(cp.getRowsCount());
+
+  logsheetData hourlyAvg[cp.getRowsCount()];
+
+  //Json assembling
+  String output;
+  DynamicJsonDocument doc(1536);
+  float h, t;
+  doc.clear();
+  JsonArray time = doc.createNestedArray("time");
+  JsonArray temperature = doc.createNestedArray("temperature");
+  JsonArray humidity = doc.createNestedArray("humidity");
+
+  for(int row = 0; row < cp.getRowsCount(); row++) {
+    if (SIMULATION){
+      Serial.print(row, DEC);
+      Serial.print(" => ");
+      Serial.print(strTime[row]);
+      Serial.print(" ; ");
+      Serial.print(strT[row]);
+      Serial.print(" ; ");
+      Serial.println(strH[row]);
+    }
+    String Ti= String(strTime[row]);
+    String T = String(strT[row]);
+    String H = String(strH[row]);
+
+    time.add(Ti.toInt());
+    temperature.add(T.toFloat());
+    humidity.add(H.toFloat());
+  }
+
+  serializeJson(doc, output);
+  return output;
+}
+
 void Logsheet::_writeFile(const char * path, const char * message) {
   Serial.printf("Writing file: %s\n", path);
 
@@ -807,3 +856,4 @@ void Logsheet::_appendFile(const char * path, const char * message) {
   }
   file.close();
 }
+

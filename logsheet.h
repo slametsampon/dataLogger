@@ -27,6 +27,7 @@ const int SECOND_6 = 6;//average at last one
 const String PATH_LS = "/logsheet/";
 const String SENSOR_FILE_CFG = "sensors.cfg";
 const String HEADER = "TIME;TEMPERATURE;HUMIDITY\n";
+const int DAILY_SIZE = 425 ;//26 + (16*24) = 410
 
 enum DayOfWeek{
   Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
@@ -51,21 +52,21 @@ enum DayOfWeek{
             String _initRandomJson();
             void _oledDisplay(float, float);
 
+            String _getTimeStr(int);
+            String _getDayOfWeek(int);
             void _recordEvent();
             void _recordLogsheet();
             void _minuteLogsheet();
             void _hourlyLogsheet();
             void _dailyLogsheet();
             String _getCsv(logsheetData data);
-            logsheetData _parseCsv(const char *);
             void _shiftArray(int size, logsheetData last);
             logsheetData _calculateAverage(logsheetData data[], int size);
 
-            String _getTimeStr(int);
-            String _getDayOfWeek(int);
             void _appendFile(const char * path, const char * message);
             void _writeFile(const char * path, const char * message);
             String _readFile(const char * path);
+            String _readFileJson(int);//read file day of week, return json
             
             String _id;
             float _prevT, _prevH;//temperature and humidity
