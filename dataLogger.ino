@@ -27,11 +27,7 @@ AccessParam accessParamHumidity("accessParamHumidity");
 
 Adafruit_SSD1306 display(OLED_RESET);
 DHT dht(DHTPIN, DHTTYPE);
-
 Logsheet logsheet("logsheet");
-
-// Stores LED state
-String ledState;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -148,29 +144,6 @@ void startMDNS() { // Start the mDNS responder
   Serial.println(".local");
 }
 
-//NTP
-bool getLocalTime(struct tm * info, uint32_t ms) {
-  uint32_t count = ms / 10;
-  time_t now;
-
-  time(&now);
-  localtime_r(&now, info);
-
-  if (info->tm_year > (2016 - 1900)) {
-    return true;
-  }
-
-  while (count--) {
-    delay(10);
-    time(&now);
-    localtime_r(&now, info);
-    if (info->tm_year > (2016 - 1900)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 void urlController(){
 
   loadStaticFile();
@@ -267,8 +240,32 @@ void listAllFilesInDir(String dir_path){
 	}
 }
 
+//NTP
+bool getLocalTime(struct tm * info, uint32_t ms) {
+  uint32_t count = ms / 10;
+  time_t now;
+
+  time(&now);
+  localtime_r(&now, info);
+
+  if (info->tm_year > (2016 - 1900)) {
+    return true;
+  }
+
+  while (count--) {
+    delay(10);
+    time(&now);
+    localtime_r(&now, info);
+    if (info->tm_year > (2016 - 1900)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*  
-  
+  // Stores LED state
+  String ledState;  
   // Route to set GPIO to HIGH
   server.on("/on", HTTP_GET, [](AsyncWebServerRequest *request){
     digitalWrite(ledPin, HIGH);    
