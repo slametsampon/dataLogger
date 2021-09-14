@@ -1,32 +1,39 @@
-// #define DHTPIN D5     // ????
-#define DHTPIN D4     // what pin we're connected to ????
+#ifndef dataLogger_h
+#define dataLogger_h
 
-#define DHTTYPE DHT11   
-#define OLED_RESET 0  // GPIO0
- 
+    // #define DHTPIN D5     // ????
+    #define DHTPIN D4     // what pin we're connected to ????
 
-const boolean DEBUG = true;
+    #define DHTTYPE DHT11   
+    #define OLED_RESET 0  // GPIO0
+    
 
-// Replace with your network credentials
-const char* ssid     = "Sam-Laptop";
-//const char* ssid     = "SamMobile";
-const char* password = "sampon170466";
-const char* mdnsName = "dataLogger";
+    const boolean DEBUG = true;
 
-//NTP : Network Time Protokol
-const long timezone = 6;//for jakarta time
-const byte daysavetime = 1;
+    // Replace with your network credentials
+    const char* ssid     = "Sam-Laptop";
+    //const char* ssid     = "SamMobile";
+    const char* password = "sampon170466";
+    //const char* ssid     = "SamFamily";
+    //const char* password = "muwa7x06";
 
-// Set LED GPIO
-const int ledPin = LED_BUILTIN;
+    const char* mdnsName = "dataLogger";
 
-bool WiFiAP = false;      // Do yo want the ESP as AP?
+    //NTP : Network Time Protokol
+    const long timezone = 6;//for jakarta time
+    const byte daysavetime = 1;
 
-const int ADC_MAX = 1023;//10 bits
-const int DEBOUNCING_TIME = 150;//milli second
+    // Set LED GPIO
+    const int ledPin = LED_BUILTIN;
 
-const int BLINK_NORMAL = 500;//milli second
-const int BLINK_WARNING = 250;//milli second
-const int BLINK_ERROR = 125;//milli second
-const int SAMPLING_TIME = 10000;//milli second
+    bool WiFiAP = false;      // Do yo want the ESP as AP?
 
+    const int ADC_MAX = 1023;//10 bits
+    const int DEBOUNCING_TIME = 150;//milli second
+
+    const int BLINK_NORMAL = 500;//milli second
+    const int BLINK_WARNING = 250;//milli second
+    const int BLINK_ERROR = 125;//milli second
+    const int SAMPLING_TIME = 10000;//milli second
+
+#endif

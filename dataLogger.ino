@@ -20,7 +20,7 @@
 #include "SequenceTimer.h"
 #include "logsheet.h"
 
-SequenceTimer   mainSequence("Sequence");
+SequenceTimer   mainSequence("mainSequence");
 
 AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
@@ -45,12 +45,21 @@ void urlController();
 void handleLogin();
 void handleConfig();
 void loadStaticFile();//css, js
+void listAllFilesInDir(String);//list files in all dir's
 
 void setup(){
   // Serial port for debugging purposes
   Serial.begin(115200);
   while (!Serial) {;}
   if (DEBUG) { Serial.print(F("\n\nSerial started at 115200\n" ));   }
+
+  // Initialize LittleFS
+  Serial.println("Begin LittleFS");
+  if(!LittleFS.begin()){
+    Serial.println("An Error has occurred while mounting LittleFS");
+    return;
+  }
+  listAllFilesInDir("/");
 
   pinMode(ledPin, OUTPUT);
 
@@ -60,28 +69,21 @@ void setup(){
   logsheet.AttachDisplay(&display);
   logsheet.info();
 
-  // Initialize LittleFS
-  Serial.println("Begin LittleFS");
-  if(!LittleFS.begin()){
-    Serial.println("An Error has occurred while mounting LittleFS");
-    return;
-  }
-
   // Start WiFi
   if (WiFiAP)
     startWiFiAP();
   else
     startWiFiClient();
 
-  Serial.println("Contacting Time Server");
-  configTime(3600 * timezone, daysavetime * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
-  struct tm tmstruct ;
-  delay(2000);
-  tmstruct.tm_year = 0;
-  getLocalTime(&tmstruct, 5000);
-  Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct.tm_year) + 1900, (tmstruct.tm_mon) + 1, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
+  struct tm tmstruct = getTimeNtp();
+  tmstruct.tm_year += 1900;
+  tmstruct.tm_mon +=1;
+  Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", tmstruct.tm_year, tmstruct.tm_mon, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
   Serial.println("");
-  
+
+  //logsheet setTime
+  logsheet.setTime(getTimeNtp());
+
   //start mDNS
   startMDNS();
 
@@ -96,7 +98,21 @@ void loop(){
 
   //Logsheet action
   logsheet.execute(SAMPLING_TIME);
+
+  mainSequence.execute();
   
+  if (mainSequence.isAMinuteEvent())logsheet.setTime(getTimeNtp());
+  
+}
+
+struct tm getTimeNtp(){
+  Serial.println("Contacting Time Server");
+  configTime(3600 * timezone, daysavetime * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
+  struct tm tmstruct;
+  delay(2000);
+  tmstruct.tm_year = 0;
+  getLocalTime(&tmstruct, 5000);
+  return tmstruct;
 }
 
 void startWiFiClient(){
@@ -206,6 +222,24 @@ void loadStaticFile(){
 
 }
 
+void listAllFilesInDir(String dir_path){
+	Dir dir = LittleFS.openDir(dir_path);
+	while(dir.next()) {
+		if (dir.isFile()) {
+			// print file names
+			Serial.print("File: ");
+			Serial.println(dir_path + dir.fileName());
+		}
+		if (dir.isDirectory()) {
+			// print directory names
+			Serial.print("Dir: ");
+			Serial.println(dir_path + dir.fileName() + "/");
+			// recursive file listing inside new directory
+			listAllFilesInDir(dir_path + dir.fileName() + "/");
+		}
+	}
+}
+
 //NTP
 bool getLocalTime(struct tm * info, uint32_t ms) {
   uint32_t count = ms / 10;
@@ -228,7 +262,6 @@ bool getLocalTime(struct tm * info, uint32_t ms) {
   }
   return false;
 }
-
 
 /*  
   // Stores LED state
