@@ -15,10 +15,14 @@
 #include <ESP8266mDNS.h>
 #include <ESPAsyncWebServer.h>
 #include <WebSocketsServer.h>
+#include <ESP8266WiFiMulti.h> 
 
 #include "dataLogger.h"
 #include "SequenceTimer.h"
 #include "logsheet.h"
+
+AccesUser accessEngineer("accessEngineer");
+AccesUser accessOperator("accessOperator");
 
 SequenceTimer   mainSequence("mainSequence");
 
@@ -29,6 +33,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 DHT dht(DHTPIN, DHTTYPE);
 Logsheet logsheet("logsheet");
 
+ESP8266WiFiMulti wifiMulti;     // Create an instance of the ESP8266WiFiMulti class, called 'wifiMulti'
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
@@ -40,7 +45,10 @@ boolean webSocketIsOpen = false;
 //functions prototype
 void startWiFiAP();
 void startWiFiClient();
+void startWiFiMulti();
 void startMDNS();
+void loadUsers();
+
 void urlController();
 void handleLogin();
 void handleConfig();
@@ -61,6 +69,11 @@ void setup(){
   }
   listAllFilesInDir("/");
 
+  //load Engineer and Operator from littleFS
+  loadUsers();
+  accessEngineer.info();
+  accessOperator.info();
+
   pinMode(ledPin, OUTPUT);
 
   // Initialize the sensor
@@ -70,10 +83,9 @@ void setup(){
   logsheet.info();
 
   // Start WiFi
-  if (WiFiAP)
-    startWiFiAP();
-  else
-    startWiFiClient();
+  if (WiFiAP) startWiFiAP();
+  //else startWiFiClient();
+  else startWiFiMulti();
 
   struct tm tmstruct = getTimeNtp();
   tmstruct.tm_year += 1900;
@@ -115,10 +127,28 @@ struct tm getTimeNtp(){
   return tmstruct;
 }
 
+void startWiFiMulti() { // Try to connect to some given access points. Then wait for a connection
+  wifiMulti.addAP(ssid1,password1);   // add Wi-Fi networks you want to connect to
+  wifiMulti.addAP(ssid2,password2);
+  wifiMulti.addAP(ssid3,password3);
+
+  Serial.println("Connecting");
+  while (wifiMulti.run() != WL_CONNECTED) {  // Wait for the Wi-Fi to connect
+    delay(250);
+    Serial.print('.');
+  }
+  Serial.println("\r\n");
+  Serial.print("Connected to ");
+  Serial.println(WiFi.SSID());             // Tell us what network we're connected to
+  Serial.print("IP address:\t");
+  Serial.print(WiFi.localIP());            // Send the IP address of the ESP8266 to the computer
+  Serial.println("\r\n");
+}
+
 void startWiFiClient(){
-  Serial.println("Connecting to "+(String)ssid);
+  Serial.println("Connecting to "+(String)ssid1);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid1, password1);
   
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -132,7 +162,7 @@ void startWiFiClient(){
 
 void startWiFiAP(){
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(ssid, password);
+  WiFi.softAP(ssid1, password1);
   Serial.println("AP started");
   Serial.println("IP address: " + WiFi.softAPIP().toString());
 }
@@ -205,14 +235,29 @@ void loadStaticFile(){
     request->send(LittleFS, "/style.css", "text/css");
   });
 
+  // Route to load authentication.js file
+  server.on("/authentication.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/authentication.js", "text/js");
+  });
+
   // Route to load report.js file
   server.on("/report.js", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/report.js", "text/js");
   });
 
-  // Route to load functions.js file
-  server.on("/functions.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/functions.js", "text/js");
+  // Route to load index.js file
+  server.on("/index.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/index.js", "text/js");
+  });
+
+  // Route to load login.js file
+  server.on("/login.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/login.js", "text/js");
+  });
+
+  // Route to load config.js file
+  server.on("/config.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(LittleFS, "/config.js", "text/js");
   });
 
   // Route to load widgets.js file
@@ -238,6 +283,97 @@ void listAllFilesInDir(String dir_path){
 			listAllFilesInDir(dir_path + dir.fileName() + "/");
 		}
 	}
+}
+
+void loadUsers(){
+  /*
+  {
+    "Engineer": {
+      "username":"engineer",
+      "password":"123456",
+      "email":"engineer@example.com",
+      "level":0
+    },
+    "Operator": {
+      "username":"operator",
+      "password":"123",
+      "email":"operator@example.com",
+      "level":9
+    }
+  }
+
+  ! Stream& input;
+
+
+  StaticJsonDocument<384> doc;
+
+  DeserializationError error = deserializeJson(doc, input);
+
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+
+  JsonObject Engineer = doc["Engineer"];
+  const char* Engineer_username = Engineer["username"]; // "engineer"
+  const char* Engineer_password = Engineer["password"]; // "123456"
+  const char* Engineer_email = Engineer["email"]; // "engineer@example.com"
+  int Engineer_level = Engineer["level"]; // 0
+
+  JsonObject Operator = doc["Operator"];
+  const char* Operator_username = Operator["username"]; // "operator"
+  const char* Operator_password = Operator["password"]; // "123"
+  const char* Operator_email = Operator["email"]; // "operator@example.com"
+  int Operator_level = Operator["level"]; // 9
+
+  */
+  userData userDt;
+  Serial.println("_setupFileCfgParameter(String fileName)");
+
+  String fullFileName = PATH_ROOT + FILE_USER;
+
+  Serial.print("fullFileName : ");
+  Serial.println(fullFileName);
+
+  char fileNameChar[31];
+  fullFileName.toCharArray(fileNameChar,31);
+
+  File file = LittleFS.open(fileNameChar, "r");
+  if (!file) {
+    Serial.println("Failed to open file for reading");
+  }
+  else{
+    StaticJsonDocument<384> doc;
+
+    DeserializationError error = deserializeJson(doc, file);
+
+    if (error) {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.f_str());
+      return;
+    }
+
+    JsonObject Engineer = doc["Engineer"];
+    //Engineer
+    userDt.username = (String) Engineer["username"];
+    userDt.password = (String) Engineer["password"];
+    userDt.email = (String) Engineer["email"];
+    String level = (String) Engineer["level"];
+    userDt.level = level.toInt();
+    accessEngineer.setUser(userDt);
+
+    JsonObject Operator = doc["Operator"];
+    //Engineer
+    userDt.username = (String) Operator["username"];
+    userDt.password = (String) Operator["password"];
+    userDt.email = (String) Operator["email"];
+    level = (String) Operator["level"];
+    userDt.level = level.toInt();
+    accessOperator.setUser(userDt);
+
+    file.close();
+  }
 }
 
 //NTP

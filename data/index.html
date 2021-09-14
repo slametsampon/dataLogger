@@ -19,12 +19,12 @@
 
     <div class="topnav">
       <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/report">Report</a></li>   
-          <li><a href="/config">Config</a></li>   
-          <li><a href="/login">Login</a></li>   
-          <li><a href="/logout">Logout</a></li>   
-        </ul>
+        <li id = "home"><a href="/" class="disabled-link">Home</a></li>
+        <li id = "report"><a href="/report">Report</a></li>   
+        <li id = "config"><a href="/config">Config</a></li>   
+        <li id = "login"><a href="/login">Login</a></li>   
+        <li id = "logout"><a href="/logout">Logout</a></li>   
+      </ul>
     </div>
   
     <div id='wrapper'>
@@ -59,16 +59,19 @@
           <div> <div class='box red'></div> Temperature</div>
           <div> <div class='box blue'></div> Humidity</div>
         </div>
+        <!--
         <p>
           <a class="btn btn-success" role="button">Current</a>
           <a class="btn btn-success" role="button">Hist-Hour</a>
           <a class="btn btn-success" role="button">Hist-Day</a>
         </p>   
+        -->
       </div>      
  
     </div> <!--  'wrapper'  -->
   </body>
  
-  <script src="functions.js"></script> 
+  <script src="authentication.js"></script>
+  <script src="index.js"></script> 
   <script src="widgets.js"></script> 
 </html> 

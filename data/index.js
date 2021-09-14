@@ -1,4 +1,3 @@
-
 function updateGraph(t,h)
 {
 
@@ -134,4 +133,11 @@ var humdArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9
 var t = 20;
 var h = 60;
 
-document.addEventListener('DOMContentLoaded', init, false);
+//document.addEventListener('DOMContentLoaded', init, false);
+
+function setupIndex(){
+    init();
+    userAccess(0);
+}
+
+document.addEventListener('DOMContentLoaded', setupIndex, false);

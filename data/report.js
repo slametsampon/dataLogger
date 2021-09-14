@@ -42,6 +42,15 @@ function fillDataTable(data){
 }
 
 let table = document.querySelector("table");
+
+function createCaption(table){
+  var d = new Date();
+  var t = d.toLocaleDateString();
+  
+  let caption = table.createCaption();
+  caption.textContent = 'Hourly Average : ' + t;
+}
+
 function generateReportTableHead(table, dataHeader) {
   let thead = table.createTHead();
   let row = thead.insertRow();
@@ -71,23 +80,31 @@ function generateReportTable(table) {
     let text2 = document.createTextNode(humdArray[i]);
     cell2.appendChild(text2);
   }
+
+  generateReportTableHead(table, headerArray);
+  createCaption(table);  
+}
+
+function reportBuildingSimul() {
+  initRandomDataTable();
+  generateReportTable(table);
+
+  userAccess(0);
 }
 
 function reportBuilding() {
   var xhttp = new XMLHttpRequest();
-xhttp.onreadystatechange = function() {
+  xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var respText = this.responseText;
-      //document.getElementById("json").innerHTML = respText;
-      //initRandomDataTable();
       fillDataTable(respText);
       generateReportTable(table);
-      generateReportTableHead(table, headerArray);
-      respText = '';
 
+      userAccess(0);
     }
   };
   xhttp.open("GET", "/jsonData", true);
   xhttp.send();
 }
+//document.addEventListener('DOMContentLoaded', reportBuildingSimul, false);
 document.addEventListener('DOMContentLoaded', reportBuilding, false);

@@ -46,16 +46,18 @@ float increment = doc["increment"]; // 1.1
 #include "Arduino.h"
 #include  <ArduinoJson.h>
 
+  const int USER_NAME = 0;
+  const int USER_PASSWORD = 1;
+  const int USER_EMAIL = 2;
+  const int USER_LEVEL = 3;
+
   const int PARAMETER_VALUE = 0;
   const int PARAMETER_LOW_RANGE = 1;
   const int PARAMETER_HIGH_RANGE = 2;
   const int PARAMETER_LOW_LIMIT = 3;
   const int PARAMETER_HIGH_LIMIT = 4;
   const int PARAMETER_ALFA_EMA = 5;
-  const int PARAMETER_INCREMENT = 6;
-  const int PARAMETER_ALARM = 7;
-  const int PARAMETER_OPERATION_MODE = 8;
-  const float DELTA_INCREMENT = 0.5;
+  const int PARAMETER_ALARM = 6;
 
   //commSer header code
   const int DATA_OPERATION = 0;
@@ -73,6 +75,7 @@ float increment = doc["increment"]; // 1.1
   typedef struct userData{
       String username;//engineer
       String password;//123456
+      String email;//exampla@example.com
       int level;
   }userData;
   class AccesUser{
@@ -84,7 +87,7 @@ float increment = doc["increment"]; // 1.1
       float getUser(int);
       void setUserJson(JsonObject);
       void setUser(userData);
-      void setUser(int, float);
+      void setUser(int, String);
       String getId();
       void info();
 

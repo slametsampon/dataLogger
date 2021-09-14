@@ -2,6 +2,81 @@
 
 
 //AccessParam - Class
+AccesUser::AccesUser(String id):_id(id){}
+
+String AccesUser::getJson(){
+  /*
+
+    {
+      "username":"engineer",
+      "password":"123456",
+      "email":"engineer@example.com",
+      "level":0
+    }
+
+  StaticJsonDocument<128> doc;
+
+  doc["username"] = "engineer";
+  doc["password"] = "123456";
+  doc["email"] = "engineer@example.com";
+  doc["level"] = 0;
+
+  serializeJson(doc, output);
+
+  */
+
+  // Get a reference to the root object
+  StaticJsonDocument<128> doc;
+  String output;
+  
+  doc["username"] = _userData.username;
+  doc["password"] = _userData.password;
+  doc["email"] = _userData.email;
+  doc["level"] = _userData.level;
+
+  serializeJson(doc, output);
+  return output;
+}
+
+void AccesUser::setUser(userData userData){
+
+  _userData = userData;
+}
+
+void AccesUser::setUser(int idUser, String val){
+
+  switch (idUser)
+  {
+    case USER_NAME:
+      _userData.username = val;
+      break;
+
+    case USER_PASSWORD:
+      _userData.password = val;
+      break;
+    
+    case USER_EMAIL:
+      _userData.email = val;
+      break;
+    
+    case USER_LEVEL:
+      _userData.level = val.toInt();
+      break;
+    
+    default:
+      break;
+  }
+}
+
+void AccesUser::info(){
+  Serial.println("AccesUser::info()");
+
+  String strJson = this->getJson();
+  Serial.println(strJson);
+}
+
+
+//AccessParam - Class
 AccessParam::AccessParam(String id):_id(id){}
 
 void AccessParam::init(String id, param dtParam){
@@ -153,7 +228,6 @@ boolean AccessParam::isChangeAble(int idParam){
     case PARAMETER_HIGH_RANGE:
     case PARAMETER_LOW_LIMIT:
     case PARAMETER_HIGH_LIMIT:
-    case PARAMETER_INCREMENT:
     case PARAMETER_ALFA_EMA:
       isChangeAble = true;
       break;
@@ -164,6 +238,7 @@ boolean AccessParam::isChangeAble(int idParam){
   
   return isChangeAble;
 }
+
 void AccessParam::setParam(int idParam, float val){
 
   switch (idParam)

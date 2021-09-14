@@ -1,4 +1,7 @@
-body           { background-color: #ffffff; font-size: 100% }
+body           { 
+  background-color: #ffffff; 
+  font-size: 150% 
+}
 #wrapper       { width: 500px; margin: 20px auto;  padding: 5px 5px 5px 5px;    text-align:center;   border: 2px solid blue;   border-radius: 15px;  }
 /*#wrapper       { width: 100%; margin: 20px auto;  padding: 5px 5px 5px 5px;    text-align:center;   border: 2px solid blue;   border-radius: 15px;  }*/
 h2             { text-align: center;}
@@ -107,3 +110,13 @@ tr:nth-child(even) {
     padding-bottom:20px;
     padding-left:20px;
   }
+  .disabled-link {
+    pointer-events: none;
+    color: grey;
+  }
+  .enable-link {
+    pointer-events: auto;
+    color: white;
+  }
+  
+  
