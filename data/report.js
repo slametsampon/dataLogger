@@ -43,9 +43,47 @@ function fillDataTable(data){
 
 let table = document.querySelector("table");
 
-function createCaption(table){
+function dayName(dayVal){
+  var dName = "";
+
+  if (dayVal == 0)dName = "Sunday";
+  else if (dayVal == 1)dName = "Monday";
+  else if (dayVal == 2)dName = "Tuesday";
+  else if (dayVal == 3)dName = "Wednesday";
+  else if (dayVal == 4)dName = "Thursday";
+  else if (dayVal == 5)dName = "Friday";
+  else if (dayVal == 6)dName = "Saturday";
+
+  return dName;
+}
+
+var reqDate = 0;
+function calcDate(){
+  if(document.getElementById("days").value != ""){
+    let reqDay = parseInt(document.getElementById("days").value);
+    //let reqDay = 5;
+  
+    let d = new Date();
+    let currDay = d.getDay();
+  
+    let difDay = currDay - reqDay;
+  
+    if (difDay == 0) difDay = 0;
+    else if (difDay < 0) difDay = 7 + difDay;
+    reqDate = difDay;  
+  }
+  else reqDate = 0;
+}
+
+function createCaption(table, dateVal){
   var d = new Date();
+  let currDate = d.getDate();
+  d.setDate(currDate - dateVal);
+
+  let day = d.getDay();
+
   var t = d.toLocaleDateString();
+  t = dayName(day) + ", " + t;
   
   let caption = table.createCaption();
   caption.textContent = 'Hourly Average : ' + t;
@@ -82,29 +120,41 @@ function generateReportTable(table) {
   }
 
   generateReportTableHead(table, headerArray);
-  createCaption(table);  
+  createCaption(table,reqDate);  
 }
 
 function reportBuildingSimul() {
+
+  //clear table
+  $("#table").empty();
+
   initRandomDataTable();
   generateReportTable(table);
 
-  userAccess(0);
+  userAccess(9);
 }
 
-function reportBuilding() {
+function getHourlyAvg(){
+  //calculate date
+  calcDate();
+
+  //clear table
+  $("#table").empty();
+
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var respText = this.responseText;
+      document.getElementById("diagText").innerHTML = respText;
       fillDataTable(respText);
       generateReportTable(table);
 
-      userAccess(0);
+      userAccess(9);
     }
   };
-  xhttp.open("GET", "/jsonData", true);
+  xhttp.open("GET", "/hourlyAvgDay?days="+document.getElementById("days").value, true);
   xhttp.send();
 }
+
 //document.addEventListener('DOMContentLoaded', reportBuildingSimul, false);
-document.addEventListener('DOMContentLoaded', reportBuilding, false);
+document.addEventListener('DOMContentLoaded', getHourlyAvg, false);

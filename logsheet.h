@@ -39,6 +39,7 @@ enum DayOfWeek{
             void AttachSensor(DHT*);
             void AttachDisplay(Adafruit_SSD1306*);
             String getHour24();
+            String getHourlyAvg(int);
             void setTime(struct tm);
             void execute(unsigned long);//sampling periode ms
             String getValues();//return string in format Json for Temp, Humidity

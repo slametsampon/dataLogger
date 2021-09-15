@@ -82,6 +82,10 @@ String Logsheet::getHour24(){
   return (this->_readFileJson(_tm.tm_wday));
 }
 
+String Logsheet::getHourlyAvg(int dWeek){
+  return (this->_readFileJson(dWeek));
+}
+
 void Logsheet::setTime(struct tm tmVal){
   _tm = tmVal;
   _tm.tm_year += 1900;

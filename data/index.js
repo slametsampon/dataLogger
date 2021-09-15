@@ -137,7 +137,7 @@ var h = 60;
 
 function setupIndex(){
     init();
-    userAccess(0);
+    userAccess(9);
 }
 
 document.addEventListener('DOMContentLoaded', setupIndex, false);

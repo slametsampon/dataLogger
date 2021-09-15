@@ -25,31 +25,28 @@
         </div>
       
         <div class="container">
+            <p id = "diagText">diagText</p>
 
             <br>
-            <table>
+            <table id="table">
                 <!-- here goes our data! -->
             </table>
             <br>
-
-            <form action="/reportDay" method="POST">
                 <label for="days">Choose a Day :</label>
-                <select name="days" id="days">
-                  <option value="">Select a day</option>
-                  <option value="Sunday">Sunday</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
+                <select name="days" id="days" onchange="calcDate(this)">
+                    <option value="">Select a day</option>
+                    <option value="0">Sunday</option>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
                 </select>
-                <input type="submit" value="Submit">
-              </form>         
-
-              <p>
-                <a class="btn btn-success" role="button">Email</a>
-              </p>         
-
+                <a class="btn btn-primary" role="button" onclick="getHourlyAvg()">Get Data</a>
+                <p>
+                    <a class="btn btn-success" role="button">Email</a>
+                </p>         
         </div>
     </body>
 

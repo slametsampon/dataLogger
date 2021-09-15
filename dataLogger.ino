@@ -186,11 +186,21 @@ void urlController(){
     request->send(LittleFS, "/report.html", "text/html");
   });
   
-  server.on("/jsonData", HTTP_GET, [](AsyncWebServerRequest *request){
-    String webPage = logsheet.getHour24();
-    request->send(200, "application/json", webPage);
+  server.on("/hourlyAvgDay", HTTP_GET, [](AsyncWebServerRequest * request){
+    if(request->hasArg("days")){
+        String arg = request->arg("days");
+        Serial.print("The days is: ");
+        Serial.println(arg);
+
+        int day = arg.toInt();
+
+        String hourlyAvg = logsheet.getHourlyAvg(day);
+        request->send(200, "application/json", hourlyAvg);
+    } else {
+        Serial.println("Post did not have a 'samplingTime' field.");
+    }
   });
-  
+
   // route to update sensor - temperature and humidity
   server.on("/getSensor", HTTP_GET, [](AsyncWebServerRequest *request){
     String strDhtVal = logsheet.getValues();
@@ -198,8 +208,8 @@ void urlController(){
     Serial.println(strDhtVal);
   });
   
-  server.on("/login", HTTP_GET, [](AsyncWebServerRequest * request){
-    request->send(LittleFS, "/login.html", "text/html");
+  server.on("/logout", HTTP_GET, [](AsyncWebServerRequest * request){
+    request->send(LittleFS, "/index.html", "text/html");
   });
 
   server.on("/login", HTTP_ANY, [](AsyncWebServerRequest * request){

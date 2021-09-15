@@ -1,5 +1,5 @@
 function setupConfig(){
-    userAccess(0);
+    userAccess(9);
 }
 
 document.addEventListener('DOMContentLoaded', setupConfig, false);
