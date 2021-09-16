@@ -1,7 +1,9 @@
-let operatorLevel = 1;
-let engineerLevel = 9;
-
-  function userAccess(level){
+  function userAccess(data){
+    const operatorLevel = 1;
+    const engineerLevel = 9;
+    
+    let activeUsr = JSON.parse(data);
+    let level = parseInt(activeUsr.level)
     if (level == engineerLevel) {
         // Selecting element
         var elem = document.getElementById("report");     

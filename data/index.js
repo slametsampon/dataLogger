@@ -1,3 +1,10 @@
+var tempArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
+var humdArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
+var t = 20;
+var h = 60;
+var sensorCfg;
+var activeUser;
+
 function updateGraph(t,h)
 {
   drawGraph('graph',
@@ -20,7 +27,6 @@ function processReceivedData(evt)
   //updateValues(60,20);
 }
 
-// This is executed after the document has finished loading.
 function setupWidgets(data){
   sensorCfg = JSON.parse(data);
 
@@ -92,7 +98,6 @@ setInterval(function ( ) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      //document.getElementById("temperature").innerHTML = this.responseText;
       updateValues(this.responseText);
     }
   };
@@ -100,41 +105,26 @@ setInterval(function ( ) {
   xhttp.send();
 }, 10000 ) ;
 
-function getSensorCfg() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      setupWidgets(this.responseText);
-    }
-  };
-  xhttp.open("GET", "/getSensorCfg", true);
-  xhttp.send();
-};
-
-function getActiveUser() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      activeUser = JSON.parse(this.responseText);
-    }
-  };
-  xhttp.open("GET", "/getActiveUser", true);
-  xhttp.send();
-};
-
-var tempArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
-var humdArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
-var t = 20;
-var h = 60;
-var sensorCfg;
-var activeUser;
-
-//document.addEventListener('DOMContentLoaded', init, false);
-
+// This is executed after the document has finished loading.
 function setupIndex(){
-  getSensorCfg();
-  userAccess(9);
-
+  var index_url = ["getActiveUser", "getSensorCfg"];
+  var request = new XMLHttpRequest();
+  (function loop(i, length) {
+      if (i>= length) {
+          return;
+      }
+      var url = "/" + index_url[i];
+  
+      request.open("GET", url, true);
+      request.onreadystatechange = function() {
+          if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
+            if(i == 0)userAccess(this.responseText);
+            else if(i == 1)setupWidgets(this.responseText);
+            loop(i + 1, length);
+          }
+      }
+      request.send();
+  })(0, index_url.length);
 }
 
 document.addEventListener('DOMContentLoaded', setupIndex, false);

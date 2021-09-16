@@ -229,10 +229,17 @@ void urlController(){
     Serial.println(strDhtVal);
   });
   
+  // route to logout
   server.on("/logout", HTTP_GET, [](AsyncWebServerRequest * request){
     request->send(LittleFS, "/index.html", "text/html");
   });
 
+  // route to login
+  server.on("/login", HTTP_GET, [](AsyncWebServerRequest * request){
+    request->send(LittleFS, "/login.html", "text/html");
+  });
+
+  // route to login - post
   server.on("/login", HTTP_ANY, [](AsyncWebServerRequest * request){
     if(request->hasArg("username")){
         String arg = request->arg("username");
@@ -244,10 +251,12 @@ void urlController(){
     }
   });
 
+  // route to config sensor - temperature and humidity
   server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/config.html", "text/html");
   });
   
+  // route to config sensor - post - temperature and humidity
   server.on("/config", HTTP_ANY, [](AsyncWebServerRequest * request){
     if(request->hasArg("samplingTime")){
         String arg = request->arg("samplingTime");
