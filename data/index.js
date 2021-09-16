@@ -1,11 +1,9 @@
 function updateGraph(t,h)
 {
-
-  var graphCanvas = 'graph';
-  var graphMin = -30;
-  var graphMax = 100;
-  var drawLines = true;
-  drawGraph(graphCanvas, graphMin, graphMax, drawLines, t, h);
+  drawGraph('graph',
+    sensorCfg.Temperature.lowRange,
+    sensorCfg.Humidity.highRange,
+    true, t, h);
 }
 
 function processReceivedData(evt) 
@@ -22,14 +20,39 @@ function processReceivedData(evt)
   //updateValues(60,20);
 }
 
+// This is executed after the document has finished loading.
+function setupWidgets(data){
+  sensorCfg = JSON.parse(data);
+
+  drawDial('canvasTemp',  '#0b9106', 160, 20,
+    sensorCfg.Temperature.lowRange,
+    sensorCfg.Temperature.highRange,
+    sensorCfg.Temperature.highLimit,
+    t);
+
+  drawDial('canvasHumid', '#aaaaff', 160, 20,
+    sensorCfg.Humidity.lowRange,
+    sensorCfg.Humidity.highRange,
+    sensorCfg.Humidity.highLimit,
+    h);
+  
+  
+  drawGraph('graph',
+    sensorCfg.Temperature.lowRange,
+    sensorCfg.Humidity.highRange,
+    false, t, h);
+
+  var myVarTime = setInterval(updateTime, 1000); 
+}
+
 function updateValues(data){
-  const dataJson = JSON.parse(data);
+  const sensor = JSON.parse(data);
 
-  var t = dataJson.Temperature.value;
-  var statusT = dataJson.Temperature.status;
+  var t = sensor.Temperature.value;
+  var statusT = sensor.Temperature.status;
 
-  var h = dataJson.Humidity.value;
-  var statusH = dataJson.Humidity.status;
+  var h = sensor.Humidity.value;
+  var statusH = sensor.Humidity.status;
 
   document.getElementById('temp').innerHTML = t;
   document.getElementById('StatusTemp').innerHTML = statusT;
@@ -37,8 +60,24 @@ function updateValues(data){
   document.getElementById('humd').innerHTML = h;
   document.getElementById('StatusHumd').innerHTML = statusH;
 
-  drawDial('canvasTemp',  '#0b9106', 160, 20, -30,  50, 40, t);
-  drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, 90, h);
+  drawDial('canvasTemp',  '#0b9106', 160, 20,
+    sensorCfg.Temperature.lowRange,
+    sensorCfg.Temperature.highRange,
+    sensorCfg.Temperature.highLimit,
+    t);
+
+  drawDial('canvasHumid', '#aaaaff', 160, 20,
+    sensorCfg.Humidity.lowRange,
+    sensorCfg.Humidity.highRange,
+    sensorCfg.Humidity.highLimit,
+    h);
+  
+  
+  drawGraph('graph',
+    sensorCfg.Temperature.lowRange,
+    sensorCfg.Humidity.highRange,
+    false, t, h);
+
   updateGraph(t,h);
 }
 
@@ -47,21 +86,6 @@ function updateTime()
    var d = new Date();
    var t = d.toLocaleTimeString();
    document.getElementById('time').innerHTML = t;
-}
-
-// This is executed after the document has finished loading.
-function init() 
-{
-  //Socket = new WebSocket('ws://' + window.location.hostname + ':81/');
-  //Socket.onmessage = function(event) { processReceivedData(event); };
-
-  console.log('started');
-  //drawDial('canvasTemp',  '#ffaaaa', 160, 20, -30,  50, 20); 
-  drawDial('canvasTemp',  '#0b9106', 160, 20, -30,  50, 40, t);
-  drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, 90, h);
-  drawGraph('graph', -30, 100, false, t, h);
-
-  var myVarTime = setInterval(updateTime, 1000); 
 }
 
 setInterval(function ( ) {
@@ -76,68 +100,41 @@ setInterval(function ( ) {
   xhttp.send();
 }, 10000 ) ;
 
-//new functions
-/*
-function fillDataTable(data){
-  const dataJson = JSON.parse(data);
-  let dataLen = dataJson.time.length;
-
-  text = "<ul>";
-  for (let i = 0; i < dataLen; i++) {
-    if (i<10){
-      i_str = i;
-      timeArray[i] = "0" + i.toString() + ":00";
-      }
-      else{
-          timeArray[i] = i.toString() + ":00";
-      }
-      tempArray[i] = dataJson.temperature[i];
-      humdArray[i] = dataJson.humidity[i];
-  }  
-}
-
-setInterval(function ( ) {
+function getSensorCfg() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      //document.getElementById("temperature").innerHTML = this.responseText;
-      document.getElementById('temp').innerHTML = this.responseText;
-      t = parseInt(this.responseText);
-      drawDial('canvasTemp',  '#0b9106', 160, 20, -30,  50, 40, t);
-      updateGraph(t,h);
+      setupWidgets(this.responseText);
     }
   };
-  xhttp.open("GET", "/temperature", true);
+  xhttp.open("GET", "/getSensorCfg", true);
   xhttp.send();
-}, 10000 ) ;
+};
 
-setInterval(function ( ) {
+function getActiveUser() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      //document.getElementById("humidity").innerHTML = this.responseText;
-      document.getElementById('humd').innerHTML = this.responseText;
-      h = parseInt(this.responseText);
-      drawDial('canvasHumid', '#aaaaff', 160, 20,   0, 100, 90, h);
-      updateGraph(t,h);
+      activeUser = JSON.parse(this.responseText);
     }
   };
-  xhttp.open("GET", "/humidity", true);
+  xhttp.open("GET", "/getActiveUser", true);
   xhttp.send();
-}, 10000 ) ;
-
-*/
+};
 
 var tempArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
 var humdArray = [ -9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999,-9999 ];
 var t = 20;
 var h = 60;
+var sensorCfg;
+var activeUser;
 
 //document.addEventListener('DOMContentLoaded', init, false);
 
 function setupIndex(){
-    init();
-    userAccess(9);
+  getSensorCfg();
+  userAccess(9);
+
 }
 
 document.addEventListener('DOMContentLoaded', setupIndex, false);

@@ -1,7 +1,7 @@
 let operatorLevel = 1;
 let engineerLevel = 9;
 
-function userAccess(level){
+  function userAccess(level){
     if (level == engineerLevel) {
         // Selecting element
         var elem = document.getElementById("report");     

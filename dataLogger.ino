@@ -23,6 +23,7 @@
 
 AccesUser accessEngineer("accessEngineer");
 AccesUser accessOperator("accessOperator");
+AccesUser activeUser("activeUser");
 
 SequenceTimer   mainSequence("mainSequence");
 
@@ -48,6 +49,7 @@ void startWiFiClient();
 void startWiFiMulti();
 void startMDNS();
 void loadUsers();
+void setupDefaultUser();
 
 void urlController();
 void handleLogin();
@@ -73,6 +75,10 @@ void setup(){
   loadUsers();
   accessEngineer.info();
   accessOperator.info();
+
+  //setup default active user
+  setupDefaultUser();
+  activeUser.info();
 
   pinMode(ledPin, OUTPUT);
 
@@ -201,6 +207,21 @@ void urlController(){
     }
   });
 
+  // route to active user
+  server.on("/getActiveUser", HTTP_GET, [](AsyncWebServerRequest *request){
+    Serial.println("server.on(/getActiveUser");
+    String activeUsr = activeUser.getJson();
+    request->send(200, "application/json", activeUsr);
+    Serial.println(activeUsr);
+  });
+  
+  // route to config sensor - temperature and humidity
+  server.on("/getSensorCfg", HTTP_GET, [](AsyncWebServerRequest *request){
+    String sensorCfg = logsheet.getCfgParameter();
+    request->send(200, "application/json", sensorCfg);
+    Serial.println(sensorCfg);
+  });
+  
   // route to update sensor - temperature and humidity
   server.on("/getSensor", HTTP_GET, [](AsyncWebServerRequest *request){
     String strDhtVal = logsheet.getValues();
@@ -385,6 +406,16 @@ void loadUsers(){
     file.close();
   }
 }
+
+void setupDefaultUser(){
+  userData userDt;
+  userDt.username = "guest";
+  userDt.password = "guest";
+  userDt.email = "guest@example.com";
+  userDt.level = 0;
+  activeUser.setUser(userDt);
+}
+
 
 //NTP
 bool getLocalTime(struct tm * info, uint32_t ms) {

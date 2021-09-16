@@ -77,12 +77,8 @@ String Logsheet::getValues(){
     return output;
 }
 
-String Logsheet::getHour24(){
-  //return (this->_initRandomJson());
-  return (this->_readFileJson(_tm.tm_wday));
-}
-
 String Logsheet::getHourlyAvg(int dWeek){
+  //return (this->_initRandomJson());
   return (this->_readFileJson(dWeek));
 }
 
@@ -93,6 +89,75 @@ void Logsheet::setTime(struct tm tmVal){
   Serial.println("Logsheet::setTime(struct tm tmVal)");
   Serial.printf("Now is : %d-%02d-%02d %02d:%02d:%02d\n", _tm.tm_year, _tm.tm_mon, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
   Serial.println("");
+}
+
+String Logsheet::getCfgParameter(){
+  String output;
+
+  /*
+    {
+    "Temperature": {
+      "unit":"°C",
+      "highRange":50.0,
+      "lowRange":0.0,
+      "highLimit":40.0,
+      "lowLimit":10.0,
+      "alfaEma":80.0
+    },
+    "Humidity": {
+      "unit":"%",
+      "highRange":100.0,
+      "lowRange":0.0,
+      "highLimit":90.0,
+      "lowLimit":40.0,
+      "alfaEma":80.0
+    }
+  }
+
+  StaticJsonDocument<256> doc;
+
+  JsonObject Temperature = doc.createNestedObject("Temperature");
+  Temperature["unit"] = "°C";
+  Temperature["highRange"] = 50;
+  Temperature["lowRange"] = 0;
+  Temperature["highLimit"] = 40;
+  Temperature["lowLimit"] = 10;
+  Temperature["alfaEma"] = 80;
+
+  JsonObject Humidity = doc.createNestedObject("Humidity");
+  Humidity["unit"] = "%";
+  Humidity["highRange"] = 100;
+  Humidity["lowRange"] = 0;
+  Humidity["highLimit"] = 90;
+  Humidity["lowLimit"] = 40;
+  Humidity["alfaEma"] = 80;
+
+  serializeJson(doc, output);
+
+  */
+
+  StaticJsonDocument<256> doc;
+
+  param dtParam = _paramTemperature->getParam();
+  JsonObject Temperature = doc.createNestedObject("Temperature");
+  Temperature["unit"] = dtParam.unit;
+  Temperature["highRange"] = dtParam.highRange;
+  Temperature["lowRange"] = dtParam.lowRange;
+  Temperature["highLimit"] = dtParam.highLimit;
+  Temperature["lowLimit"] = dtParam.lowLimit;
+  Temperature["alfaEma"] = dtParam.alfaEma;
+
+  dtParam = _paramHumidity->getParam();
+  JsonObject Humidity = doc.createNestedObject("Humidity");
+  Humidity["unit"] = dtParam.unit;
+  Humidity["highRange"] = dtParam.highRange;
+  Humidity["lowRange"] = dtParam.lowRange;
+  Humidity["highLimit"] = dtParam.highLimit;
+  Humidity["lowLimit"] = dtParam.lowLimit;
+  Humidity["alfaEma"] = dtParam.alfaEma;
+
+  serializeJson(doc, output);
+  return output;
 }
 
 void Logsheet::_oledDisplay(float t, float h){
