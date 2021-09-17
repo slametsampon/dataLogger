@@ -209,7 +209,6 @@ void urlController(){
 
   // route to active user
   server.on("/getActiveUser", HTTP_GET, [](AsyncWebServerRequest *request){
-    Serial.println("server.on(/getActiveUser");
     String activeUsr = activeUser.getJson();
     request->send(200, "application/json", activeUsr);
     Serial.println(activeUsr);
@@ -231,6 +230,10 @@ void urlController(){
   
   // route to logout
   server.on("/logout", HTTP_GET, [](AsyncWebServerRequest * request){
+
+    //set active user to default
+    setupDefaultUser();
+
     request->send(LittleFS, "/index.html", "text/html");
   });
 
@@ -240,15 +243,12 @@ void urlController(){
   });
 
   // route to login - post
-  server.on("/login", HTTP_ANY, [](AsyncWebServerRequest * request){
-    if(request->hasArg("username")){
-        String arg = request->arg("username");
-        Serial.print("The username is: ");
-        Serial.println(arg);
-        request->send(LittleFS, "/index.html", "text/html");
-    } else {
-        Serial.println("Post did not have a 'username' field.");
-    }
+  server.on("/login", HTTP_POST, [](AsyncWebServerRequest * request){
+    //check user
+    boolean valid = authenticationUser(request);
+    if (valid) request->send(LittleFS, "/index.html", "text/html");
+    else request->send(LittleFS, "/login.html", "text/html");
+
   });
 
   // route to config sensor - temperature and humidity
@@ -257,16 +257,133 @@ void urlController(){
   });
   
   // route to config sensor - post - temperature and humidity
-  server.on("/config", HTTP_ANY, [](AsyncWebServerRequest * request){
-    if(request->hasArg("samplingTime")){
-        String arg = request->arg("samplingTime");
-        Serial.print("The samplingTime is: ");
-        Serial.println(arg);
-        request->send(LittleFS, "/config.html", "text/html");
-    } else {
-        Serial.println("Post did not have a 'samplingTime' field.");
-    }
+  server.on("/config", HTTP_POST, [](AsyncWebServerRequest * request){
+    //validate parameters
+    boolean valid = validateParameter(request);
+
+    if (valid) request->send(LittleFS, "/index.html", "text/html");
+    else request->send(LittleFS, "/config.html", "text/html");
+
   });
+}
+
+boolean authenticationUser(AsyncWebServerRequest * request){
+  String username, password;
+  boolean status = false;
+
+  if(request->hasArg("username")){
+      username = request->arg("username");
+      Serial.print("The username is: ");
+      Serial.println(username);
+  }
+  if(request->hasArg("password")){
+      password = request->arg("password");
+      Serial.print("The password is: ");
+      Serial.println(password);
+  }
+  else {
+      Serial.println("Post did not have a 'username' field.");
+  }
+
+  //check username
+  if((username == accessEngineer.getUser(USER_NAME)) && (password == accessEngineer.getUser(USER_PASSWORD))){
+    status = true;
+    activeUser.setUser(accessEngineer.getUser());
+  }
+  else if((username == accessOperator.getUser(USER_NAME)) && (password == accessOperator.getUser(USER_PASSWORD))){
+    status = true;
+    activeUser.setUser(accessOperator.getUser());
+  }
+  return status;
+}
+
+boolean validateParameter(AsyncWebServerRequest * request){
+  boolean status = false;
+  String argData;
+  param dtParam;
+
+  if(request->hasArg("samplingTime")){
+      String argData = request->arg("samplingTime");
+      Serial.print("The samplingTime is: ");
+      Serial.println(argData);
+
+      float val = argData.toFloat();
+  } 
+  else if(request->hasArg("indicatorL")){
+      String argData = request->arg("indicatorL");
+      Serial.print("The indicatorL is: ");
+      Serial.println(argData);
+
+      float val = argData.toFloat();
+      dtParam.lowRange = val;
+  } 
+
+  else if(request->hasArg("indicatorL")){
+      String argData = request->arg("indicatorL");
+      Serial.print("The indicatorL is: ");
+      Serial.println(argData);
+
+      float val = argData.toFloat();
+      dtParam.lowRange = val;
+  } 
+
+  else if(request->hasArg("indicatorH")){
+      String argData = request->arg("indicatorH");
+      Serial.print("The indicatorH is: ");
+      Serial.println(argData);
+
+      float val = argData.toFloat();
+      dtParam.highRange = val;
+  } 
+
+  else if(request->hasArg("alarmL")){
+      String argData = request->arg("alarmL");
+      Serial.print("The alarmL is: ");
+      Serial.println(argData);
+
+      float val = argData.toFloat();
+      dtParam.lowLimit = val;
+  } 
+
+  else if(request->hasArg("alarmH")){
+      String argData = request->arg("alarmH");
+      Serial.print("The alarmH is: ");
+      Serial.println(argData);
+
+      float val = argData.toFloat();
+      dtParam.highLimit = val;
+  } 
+
+  else if(request->hasArg("alfaEma")){
+      String argData = request->arg("alfaEma");
+      Serial.print("The alfaEma is: ");
+      Serial.println(argData);
+
+      float val = argData.toFloat();
+      dtParam.alfaEma = val;
+  } 
+
+  else if(request->hasArg("config")){
+      String argData = request->arg("config");
+      Serial.print("The config is: ");
+      Serial.println(argData);
+
+      if(argData == "configT"){
+        status = true;
+        accessParamTemperature.setParam(dtParam);
+      }
+
+      else if(argData == "configH"){
+        status = true;
+        accessParamHumidity.setParam(dtParam);
+      }
+  } 
+
+  else {
+      Serial.println("Post did not have a 'samplingTime' field.");
+  }
+
+  return status;
 }
 
 void loadStaticFile(){

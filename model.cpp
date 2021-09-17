@@ -68,6 +68,36 @@ void AccesUser::setUser(int idUser, String val){
   }
 }
 
+userData AccesUser::getUser(){
+
+  return _userData;
+}
+
+String AccesUser::getUser(int idUser){
+
+  switch (idUser)
+  {
+    case USER_NAME:
+      return _userData.username ;
+      break;
+
+    case USER_PASSWORD:
+      return _userData.password ;
+      break;
+    
+    case USER_EMAIL:
+      return _userData.email ;
+      break;
+    
+    case USER_LEVEL:
+      return String (_userData.level);
+      break;
+    
+    default:
+      break;
+  }
+}
+
 void AccesUser::info(){
   Serial.println("AccesUser::info()");
 

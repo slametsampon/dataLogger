@@ -84,7 +84,7 @@ float increment = doc["increment"]; // 1.1
       AccesUser(String);
       String getJson();
       userData getUser();
-      float getUser(int);
+      String getUser(int);
       void setUserJson(JsonObject);
       void setUser(userData);
       void setUser(int, String);
