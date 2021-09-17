@@ -25,10 +25,9 @@
         </div>
       
         <div class="content">
-            <p id = "diagText">diagText</p>
             <div class="card">
                 <h5>Configuration</h5>
-                <form action="/config" method="POST">
+                <form action="/config" method="POST" onsubmit="return confirm('Are you sure you want to submit this parameters ?');">
 
                     <input type="radio" id="configT" name="config" value="configT" checked onclick="getSensorCfg()">
                     <label for="configT">Temperature</label><br>

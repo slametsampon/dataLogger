@@ -59,7 +59,6 @@ function getSensorCfg(){
 }
 
 function fillUpParameter(data){
-  document.getElementById("diagText").innerHTML = data;
   
   let sensorCfg = JSON.parse(data);
 

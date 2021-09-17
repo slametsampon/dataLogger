@@ -145,7 +145,6 @@ function getHourlyAvg(){
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var respText = this.responseText;
-      document.getElementById("diagText").innerHTML = respText;
       fillDataTable(respText);
       generateReportTable(table);
     }
