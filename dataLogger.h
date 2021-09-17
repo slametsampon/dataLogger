@@ -19,6 +19,15 @@
     const char* password3 = "muwa7x06";
     bool WiFiAP = false;      // Do yo want the ESP as AP?
 
+    #define SMTP_HOST "smtp.gmail.com"
+    #define SMTP_PORT 465
+
+    /* The sign in credentials */
+    #define AUTHOR_EMAIL "alumni86smansagtg@gmail.com"
+    #define AUTHOR_PASSWORD "alumiSmansa86gtg"
+
+    /* Recipient's email*/
+    #define RECIPIENT_EMAIL "slametsambwi@gmail.com"
 
     const char* mdnsName = "dataLogger";
 
