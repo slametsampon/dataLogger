@@ -41,6 +41,7 @@ address{
 .report_desc {
 	text-align: right;
 	margin-bottom: 20px;
+	margin-right: 20px;
 }
 
 /*Style for general tables*/
