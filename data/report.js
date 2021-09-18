@@ -195,20 +195,20 @@ function downloadAsPDF() {
   }
   var fileName = dName + '_ls.pdf';
 
-  var element = document.querySelector('report_form');
+  var element = document.querySelector('report_form');  
   const opt = {
       filename: fileName,
       margin: 2,
-      image: {type: 'jpeg', quality: 0.9},
+      image: {type: 'jpg', quality: 0.99}, 
+      html2canvas: {dpi: 192, letterRendering: true, useCORS: true}, 
       jsPDF: {
           format: 'a4',
           unit:'cm',
           orientation: 'portrait'
       }
   };
-  // New Promise-based usage:
   html2pdf().set(opt).from(element).save();
 }
 
-document.addEventListener('DOMContentLoaded', reportBuildingSimul, false);
-//document.addEventListener('DOMContentLoaded', setupReport, false);
+//document.addEventListener('DOMContentLoaded', reportBuildingSimul, false);
+document.addEventListener('DOMContentLoaded', setupReport, false);

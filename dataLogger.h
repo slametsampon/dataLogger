@@ -17,6 +17,9 @@
     const char* password2 = "sampon170466";
     const char* ssid3     = "SamFamily";
     const char* password3 = "muwa7x06";
+    const char* ssid4     = "Fariyo Ganteng";
+    const char* password4 = "Fariyoganteng";
+
     bool WiFiAP = false;      // Do yo want the ESP as AP?
 
     #define SMTP_HOST "smtp.gmail.com"
