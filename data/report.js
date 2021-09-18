@@ -57,8 +57,8 @@ function dayName(dayVal){
   return dName;
 }
 
-var reqDate = 0;
 function calcDate(){
+  var difDay = 0;
   if(document.getElementById("days").value != ""){
     let reqDay = parseInt(document.getElementById("days").value);
     //let reqDay = 5;
@@ -66,13 +66,12 @@ function calcDate(){
     let d = new Date();
     let currDay = d.getDay();
   
-    let difDay = currDay - reqDay;
+    difDay = currDay - reqDay;
   
     if (difDay == 0) difDay = 0;
     else if (difDay < 0) difDay = 7 + difDay;
-    reqDate = difDay;  
   }
-  else reqDate = 0;
+  return difDay;
 }
 
 function createCaption(table, dateVal){
@@ -89,6 +88,18 @@ function createCaption(table, dateVal){
   caption.textContent = 'Hourly Average : ' + t;
 }
 
+function createHeaderDate(dateVal){
+  var d = new Date();
+  let currDate = d.getDate();
+  d.setDate(currDate - dateVal);
+
+  let day = d.getDay();
+
+  document.getElementById("id_day").innerHTML = dayName(day);
+  document.getElementById("id_date").innerHTML = d.toLocaleDateString();
+  
+}
+
 function generateReportTableHead(table, dataHeader) {
   let thead = table.createTHead();
   let row = thead.insertRow();
@@ -101,6 +112,7 @@ function generateReportTableHead(table, dataHeader) {
 }
 
 function generateReportTable(table) {
+  createHeaderDate(calcDate());  
 
   let fLen = tempArray.length;
   for (let i = 0; i < fLen; i++) {
@@ -120,7 +132,7 @@ function generateReportTable(table) {
   }
 
   generateReportTableHead(table, headerArray);
-  createCaption(table,reqDate);  
+  //createCaption(table,calcDate());
 }
 
 function reportBuildingSimul() {
@@ -135,9 +147,6 @@ function reportBuildingSimul() {
 }
 
 function getHourlyAvg(){
-  //calculate date
-  calcDate();
-
   //clear table
   $("#table").empty();
 
@@ -178,5 +187,28 @@ function setupReport(){
   })(0, index_url.length);
 }
 
-//document.addEventListener('DOMContentLoaded', reportBuildingSimul, false);
-document.addEventListener('DOMContentLoaded', setupReport, false);
+function downloadAsPDF() {
+  let d = new Date();
+  var dName = dayName(d.getDay());
+  if(document.getElementById("days").value != ""){
+    dName = dayName(parseInt(document.getElementById("days").value));
+  }
+  var fileName = dName + '_ls.pdf';
+
+  var element = document.querySelector('report_form');
+  const opt = {
+      filename: fileName,
+      margin: 2,
+      image: {type: 'jpeg', quality: 0.9},
+      jsPDF: {
+          format: 'a4',
+          unit:'cm',
+          orientation: 'portrait'
+      }
+  };
+  // New Promise-based usage:
+  html2pdf().set(opt).from(element).save();
+}
+
+document.addEventListener('DOMContentLoaded', reportBuildingSimul, false);
+//document.addEventListener('DOMContentLoaded', setupReport, false);

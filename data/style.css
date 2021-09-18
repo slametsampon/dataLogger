@@ -24,6 +24,25 @@ canvas         { background-color: #ffffff;    }
 .red            { background-color: red; }
 .blue           { background-color: blue; }
 
+/* For PDF*/
+.flex {
+	display: flex;
+	justify-content: space-between;
+}
+
+img{
+  width:300px;
+}
+
+address{
+  margin-top: 20px;
+}
+
+.report_desc {
+	text-align: right;
+	margin-bottom: 20px;
+}
+
 /*Style for general tables*/
 table {
     table-layout: fixed;
