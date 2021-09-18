@@ -194,13 +194,25 @@ function downloadAsPDF() {
     dName = dayName(parseInt(document.getElementById("days").value));
   }
   var fileName = dName + '_ls.pdf';
+  //generateToPdf('report_form', fileName,'canvas');
 
   var element = document.querySelector('report_form');  
+  window.scrollTo(0, 0); // this will help to print if div hidden or on mobile screen
+
+  // This row fixed problem
+  element.parentNode.style.overflow = 'visible';
+
   const opt = {
       filename: fileName,
       margin: 2,
-      image: {type: 'jpg', quality: 0.99}, 
-      html2canvas: {dpi: 192, letterRendering: true, useCORS: true}, 
+      image: {type: 'jpg', quality: 0.9}, 
+      html2canvas: {element,
+        allowTaint: true,
+        useCORS: true,
+        logging: false,
+        letterRendering: true,
+        scale: 1,
+      }, 
       jsPDF: {
           format: 'a4',
           unit:'cm',

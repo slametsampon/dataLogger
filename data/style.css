@@ -2,8 +2,7 @@ body           {
   background-color: #ffffff; 
   font-size: 150% 
 }
-#wrapper       { width: 500px; margin: 20px auto;  padding: 5px 5px 5px 5px;    text-align:center;   border: 2px solid blue;   border-radius: 15px;  }
-/*#wrapper       { width: 100%; margin: 20px auto;  padding: 5px 5px 5px 5px;    text-align:center;   border: 2px solid blue;   border-radius: 15px;  }*/
+#wrapper       { width: 400px; margin: 20px auto;  padding: 5px 5px 5px 5px;    text-align:center;   border: 2px solid blue;   border-radius: 15px;  }
 h2             { text-align: center;}
 h3             { margin: 0px 0px 5px 0px; }
 
@@ -31,7 +30,8 @@ canvas         { background-color: #ffffff;    }
 }
 
 img{
-  width:300px;
+  width:350px;
+  width:150px;
 }
 
 address{
@@ -47,6 +47,7 @@ address{
 table {
     table-layout: fixed;
     width: 100%;
+    height: 60%;
     border-collapse: collapse;
 }
 
@@ -71,7 +72,8 @@ th {
     
 td {
     letter-spacing: 1px;
-}
+    font-size: 100%; 
+  }
 
 thead th {
     background-color: #dddddd;
