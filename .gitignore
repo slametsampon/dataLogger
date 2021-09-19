@@ -1,5 +1,13 @@
+#Scratch for testing
+Scratch
+
+#config files
+config
+
+#build directories
 build
 build/
+
 # Prerequisites
 *.d
 
