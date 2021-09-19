@@ -7,7 +7,7 @@ function setupConfig(){
   if(document.getElementById("configT").checked) prevCfg = "configT";
   else if(document.getElementById("configH").checked) prevCfg = "configH";
 
-  var index_url = ["getActiveUser", "getSensorCfg"];
+  var index_url = ["getActiveUser", "getSensorCfg", "getSamplingTime"];
   var request = new XMLHttpRequest();
   (function loop(i, length) {
       if (i>= length) {
@@ -20,7 +20,8 @@ function setupConfig(){
           if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
             var respText = this.responseText;
             if(i == 0)userAccess(respText);
-            if(i == 1)fillUpParameter(respText);
+            else if(i == 1)fillUpParameter(respText);
+            else if(i == 2)getSamplingTime(respText);
             loop(i + 1, length);
           }
       }
@@ -106,6 +107,12 @@ function fillUpParameter(data){
     element.placeholder = sensorCfg.Humidity.lowRange.toString();
     element.value = element.placeholder;
   }
+}
+
+function getSamplingTime(data){
+  var element = document.getElementById("id_samplingTime");
+  element.placeholder = data;
+  element.value = element.placeholder;
 }
 
 document.addEventListener('DOMContentLoaded', setupConfig, false);

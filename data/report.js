@@ -222,5 +222,20 @@ function downloadAsPDF() {
   html2pdf().set(opt).from(element).save();
 }
 
+//index.js  
+function sendEmail() {
+	Email.send({
+	Host: "smtp.gmail.com",
+	Username : "slametsambwi@gmail.com",
+	Password : "sambwi170466",
+	To : "alumni86smansagtg@gmail.com",
+	From : "slametsambwi@gmail.com",
+	Subject : "Testing email javascript",
+	Body : "It's just testing",
+	}).then(
+		message => alert("mail sent successfully")
+	);
+}
+
 //document.addEventListener('DOMContentLoaded', reportBuildingSimul, false);
 document.addEventListener('DOMContentLoaded', setupReport, false);

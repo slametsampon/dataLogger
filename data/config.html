@@ -26,8 +26,15 @@
       
         <div class="content">
             <div class="card">
-                <h5>Configuration</h5>
+                <h3>Configuration - Form</h3><br>
                 <form action="/config" method="POST" onsubmit="return confirm('Are you sure you want to submit this parameters ?');">
+                    <div>
+
+                        <label for="id_samplingTime">Sampling (ms)</label><br>
+                        <input type="text" id="id_samplingTime" name="samplingTime" placeholder="6000">
+                      
+                    </div>
+                    <hr style="height:2px;border-width:0;color:gray;background-color:gray">
 
                     <input type="radio" id="configT" name="config" value="configT" checked onclick="getSensorCfg()">
                     <label for="configT">Temperature</label><br>
@@ -35,9 +42,6 @@
                     <input type="radio" id="configH" name="config" value="configH" onclick="getSensorCfg()">
                     <label for="configH">Humidity</label><br><br>
 
-                    <label for="id_samplingTime">Sampling (ms)</label><br>
-                    <input type="text" id="id_samplingTime" name="samplingTime" placeholder="6000"><br><br>
-                  
                     <label for="id_alfaEma">Alfa Ema (%)</label><br>
                     <input type="text" id="id_alfaEma" name="alfaEma" placeholder="80"><br><br>
                   

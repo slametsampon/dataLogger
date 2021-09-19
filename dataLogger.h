@@ -43,6 +43,8 @@
     const int BLINK_NORMAL = 500;//milli second
     const int BLINK_WARNING = 250;//milli second
     const int BLINK_ERROR = 125;//milli second
-    const int SAMPLING_TIME = 10000;//milli second
+    const int SAMPLING_TIME = 10000;//milli second, default value
+    const int SAMPLING_TIME_MIN = 1000;//milli second, minimum value
+    const int SAMPLING_TIME_MAX = 60000;//milli second, maximum value
 
 #endif

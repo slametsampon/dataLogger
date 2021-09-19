@@ -27,6 +27,7 @@ AccesUser accessOperator("accessOperator");
 AccesUser activeUser("activeUser");
 
 SequenceTimer   mainSequence("mainSequence");
+unsigned long samplingTime = 0;
 
 AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
@@ -80,6 +81,10 @@ void setup(){
   }
   listAllFilesInDir("/");
 
+  //setup samplingTime
+  samplingTime = SAMPLING_TIME;//default value
+  Serial.printf("setup samplingTime : %3d\n", samplingTime);
+
   //load Engineer and Operator from littleFS
   loadUsers();
   accessEngineer.info();
@@ -125,7 +130,7 @@ void setup(){
 void loop(){
 
   //Logsheet action
-  logsheet.execute(SAMPLING_TIME);
+  logsheet.execute(samplingTime);
 
   mainSequence.execute();
   
@@ -230,6 +235,12 @@ void urlController(){
     String sensorCfg = logsheet.getCfgParameter();
     request->send(200, "application/json", sensorCfg);
     Serial.println(sensorCfg);
+  });
+  
+  server.on("/getSamplingTime", HTTP_GET, [](AsyncWebServerRequest *request){
+    String strData = String (samplingTime);
+    request->send_P(200, "text/plain", strData.c_str());
+    Serial.printf("samplingTime is:%3d\n", samplingTime);
   });
   
   // route to update sensor - temperature and humidity
@@ -347,8 +358,11 @@ boolean validateParameter(AsyncWebServerRequest * request){
       Serial.print("The samplingTime is: ");
       Serial.println(argData);
 
-      float val = argData.toFloat();
+      samplingTime = (unsigned long) argData.toInt();
+      if(samplingTime < SAMPLING_TIME_MIN) samplingTime = (unsigned long) SAMPLING_TIME_MIN;
+      else if(samplingTime > SAMPLING_TIME_MAX) samplingTime = (unsigned long) SAMPLING_TIME_MAX;
   } 
+
   else if(request->hasArg("indicatorL")){
       String argData = request->arg("indicatorL");
       Serial.print("The indicatorL is: ");

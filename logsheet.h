@@ -23,6 +23,7 @@ const int DAY_366 = 366;
 const int HOUR_24 = 24;
 const int MINUTE_60 = 60;
 const int SECOND_6 = 6;//average at last one
+const int SECOND_60 = 60;//average at last one
 
 const String PATH_LS = "/logsheet/";
 const String SENSOR_FILE_CFG = "sensors.cfg";
@@ -71,16 +72,17 @@ enum DayOfWeek{
             
             String _id;
             float _prevT, _prevH;//temperature and humidity
-	          unsigned long _prevMilli;
-            int _samplingSec, _samplingMinute, _samplingHour;
+	          unsigned long _prevMilli, _samplingTime;
+            int _samplingSec, _nbrSamplingSec;
             boolean _minuteEvent, _hourEvent, _dayEvent;
             boolean _saveHourlyEvent, _saveDailyEvent;
+            boolean _synchronized = false;
             struct tm _tm;
 
             DHT *_dht;
             Adafruit_SSD1306 *_display;
             AccessParam *_paramTemperature, *_paramHumidity;
-            logsheetData _logsheetSecond[SECOND_6];
+            logsheetData _logsheetSecond[SECOND_60];
             logsheetData _logsheetMinute[MINUTE_60];
     };
 
