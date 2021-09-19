@@ -16,42 +16,46 @@
 
         <div class="topnav">
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/report">Report</a></li>   
-                <li><a href="/config">Config</a></li>   
-                <li><a href="/login">Login</a></li>   
-                <li><a href="/logout">Logout</a></li>   
+                <li id = "home"><a href="/">Home</a></li>
+                <li id = "report"><a href="/report">Report</a></li>   
+                <li id = "config"><a href="/config" class="disabled-link">Config</a></li>   
+                <li id = "login"><a href="/login">Login</a></li>   
+                <li id = "logout"><a href="/logout" onclick="return confirm('Are you sure to logout ?')">Logout</a></li>   
             </ul>
         </div>
       
         <div class="content">
             <div class="card">
-                <h5>Configuration</h5>
-                <form action="/config" method="POST">
+                <h3>Configuration - Form</h3><br>
+                <form action="/config" method="POST" onsubmit="return confirm('Are you sure you want to submit this parameters ?');">
+                    <div>
 
-                    <input type="radio" id="configT" name="config" value="configT">
-                    <label for="temperatureConfig">Temperature</label><br>
+                        <label for="id_samplingTime">Sampling (ms)</label><br>
+                        <input type="text" id="id_samplingTime" name="samplingTime" placeholder="6000">
+                      
+                    </div>
+                    <hr style="height:2px;border-width:0;color:gray;background-color:gray">
 
-                    <input type="radio" id="configH" name="config" value="configH">
-                    <label for="humidityConfig">Humidity</label><br><br>
+                    <input type="radio" id="configT" name="config" value="configT" checked onclick="getSensorCfg()">
+                    <label for="configT">Temperature</label><br>
 
-                    <label for="samplingTime">Sampling (ms)</label><br>
-                    <input type="text" name="samplingTime" placeholder="6000"><br><br>
+                    <input type="radio" id="configH" name="config" value="configH" onclick="getSensorCfg()">
+                    <label for="configH">Humidity</label><br><br>
+
+                    <label for="id_alfaEma">Alfa Ema (%)</label><br>
+                    <input type="text" id="id_alfaEma" name="alfaEma" placeholder="80"><br><br>
                   
-                    <label for="alfaEma">Alfa Ema (%)</label><br>
-                    <input type="text" name="alfaEma" placeholder="80"><br><br>
+                    <label for="id_alarmH">Alarm High</label><br>
+                    <input type="text" id="id_alarmH" name="alarmH" placeholder="90"><br><br>
                   
-                    <label for="alarmH">Alarm High</label><br>
-                    <input type="text" name="alarmH" placeholder="90"><br><br>
+                    <label for="id_alarmL">Alarm Low</label><br>
+                    <input type="text" id="id_alarmL" name="alarmL" placeholder="45"><br><br>
                   
-                    <label for="alarmL">Alarm Low</label><br>
-                    <input type="text" name="alarmL" placeholder="45"><br><br>
+                    <label for="id_indicatorH">Indicator High</label><br>
+                    <input type="id_text" id="id_indicatorH" name="indicatorH" placeholder="100"><br><br>
                   
-                    <label for="indicatorH">Indicator High</label><br>
-                    <input type="text" name="indicatorH" placeholder="100"><br><br>
-                  
-                    <label for="indicatorL">Indicator Low</label><br>
-                    <input type="text" name="indicatorL" placeholder="0"><br><br>
+                    <label for="id_indicatorL">Indicator Low</label><br>
+                    <input type="text" id="id_indicatorL" name="indicatorL" placeholder="0"><br><br>
 
                     <input type="submit" value="Submit">
                 </form>
@@ -59,5 +63,6 @@
         </div>
     </body>
 
-    <script src="report.js"></script>
+    <script src="authentication.js"></script>
+    <script src="config.js"></script>
 </html>

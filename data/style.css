@@ -1,6 +1,8 @@
-body           { background-color: #ffffff; font-size: 100% }
-#wrapper       { width: 500px; margin: 20px auto;  padding: 5px 5px 5px 5px;    text-align:center;   border: 2px solid blue;   border-radius: 15px;  }
-/*#wrapper       { width: 100%; margin: 20px auto;  padding: 5px 5px 5px 5px;    text-align:center;   border: 2px solid blue;   border-radius: 15px;  }*/
+body           { 
+  background-color: #ffffff; 
+  font-size: 150% 
+}
+#wrapper       { width: 400px; margin: 20px auto;  padding: 5px 5px 5px 5px;    text-align:center;   border: 2px solid blue;   border-radius: 15px;  }
 h2             { text-align: center;}
 h3             { margin: 0px 0px 5px 0px; }
 
@@ -21,10 +23,32 @@ canvas         { background-color: #ffffff;    }
 .red            { background-color: red; }
 .blue           { background-color: blue; }
 
+/* For PDF*/
+.flex {
+	display: flex;
+	justify-content: space-between;
+}
+
+img{
+  width:350px;
+  width:150px;
+}
+
+address{
+  margin-top: 20px;
+}
+
+.report_desc {
+	text-align: right;
+	margin-bottom: 20px;
+	margin-right: 20px;
+}
+
 /*Style for general tables*/
 table {
     table-layout: fixed;
     width: 100%;
+    height: 60%;
     border-collapse: collapse;
 }
 
@@ -49,7 +73,8 @@ th {
     
 td {
     letter-spacing: 1px;
-}
+    font-size: 100%; 
+  }
 
 thead th {
     background-color: #dddddd;
@@ -107,3 +132,13 @@ tr:nth-child(even) {
     padding-bottom:20px;
     padding-left:20px;
   }
+  .disabled-link {
+    pointer-events: none;
+    color: grey;
+  }
+  .enable-link {
+    pointer-events: auto;
+    color: white;
+  }
+  
+  

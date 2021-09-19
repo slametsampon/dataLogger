@@ -19,16 +19,16 @@
 
     <div class="topnav">
       <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/report">Report</a></li>   
-          <li><a href="/config">Config</a></li>   
-          <li><a href="/login">Login</a></li>   
-          <li><a href="/logout">Logout</a></li>   
-        </ul>
+        <li id = "home"><a href="/" class="disabled-link">Home</a></li>
+        <li id = "report"><a href="/report">Report</a></li>   
+        <li id = "config"><a href="/config">Config</a></li>   
+        <li id = "login"><a href="/login">Login</a></li>   
+        <li id = "logout"><a href="/logout" onclick="return confirm('Are you sure to logout ?')">Logout</a></li>   
+      </ul>
     </div>
   
     <div id='wrapper'>
-
+      
       <h4>IoT DATA LOGGER - Home</h4> 
       <div id='topContainer'>
           <div id='topContainer2'>
@@ -40,35 +40,38 @@
       <div id='dialContainer'> 
         <div id='dial_1'> 
           <h3>Temperature</h3>
-          <canvas id='canvasTemp' width='200' height='150'  style='border:1px solid #000000;' > </canvas>
+          <canvas id='canvasTemp' width='150' height='125'  style='border:1px solid #000000;' > </canvas>
           <p class='noMargin bigText'><span id='temp'>20</span> °C</p>
           <p class='noMargin bigText'>Status : <span id='StatusTemp'>Normal</span></p>
       </div>    
 
         <div id='dial_2'> 
           <h3>Humidity</h3>
-          <canvas id='canvasHumid' width='200' height='150'  style='border:1px solid #000000;' > </canvas>
+          <canvas id='canvasHumid' width='150' height='125'  style='border:1px solid #000000;' > </canvas>
           <p class='noMargin bigText'><span id='humd'>60</span> %</p>
           <p class='noMargin bigText'>Status : <span id='StatusHumd'>Normal</span></p>
         </div>
       </div>  <!--  'dialContainer'  -->
 
       <div id='graphContainer'> 
-        <canvas id='graph' width='440' height='150'  style='border:1px solid #000000; background-color:white;' > </canvas>
+        <canvas id='graph' width='340' height='150'  style='border:1px solid #000000; background-color:white;' > </canvas>
         <div id='key'>
           <div> <div class='box red'></div> Temperature</div>
           <div> <div class='box blue'></div> Humidity</div>
         </div>
+        <!--
         <p>
           <a class="btn btn-success" role="button">Current</a>
           <a class="btn btn-success" role="button">Hist-Hour</a>
           <a class="btn btn-success" role="button">Hist-Day</a>
         </p>   
+        -->
       </div>      
  
     </div> <!--  'wrapper'  -->
   </body>
  
-  <script src="functions.js"></script> 
+  <script src="authentication.js"></script>
+  <script src="index.js"></script> 
   <script src="widgets.js"></script> 
 </html> 

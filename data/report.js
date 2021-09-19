@@ -42,6 +42,64 @@ function fillDataTable(data){
 }
 
 let table = document.querySelector("table");
+
+function dayName(dayVal){
+  var dName = "";
+
+  if (dayVal == 0)dName = "Sunday";
+  else if (dayVal == 1)dName = "Monday";
+  else if (dayVal == 2)dName = "Tuesday";
+  else if (dayVal == 3)dName = "Wednesday";
+  else if (dayVal == 4)dName = "Thursday";
+  else if (dayVal == 5)dName = "Friday";
+  else if (dayVal == 6)dName = "Saturday";
+
+  return dName;
+}
+
+function calcDate(){
+  var difDay = 0;
+  if(document.getElementById("days").value != ""){
+    let reqDay = parseInt(document.getElementById("days").value);
+    //let reqDay = 5;
+  
+    let d = new Date();
+    let currDay = d.getDay();
+  
+    difDay = currDay - reqDay;
+  
+    if (difDay == 0) difDay = 0;
+    else if (difDay < 0) difDay = 7 + difDay;
+  }
+  return difDay;
+}
+
+function createCaption(table, dateVal){
+  var d = new Date();
+  let currDate = d.getDate();
+  d.setDate(currDate - dateVal);
+
+  let day = d.getDay();
+
+  var t = d.toLocaleDateString();
+  t = dayName(day) + ", " + t;
+  
+  let caption = table.createCaption();
+  caption.textContent = 'Hourly Average : ' + t;
+}
+
+function createHeaderDate(dateVal){
+  var d = new Date();
+  let currDate = d.getDate();
+  d.setDate(currDate - dateVal);
+
+  let day = d.getDay();
+
+  document.getElementById("id_day").innerHTML = dayName(day);
+  document.getElementById("id_date").innerHTML = d.toLocaleDateString();
+  
+}
+
 function generateReportTableHead(table, dataHeader) {
   let thead = table.createTHead();
   let row = thead.insertRow();
@@ -54,6 +112,7 @@ function generateReportTableHead(table, dataHeader) {
 }
 
 function generateReportTable(table) {
+  createHeaderDate(calcDate());  
 
   let fLen = tempArray.length;
   for (let i = 0; i < fLen; i++) {
@@ -71,23 +130,112 @@ function generateReportTable(table) {
     let text2 = document.createTextNode(humdArray[i]);
     cell2.appendChild(text2);
   }
+
+  generateReportTableHead(table, headerArray);
+  //createCaption(table,calcDate());
 }
 
-function reportBuilding() {
+function reportBuildingSimul() {
+
+  //clear table
+  $("#table").empty();
+
+  initRandomDataTable();
+  generateReportTable(table);
+
+  userAccess(9);
+}
+
+function getHourlyAvg(){
+  //clear table
+  $("#table").empty();
+
   var xhttp = new XMLHttpRequest();
-xhttp.onreadystatechange = function() {
+  xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var respText = this.responseText;
-      //document.getElementById("json").innerHTML = respText;
-      //initRandomDataTable();
       fillDataTable(respText);
       generateReportTable(table);
-      generateReportTableHead(table, headerArray);
-      respText = '';
-
     }
   };
-  xhttp.open("GET", "/jsonData", true);
+  xhttp.open("GET", "/hourlyAvgDay?days="+document.getElementById("days").value, true);
   xhttp.send();
 }
-document.addEventListener('DOMContentLoaded', reportBuilding, false);
+
+function setupReport(){
+  var url_day = "hourlyAvgDay?days="+document.getElementById("days").value;
+  var index_url = ["getActiveUser", url_day];
+  var request = new XMLHttpRequest();
+  (function loop(i, length) {
+      if (i>= length) {
+          return;
+      }
+      var url = "/" + index_url[i];
+  
+      request.open("GET", url, true);
+      request.onreadystatechange = function() {
+          if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
+            if(i == 0)userAccess(this.responseText);
+            else if(i == 1){
+              fillDataTable(this.responseText);
+              generateReportTable(table);
+            }
+            loop(i + 1, length);
+          }
+      }
+      request.send();
+  })(0, index_url.length);
+}
+
+function downloadAsPDF() {
+  let d = new Date();
+  var dName = dayName(d.getDay());
+  if(document.getElementById("days").value != ""){
+    dName = dayName(parseInt(document.getElementById("days").value));
+  }
+  var fileName = dName + '_ls.pdf';
+  //generateToPdf('report_form', fileName,'canvas');
+
+  var element = document.querySelector('report_form');  
+  window.scrollTo(0, 0); // this will help to print if div hidden or on mobile screen
+
+  // This row fixed problem
+  element.parentNode.style.overflow = 'visible';
+
+  const opt = {
+      filename: fileName,
+      margin: 2,
+      image: {type: 'jpg', quality: 0.9}, 
+      html2canvas: {element,
+        allowTaint: true,
+        useCORS: true,
+        logging: false,
+        letterRendering: true,
+        scale: 1,
+      }, 
+      jsPDF: {
+          format: 'a4',
+          unit:'cm',
+          orientation: 'portrait'
+      }
+  };
+  html2pdf().set(opt).from(element).save();
+}
+
+//index.js  
+function sendEmail() {
+	Email.send({
+	Host: "smtp.gmail.com",
+	Username : "slametsambwi@gmail.com",
+	Password : "sambwi170466",
+	To : "alumni86smansagtg@gmail.com",
+	From : "slametsambwi@gmail.com",
+	Subject : "Testing email javascript",
+	Body : "It's just testing",
+	}).then(
+		message => alert("mail sent successfully")
+	);
+}
+
+//document.addEventListener('DOMContentLoaded', reportBuildingSimul, false);
+document.addEventListener('DOMContentLoaded', setupReport, false);

@@ -11,13 +11,24 @@
     const boolean DEBUG = true;
 
     // Replace with your network credentials
-    const char* ssid     = "Sam-Laptop";
-    //const char* ssid     = "SamMobile";
-    const char* password = "sampon170466";
-    //const char* ssid     = "SamFamily";
-    //const char* password = "muwa7x06";
+    const char* ssid1     = "Sam-Laptop";
+    const char* password1 = "sampon170466";
+    const char* ssid2     = "SamMobile";
+    const char* password2 = "sampon170466";
+    const char* ssid3     = "SamFamily";
+    const char* password3 = "muwa7x06";
+    const char* ssid4     = "Fariyo Ganteng";
+    const char* password4 = "Fariyoganteng";
+
+    bool WiFiAP = false;      // Do yo want the ESP as AP?
+
+    #define SMTP_HOST "smtp.gmail.com"
+    #define SMTP_PORT 465
 
     const char* mdnsName = "dataLogger";
+
+    const String PATH_ROOT = "/";
+    const String FILE_USER = "users.cfg";
 
     //NTP : Network Time Protokol
     const long timezone = 6;//for jakarta time
@@ -26,14 +37,14 @@
     // Set LED GPIO
     const int ledPin = LED_BUILTIN;
 
-    bool WiFiAP = false;      // Do yo want the ESP as AP?
-
     const int ADC_MAX = 1023;//10 bits
     const int DEBOUNCING_TIME = 150;//milli second
 
     const int BLINK_NORMAL = 500;//milli second
     const int BLINK_WARNING = 250;//milli second
     const int BLINK_ERROR = 125;//milli second
-    const int SAMPLING_TIME = 10000;//milli second
+    const int SAMPLING_TIME = 10000;//milli second, default value
+    const int SAMPLING_TIME_MIN = 1000;//milli second, minimum value
+    const int SAMPLING_TIME_MAX = 60000;//milli second, maximum value
 
 #endif

@@ -77,18 +77,91 @@ String Logsheet::getValues(){
     return output;
 }
 
-String Logsheet::getHour24(){
+String Logsheet::getHourlyAvg(int dWeek){
   //return (this->_initRandomJson());
-  return (this->_readFileJson(_tm.tm_wday));
+  return (this->_readFileJson(dWeek));
 }
 
 void Logsheet::setTime(struct tm tmVal){
+  //set to proper time config
+  tmVal.tm_year += 1900;
+  tmVal.tm_mon +=1;
+
+  //set local time _tm
   _tm = tmVal;
-  _tm.tm_year += 1900;
-  _tm.tm_mon +=1;
+  
   Serial.println("Logsheet::setTime(struct tm tmVal)");
   Serial.printf("Now is : %d-%02d-%02d %02d:%02d:%02d\n", _tm.tm_year, _tm.tm_mon, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
   Serial.println("");
+}
+
+String Logsheet::getCfgParameter(){
+  String output;
+
+  /*
+    {
+    "Temperature": {
+      "unit":"°C",
+      "highRange":50.0,
+      "lowRange":0.0,
+      "highLimit":40.0,
+      "lowLimit":10.0,
+      "alfaEma":80.0
+    },
+    "Humidity": {
+      "unit":"%",
+      "highRange":100.0,
+      "lowRange":0.0,
+      "highLimit":90.0,
+      "lowLimit":40.0,
+      "alfaEma":80.0
+    }
+  }
+
+  StaticJsonDocument<256> doc;
+
+  JsonObject Temperature = doc.createNestedObject("Temperature");
+  Temperature["unit"] = "°C";
+  Temperature["highRange"] = 50;
+  Temperature["lowRange"] = 0;
+  Temperature["highLimit"] = 40;
+  Temperature["lowLimit"] = 10;
+  Temperature["alfaEma"] = 80;
+
+  JsonObject Humidity = doc.createNestedObject("Humidity");
+  Humidity["unit"] = "%";
+  Humidity["highRange"] = 100;
+  Humidity["lowRange"] = 0;
+  Humidity["highLimit"] = 90;
+  Humidity["lowLimit"] = 40;
+  Humidity["alfaEma"] = 80;
+
+  serializeJson(doc, output);
+
+  */
+
+  StaticJsonDocument<256> doc;
+
+  param dtParam = _paramTemperature->getParam();
+  JsonObject Temperature = doc.createNestedObject("Temperature");
+  Temperature["unit"] = dtParam.unit;
+  Temperature["highRange"] = dtParam.highRange;
+  Temperature["lowRange"] = dtParam.lowRange;
+  Temperature["highLimit"] = dtParam.highLimit;
+  Temperature["lowLimit"] = dtParam.lowLimit;
+  Temperature["alfaEma"] = dtParam.alfaEma;
+
+  dtParam = _paramHumidity->getParam();
+  JsonObject Humidity = doc.createNestedObject("Humidity");
+  Humidity["unit"] = dtParam.unit;
+  Humidity["highRange"] = dtParam.highRange;
+  Humidity["lowRange"] = dtParam.lowRange;
+  Humidity["highLimit"] = dtParam.highLimit;
+  Humidity["lowLimit"] = dtParam.lowLimit;
+  Humidity["alfaEma"] = dtParam.alfaEma;
+
+  serializeJson(doc, output);
+  return output;
 }
 
 void Logsheet::_oledDisplay(float t, float h){
@@ -312,6 +385,21 @@ String Logsheet::_initRandomJson(){
 }
 
 void Logsheet::execute(unsigned long samplingTime){
+
+  //set samplingTime
+  _samplingTime = samplingTime;
+
+  //synchronize sampling time
+  if(!_synchronized){
+    _samplingSec = 0;
+    _synchronized = true;
+  }
+
+  //calculate sampling per minute
+  _nbrSamplingSec = 60000/_samplingTime;
+  if (_nbrSamplingSec < 1)_nbrSamplingSec = 1;
+  else if(_nbrSamplingSec > SECOND_60) _nbrSamplingSec = SECOND_60;
+
 	unsigned long currMilli = millis();
 
 	if ((currMilli - _prevMilli) >= samplingTime){
@@ -383,7 +471,7 @@ void Logsheet::_getSensorValue(){
 void Logsheet::_recordEvent(){
 
   //handle sampling second
-  if (_samplingSec >= (SECOND_6 - 1)){
+  if (_samplingSec >= (_nbrSamplingSec - 1)){
     _samplingSec = 0;
     _minuteEvent = true;
   }
@@ -418,22 +506,18 @@ void Logsheet::_recordLogsheet(){
   last.humidity = _paramHumidity->getParam(PARAMETER_VALUE);
   last.time = _getTimeStr(_samplingSec);
 
-  _shiftArray(SECOND_6, last);
+  _shiftArray(_nbrSamplingSec, last);
 
   //handle record Second
   if (_minuteEvent){
     _minuteLogsheet();
 
-    //testing
-    //_dailyLogsheet();
   } 
 
   //handle hourly hour
   if (_hourEvent && !_saveHourlyEvent){
     _hourlyLogsheet();
 
-    //testing
-    //_dailyLogsheet();
   } 
 
   //handle daily logsheet
@@ -446,7 +530,7 @@ void Logsheet::_minuteLogsheet(){
   Serial.println(_tm.tm_min);
 
   //calculate average minute
-  logsheetData avgMinute = _calculateAverage(_logsheetSecond, SECOND_6);
+  logsheetData avgMinute = _calculateAverage(_logsheetSecond, _nbrSamplingSec);
 
   //shift record minute & put average to bottom
   _shiftArray(MINUTE_60, avgMinute);
@@ -659,9 +743,9 @@ logsheetData Logsheet::_calculateAverage(logsheetData data[], int size){
     avg.temperature = avgT;
     avg.humidity = avgH;
 
-    if (size == SECOND_6)avg.time = _getTimeStr(_tm.tm_min);
-    if (size == MINUTE_60)avg.time = _getTimeStr(_tm.tm_hour);
-    if (size == HOUR_24){
+    if (size == _nbrSamplingSec)avg.time = _getTimeStr(_tm.tm_min);
+    else if (size == MINUTE_60)avg.time = _getTimeStr(_tm.tm_hour);
+    else if (size == HOUR_24){
       //build DD_MM_YYYY
       String date = _getTimeStr(_tm.tm_mday);
       date += "_";

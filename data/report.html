@@ -2,7 +2,7 @@
 
     <head>
         <meta http-equiv="content-type" content="text/html;charset=UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -16,25 +16,69 @@
 
         <div class="topnav">
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/report">Report</a></li>   
-                <li><a href="/config">Config</a></li>   
-                <li><a href="/login">Login</a></li>   
-                <li><a href="/logout">Logout</a></li>   
+                <li id = "home"><a href="/">Home</a></li>
+                <li id = "report"><a href="/report" class="disabled-link">Report</a></li>   
+                <li id = "config"><a href="/config">Config</a></li>   
+                <li id = "login"><a href="/login">Login</a></li>   
+                <li id = "logout"><a href="/logout" onclick="return confirm('Are you sure to logout ?')">Logout</a></li>   
             </ul>
-        </div>
+        </div><br>
       
         <div class="container">
 
+            <report_form>
+                <header>
+                    <div class="flex">
+                        <address>
+                            <!-- left -->
+                            <div>
+                                <img src="logoGMF" alt="Logo GMF" /><br/>
+                                Temporary Store Room<br />
+                                Line : 7
+                            </div>
+                        </address>
+                  
+                        <!-- right  -->
+                        <div class="report_desc">
+                          <div>Salman Alfarisi-583379<br />
+                            <strong>Day :</strong>
+                            <span id = "id_day">day</span><br/>
+                            <strong>Date:</strong>
+                            <span id = "id_date">date</span><br>
+                            Daily Logsheet <br />
+                            IoT Data Logger
+                          </div>
+                        </div>
+                      </div>
+                </header>
+                <main>
+                    <table id="table">
+                        <!-- here goes our data! -->
+                    </table>
+                </main>
+            </report_form>
             <br>
-            <h4>IoT DATA LOGGER - Report</h4>
-            <br>
-            <table>
-                <!-- here goes our data! -->
-            </table>
-            <br>
+                <label for="days">Choose a Day :</label>
+                <select name="days" id="days" onchange="calcDate(this)">
+                    <option value="">Select a day</option>
+                    <option value="0">Sunday</option>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                </select>
+                <a class="btn btn-primary" role="button" onclick="getHourlyAvg()">Get Data</a>
+                <p>
+                    <a class="btn btn-success" role="button" onclick="downloadAsPDF()">Download as PDF</a>
+                </p>         
         </div>
     </body>
 
+    <script src="authentication.js"></script>
     <script src="report.js"></script>
-</html>
+    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+
+  </html>

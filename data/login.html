@@ -16,11 +16,11 @@
 
         <div class="topnav">
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/report">Report</a></li>   
-                <li><a href="/config">Config</a></li>   
-                <li><a href="/login">Login</a></li>   
-                <li><a href="/logout">Logout</a></li>   
+                <li id = "home"><a href="/">Home</a></li>
+                <li id = "report"><a href="/report">Report</a></li>   
+                <li id = "config"><a href="/config">Config</a></li>   
+                <li id = "login"><a href="/login" class="disabled-link">Login</a></li>   
+                <li id = "logout"><a href="/logout" onclick="return confirm('Are you sure to logout ?')">Logout</a></li>   
             </ul>
         </div>
       
@@ -41,5 +41,6 @@
         
     </body>
 
-    <script src="report.js"></script>
+    <script src="authentication.js"></script>
+    <script src="login.js"></script>
 </html>
