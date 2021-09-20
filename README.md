@@ -16,7 +16,7 @@
 #### 13. Perubahan setting itu juga berlaku pada parameter sensor seperti range low dan high, unit dll, dan harus letakkan dalam satu display.
 #### 14. Hanya petugas tertentu saja yang bisa melakukan perubahan itu.
 #### 15. Petugas yang melakukan perubahan harus masuk/login dulu (username & password) agar bisa melakukan perubahan parameter.
-### [Hardware : ](https://github.com/slametsampon/dataLogger/blob/main/images/dataLogger.jpg)
+### [Hardware : ](https://github.com/slametsampon/dataLogger/blob/main/images/datalogger.png)
 
 #### 
 1. Menggunakan Wemos D1 R1 sebagai dasar module (shield)
@@ -24,7 +24,6 @@
 3. OLED 64 x 48 Pixel - Display lokal
 
 #### 3 Module di atas disusun dalam bentuk stack atas - bawah
-
-### [Software : ]((https://github.com/slametsampon/dataLogger/blob/main/config/dataLogger.md)
+### [Software : ](https://github.com/slametsampon/dataLogger/blob/main/config/dataLogger.md)
 
 ### Github [  - Data Logger](https://github.com/slametsampon/dataLogger)
