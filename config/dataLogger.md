@@ -1,0 +1,45 @@
+# Data Logger
+### Libraries - from Arduino IDE:
+
+#### 1. esp8266 by ESP8266 Community
+#### 2. ESP8266WiFiMulti
+#### 3. ESP8266mDNS
+#### 4. Adafruit GFX Library
+#### 5. Adafruit SSD1306
+#### 6. Adafruit unified sensor library
+#### 7. DHT
+#### 8. Wire
+#### 9. SPI
+#### 10. ArduinoJson
+
+### Libraries - from Third party:
+#### 1. [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer/archive/master.zip)
+#### 2. [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP/archive/master.zip)
+#### 3. [LittleFS](https://github.com/earlephilhower/arduino-esp8266littlefs-plugin)
+
+### Local Libraries :
+#### 1. SequenceTimer
+
+### References ESP8266:
+
+#### 1. [ESP8266-Introduction](https://randomnerdtutorials.com/getting-started-with-esp8266-wifi-transceiver-review/)
+#### 2. [ESP8266-Arduino Installation](https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/)
+#### 3. [ESP8266-Webserver](https://randomnerdtutorials.com/esp8266-web-server/)
+#### 4. [ESP8266-espasyncwebserver](https://randomnerdtutorials.com/esp8266-nodemcu-async-web-server-espasyncwebserver-library/)
+#### 5. [ESP8266-ESP8266WiFiMulti](https://randomnerdtutorials.com/esp8266-nodemcu-client-server-wi-fi/)
+#### 6. [DHT Guide](https://randomnerdtutorials.com/esp8266-dht11dht22-temperature-and-humidity-web-server-with-arduino-ide/)
+
+### References File Management:
+
+#### 1. [LittleFS](https://randomnerdtutorials.com/install-esp8266-nodemcu-littlefs-arduino/)
+#### 2. [Web Server using SPIFFS](https://randomnerdtutorials.com/esp8266-web-server-spiffs-nodemcu/)
+
+### References WEB Programming:
+#### 1. [HTML](https://www.w3schools.com/html/default.asp)
+#### 2. [CSS](https://www.w3schools.com/css/default.asp)
+#### 3. [Javascript](https://www.w3schools.com/js/default.asp)
+#### 4. [AJAX](https://www.w3schools.com/xml/ajax_intro.asp)
+
+### Others:
+#### 1. [ArduinoJson](https://arduinojson.org/)
+#### 2. [Javascript-Generate pdf](https://www.pdftron.com/blog/javascript/how-to-generate-pdfs-with-javascript/)

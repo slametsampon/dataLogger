@@ -5,7 +5,7 @@
 #ifndef SequenceTimer_h
 #define SequenceTimer_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 const int A_SECOND	= 1000; //1000 MILLI
 const int A_MINUTE	= 60000;  //60000 MILLI

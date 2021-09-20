@@ -43,7 +43,7 @@ float increment = doc["increment"]; // 1.1
 #ifndef model_h
 #define model_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include  <ArduinoJson.h>
 
   const int USER_NAME = 0;
