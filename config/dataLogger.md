@@ -53,11 +53,11 @@
 3. Configuration [config](https://github.com/slametsampon/dataLogger/blob/main/images/config.jpg)
 4. Login [login](https://github.com/slametsampon/dataLogger/blob/main/images/login.jpg)
 ### Wemos D1 (ESP8266):
-1. [A. Main Program](https://github.com/slametsampon/dataLogger/blob/main/config/dataLogger_ino.md)
+1. [Main Program](https://github.com/slametsampon/dataLogger/blob/main/config/dataLogger_ino.md)
   
-2. [B. Users Management](https://github.com/slametsampon/dataLogger/blob/main/config/users.md)
-3. [C. Logsheet Management](https://github.com/slametsampon/dataLogger/blob/main/config/Logsheet.md)
-4. [D. Sensor Configuration](https://github.com/slametsampon/dataLogger/blob/main/config/sensor.md)
+2. [Users Management](https://github.com/slametsampon/dataLogger/blob/main/config/users.md)
+3. [Logsheet Management](https://github.com/slametsampon/dataLogger/blob/main/config/Logsheet.md)
+4. [Sensor Configuration](https://github.com/slametsampon/dataLogger/blob/main/config/sensor.md)
 
 ### Web Pages:
 1. Index.html - index.js

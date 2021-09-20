@@ -8,7 +8,7 @@
 5. Nilai pengukuran yang ditampilkan melalui web browser dalam gambar ber-angka/gauge.
 6. Memberikan peringatan dalam bentuk visual saat nilai pengukuran melebihi nilai alarm.
 7. Memberikan grafik trending selama satu jam secara real time.
-8. Grafik trending bisa juga digunakan untuk menampilkan rerata harian selama satu bulan.
+8. Grafik trending bisa juga digunakan untuk menampilkan rerata harian selama satu tahun.
 9. Terdapat fasilitas memberikan laporan setiap hari berupa file pdf.
 10. File laporan (pdf) dapat di-download serta dapat di-share by WA atau email terpisah.
 11. Sebelum di-download data ditampilkan dalam bentuk tabel berdasar urutan jam selama 24 jam.
