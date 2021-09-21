@@ -17,7 +17,7 @@ Logsheet logsheet("logsheet");
 5. ESP8266WiFiMulti wifiMulti;
 6. AsyncWebServer server(80);
 
-#### 2. Setup :
+#### 2. Setup - STEP:
 #####
 1. Serial
 2. Initialize LittleFS
