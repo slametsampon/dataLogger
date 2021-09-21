@@ -19,6 +19,9 @@
 #include "dataLogger.h"
 #include "SequenceTimer.h"
 #include "logsheet.h"
+#include "start_up.h"
+
+StartUp startUp("startUp");
 
 AccesUser accessEngineer("accessEngineer");
 AccesUser accessOperator("accessOperator");
@@ -53,11 +56,23 @@ void loadStaticFile();//css, js
 void listAllFilesInDir(String);//list files in all dir's
 
 void setup(){
+  pinMode(ledPin, OUTPUT);
   // Serial port for debugging purposes
   Serial.begin(115200);
   while (!Serial) {;}
   if (DEBUG) { Serial.print(F("\n\nSerial started at 115200\n" ));   }
 
+  //init Oled display
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)
+  startUp.AttachDisplay(&display);
+  //display logo GMF
+  startUp.logoDisplay();
+  //welcome display
+  startUp.welcomeDisplay();
+
+  //init step
+  int step = 0;
+  startUp.diagDisplay(step);
   // Initialize LittleFS
   Serial.println("Begin LittleFS");
   if(!LittleFS.begin()){
@@ -65,6 +80,8 @@ void setup(){
     return;
   }
   listAllFilesInDir("/");
+  step += 1;
+  startUp.diagDisplay(step);
 
   //setup samplingTime
   samplingTime = SAMPLING_TIME;//default value
@@ -78,19 +95,24 @@ void setup(){
   //setup default active user
   setupDefaultUser();
   activeUser.info();
-
-  pinMode(ledPin, OUTPUT);
+  startUp.diagDisplay(step);
+  step += 1;
+  startUp.diagDisplay(step);
 
   // Initialize the sensor
   logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
   logsheet.AttachSensor(&dht);
   logsheet.AttachDisplay(&display);
   logsheet.info();
+  step += 1;
+  startUp.diagDisplay(step);
 
   // Start WiFi
   if (WiFiAP) startWiFiAP();
   //else startWiFiClient();
   else startWiFiMulti();
+  step += 1;
+  startUp.diagDisplay(step);
 
   struct tm tmstruct = getTimeNtp();
   tmstruct.tm_year += 1900;
@@ -100,15 +122,23 @@ void setup(){
 
   //logsheet setTime
   logsheet.setTime(getTimeNtp());
+  step += 1;
+  startUp.diagDisplay(step);
 
   //start mDNS
   startMDNS();
+  step += 1;
+  startUp.diagDisplay(step);
 
   //url controller
   urlController();
+  step += 1;
+  startUp.diagDisplay(step);
 
   // Start server
   server.begin();
+  step += 1;
+  startUp.diagDisplay(step);
 
 }
  

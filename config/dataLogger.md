@@ -43,8 +43,9 @@
 4. [AJAX](https://www.w3schools.com/xml/ajax_intro.asp)
 
 ### Others:
-1. [ArduinoJson](https://arduinojson.org/)
-2. [Javascript-Generate pdf](https://www.pdftron.com/blog/javascript/how-to-generate-pdfs-with-javascript/)
+1. [Oled Display](https://lastminuteengineers.com/oled-display-arduino-tutorial/)
+2. [ArduinoJson](https://arduinojson.org/)
+3. [Javascript-Generate pdf](https://www.pdftron.com/blog/javascript/how-to-generate-pdfs-with-javascript/)
 
 ## Software:
 ### User Interface :

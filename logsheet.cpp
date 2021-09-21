@@ -19,7 +19,7 @@ void Logsheet::AttachSensor(DHT *dht){
 
 void Logsheet::AttachDisplay(Adafruit_SSD1306 *display){
     _display = display;
-    _display->begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)
+    //_display->begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)
 
 }
 
@@ -177,14 +177,14 @@ void Logsheet::_oledDisplay(float t, float h){
   
   _display->setTextColor(WHITE);
   _display->setCursor(0,0);
-  _display->println("Humidity ");
-  _display->setCursor(1, 12);
+  _display->print("Humidity ");
+  _display->setCursor(1, 11);
   _display->print(h);
-  _display->print(" %\t");
+  _display->print(" %");
   
-  _display->setCursor(1, 21);
+  _display->setCursor(1, 29);
   _display->print("Temperatur");
-  _display->setCursor(1, 30);
+  _display->setCursor(1, 40);
   _display->print(t);
   _display->print(" *C ");
   _display->display();
