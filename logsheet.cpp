@@ -19,7 +19,10 @@ void Logsheet::AttachSensor(DHT *dht){
 
 void Logsheet::AttachDisplay(Adafruit_SSD1306 *display){
     _display = display;
-    //_display->begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)
+}
+
+void Logsheet::AttachLed(Do *led){
+  _led = led;
 }
 
 void Logsheet::AttachParameter(AccessParam *paramTemperature, AccessParam *paramHumidity){
@@ -414,6 +417,12 @@ void Logsheet::execute(unsigned long samplingTime){
     this->_recordLogsheet();
 
 	}
+
+  //led status
+  if ((_paramTemperature->getParam(PARAMETER_ALARM) != NO_ALARM) || (_paramHumidity->getParam(PARAMETER_ALARM) != NO_ALARM)){
+    _led->blink(BLINK_WARNING);
+  }
+  else _led->blink(BLINK_NORMAL);
 }
 
 void Logsheet::_getSensorValue(){

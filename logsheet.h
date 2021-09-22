@@ -39,57 +39,59 @@
     Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
   };
   class Logsheet{
-      public:
-          Logsheet(String);
-          void AttachParameter(AccessParam*, AccessParam*);
-          void AttachSensor(DHT*);
-          void AttachDisplay(Adafruit_SSD1306*);
-          String getHourlyAvg(int);
-          String getCfgParameter();
-          void setTime(struct tm);
-          void execute(unsigned long);//sampling periode ms
-          String getValues();//return string in format Json for Temp, Humidity
-          void info();
+    public:
+      Logsheet(String);
+      void AttachParameter(AccessParam*, AccessParam*);
+      void AttachSensor(DHT*);
+      void AttachDisplay(Adafruit_SSD1306*);
+      void AttachLed(Do*);
+      String getHourlyAvg(int);
+      String getCfgParameter();
+      void setTime(struct tm);
+      void execute(unsigned long);//sampling periode ms
+      String getValues();//return string in format Json for Temp, Humidity
+      void info();
 
-      private:
-          void _setupDefaultParameter();
-          void _setupFileCfgParameter(String);
-          void _getSensorValue();
-          void _print(logsheetData);
-          String _initRandomJson();
-          void _oledDisplay(float, float);
+    private:
+      void _setupDefaultParameter();
+      void _setupFileCfgParameter(String);
+      void _getSensorValue();
+      void _print(logsheetData);
+      String _initRandomJson();
+      void _oledDisplay(float, float);
 
-          String _getTimeStr(int);
-          String _getDayOfWeek(int);
-          void _recordEvent();
-          void _recordLogsheet();
-          void _minuteLogsheet();
-          void _hourlyLogsheet();
-          void _dailyLogsheet();
-          String _getCsv(logsheetData data);
-          void _shiftArray(int size, logsheetData last);
-          logsheetData _calculateAverage(logsheetData data[], int size);
+      String _getTimeStr(int);
+      String _getDayOfWeek(int);
+      void _recordEvent();
+      void _recordLogsheet();
+      void _minuteLogsheet();
+      void _hourlyLogsheet();
+      void _dailyLogsheet();
+      String _getCsv(logsheetData data);
+      void _shiftArray(int size, logsheetData last);
+      logsheetData _calculateAverage(logsheetData data[], int size);
 
-          void _appendFile(const char * path, const char * message);
-          void _writeFile(const char * path, const char * message);
-          String _readFile(const char * path);
-          String _readFileJson(int);//read file day of week, return json
-          
-          String _id;
-          float _prevT, _prevH;//temperature and humidity
-          unsigned long _prevMilli, _samplingTime;
-          int _samplingSec, _nbrSamplingSec;
-          boolean _minuteEvent, _hourEvent, _dayEvent;
-          boolean _saveHourlyEvent, _saveDailyEvent;
-          boolean _synchronized = false;
-          struct tm _tm;
+      void _appendFile(const char * path, const char * message);
+      void _writeFile(const char * path, const char * message);
+      String _readFile(const char * path);
+      String _readFileJson(int);//read file day of week, return json
+      
+      String _id;
+      float _prevT, _prevH;//temperature and humidity
+      unsigned long _prevMilli, _samplingTime;
+      int _samplingSec, _nbrSamplingSec;
+      boolean _minuteEvent, _hourEvent, _dayEvent;
+      boolean _saveHourlyEvent, _saveDailyEvent;
+      boolean _synchronized = false;
+      struct tm _tm;
 
-          DHT *_dht;
-          Adafruit_SSD1306 *_display;
+      DHT *_dht;
+      Adafruit_SSD1306 *_display;
+      Do *_led;
 
-          AccessParam *_paramTemperature, *_paramHumidity;
-          logsheetData _logsheetSecond[SECOND_60];
-          logsheetData _logsheetMinute[MINUTE_60];
+      AccessParam *_paramTemperature, *_paramHumidity;
+      logsheetData _logsheetSecond[SECOND_60];
+      logsheetData _logsheetMinute[MINUTE_60];
   };
 
 #endif

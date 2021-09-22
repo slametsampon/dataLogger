@@ -26,6 +26,7 @@ Do led(BUILTIN_LED);
 
 StartUp startUp("startUp");
 
+String loginSts = "FIRST_TIME";
 AccesUser accessEngineer("accessEngineer");
 AccesUser accessOperator("accessOperator");
 AccesUser activeUser("activeUser");
@@ -109,6 +110,7 @@ void setup(){
   logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
   logsheet.AttachSensor(&dhtSensor);
   logsheet.AttachDisplay(&display);
+  logsheet.AttachLed(&led);
   //logsheet setTime
   logsheet.setTime(getTimeNtp());
   logsheet.info();
@@ -163,12 +165,6 @@ void loop(){
   mainSequence.execute();
   
   if (mainSequence.isAMinuteEvent())logsheet.setTime(getTimeNtp());
-
-  //led status
-  if ((accessParamTemperature.getParam(PARAMETER_ALARM) != NO_ALARM) || (accessParamHumidity.getParam(PARAMETER_ALARM) != NO_ALARM)){
-    led.blink(BLINK_WARNING);
-  }
-  else led.blink(BLINK_NORMAL);
   
 }
 
@@ -244,6 +240,7 @@ void urlController(){
 
   server.on("/report", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/report.html", "text/html");
+    loginSts = "FIRST_TIME";
   });
   
   server.on("/hourlyAvgDay", HTTP_GET, [](AsyncWebServerRequest * request){
@@ -311,6 +308,13 @@ void urlController(){
 
   });
 
+  // route to loginStatus
+  server.on("/loginStatus", HTTP_GET, [](AsyncWebServerRequest * request){
+    request->send_P(200, "text/plain", loginSts.c_str());
+    Serial.printf("LoginSts is:%s\n", loginSts);
+  });
+
+  // route to login - post
   // route to config sensor - temperature and humidity
   server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(LittleFS, "/config.html", "text/html");
@@ -330,6 +334,7 @@ void urlController(){
 boolean authenticationUser(AsyncWebServerRequest * request){
   String username, password;
   boolean status = false;
+  loginSts = "VALID_LOGIN";
 
   if(request->hasArg("username")){
       username = request->arg("username");
@@ -354,6 +359,7 @@ boolean authenticationUser(AsyncWebServerRequest * request){
     status = true;
     activeUser.setUser(accessOperator.getUser());
   }
+  else loginSts = "INVALID_LOGIN";
   return status;
 }
 
