@@ -54,7 +54,7 @@
         void AttachDisplay(Adafruit_SSD1306*);
         void logoDisplay();//display logo GMF
         void welcomeDisplay();//welcome display
-        void diagDisplay(int);//display step of setup
+        void stepDisplay(int);//display step of setup
 
     private:
         String _id;
@@ -210,7 +210,7 @@ void StartUp::welcomeDisplay(){
     }
 }
 
-void StartUp::diagDisplay(int step){
+void StartUp::stepDisplay(int step){
 
     //convert to string
     String stepStr = String(step);

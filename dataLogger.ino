@@ -69,7 +69,7 @@ void setup(){
   startUp.welcomeDisplay();
   //init step
   int step = 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
   //Setp up pin and serial
   pinMode(ledPin, OUTPUT);
@@ -80,7 +80,7 @@ void setup(){
   if (DEBUG) { Serial.print(F("\n\nSerial started at 115200\n" ));   }
   /*increase step & display*/
   step += 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
   // Initialize LittleFS
   Serial.println("Begin LittleFS");
@@ -91,7 +91,7 @@ void setup(){
   listAllFilesInDir("/");
   /*increase step & display*/
   step += 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
   //load Engineer, Operator and active user from littleFS
   loadUsers();
@@ -102,7 +102,7 @@ void setup(){
   activeUser.info();
   /*increase step & display*/
   step += 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
   // Initialize the sensor
   //dhtSensor.begin();
@@ -114,7 +114,7 @@ void setup(){
   logsheet.info();
   /*increase step & display*/
   step += 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
 
   // Start WiFi
@@ -123,25 +123,25 @@ void setup(){
   else startWiFiMulti();
   /*increase step & display*/
   step += 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
   //start mDNS
   startMDNS();
   /*increase step & display*/
   step += 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
   //url controller included load static css, js, images
   urlController();
   /*increase step & display*/
   step += 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
   // Start server
   server.begin();
   /*increase step & display*/
   step += 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
   struct tm tmstruct = getTimeNtp();
   Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", tmstruct.tm_year, tmstruct.tm_mon, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
@@ -151,7 +151,7 @@ void setup(){
   Serial.printf("setup samplingTime : %3d\n", samplingTime);
   /*increase step & display*/
   step += 1;
-  startUp.diagDisplay(step);
+  startUp.stepDisplay(step);
 
 }
  

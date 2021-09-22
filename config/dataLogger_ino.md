@@ -1,21 +1,23 @@
 ### A. dataLogger.ino
 #### 1. Declaration :
 ####
-1. All users (AccesUser accessEngineer("accessEngineer");
+1. led 
+2. StarUp
+3. All users (AccesUser accessEngineer("accessEngineer");
 AccesUser accessOperator("accessOperator");
 AccesUser activeUser("activeUser");)
 
-2. SequenceTimer   mainSequence("mainSequence");
+4. SequenceTimer   mainSequence("mainSequence");
 
-3. AccessParam accessParamTemperature("accessParamTemperature");
+5. AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
 
-4. Adafruit_SSD1306 display(OLED_RESET);
+6. Adafruit_SSD1306 display(OLED_RESET);
 DHT dht(DHTPIN, DHTTYPE);
 Logsheet logsheet("logsheet");
 
-5. ESP8266WiFiMulti wifiMulti;
-6. AsyncWebServer server(80);
+7. ESP8266WiFiMulti wifiMulti;
+8. AsyncWebServer server(80);
 
 #### 2. Setup - STEP:
 #####
@@ -40,5 +42,6 @@ Logsheet logsheet("logsheet");
 #### 3. Loop
 ####
 1. Execute logsheet with sampling time
-2. Run mainSequence.execute();
-3. Update logsheet time - per minute
+2. led.blink(normal)
+3. Run mainSequence.execute();
+4. Update logsheet time - per minute
