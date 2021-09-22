@@ -1,48 +1,47 @@
 ### A. dataLogger.ino
 #### 1. Declaration :
 ####
-1. All users (AccesUser accessEngineer("accessEngineer");
+1. led 
+2. StarUp
+3. All users (AccesUser accessEngineer("accessEngineer");
 AccesUser accessOperator("accessOperator");
 AccesUser activeUser("activeUser");)
 
-2. SequenceTimer   mainSequence("mainSequence");
+4. SequenceTimer   mainSequence("mainSequence");
 
-3. AccessParam accessParamTemperature("accessParamTemperature");
+5. AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
 
-4. Adafruit_SSD1306 display(OLED_RESET);
+6. Adafruit_SSD1306 display(OLED_RESET);
 DHT dht(DHTPIN, DHTTYPE);
 Logsheet logsheet("logsheet");
 
-5. ESP8266WiFiMulti wifiMulti;
-6. AsyncWebServer server(80);
+7. ESP8266WiFiMulti wifiMulti;
+8. AsyncWebServer server(80);
 
-#### 2. Setup :
+#### 2. Setup - STEP:
 #####
-1. Serial
-2. Initialize LittleFS
-3. listAllFilesInDir in LittleFS
-4. setup samplingTime to default value
-5. load Engineer and Operator from littleFS
-6. setup active user to default (guest)
-7. setup pin
-8. Initialize loghseet (
+1. Initialize OLED, display logo & welcome
+2. Initialize pin and serial comm
+3. Initialize LittleFS & list directories and files
+4. Load Engineer, Operator and default active users from littleFS
+5. Initialize loghseet:(Initialize dhtSensor,
   logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
   logsheet.AttachSensor(&dht);
   logsheet.AttachDisplay(&display);
-  logsheet.info();)
-9. Start WiFi
+  logsheet.info(); setTime - initial)
+6. Start WiFi
   (if (WiFiAP) startWiFiAP();
   //else startWiFiClient();
   else startWiFiMulti();)
+7. start mDNS
+8. urlController() include static files;
+9. Start server
 10. Get time from NTP Server
-11. logsheet setTime - initial
-12. start mDNS
-13. urlController();
-14. Start server
 
 #### 3. Loop
 ####
 1. Execute logsheet with sampling time
-2. Run mainSequence.execute();
-3. Update logsheet time - per minute
+2. led.blink(normal)
+3. Run mainSequence.execute();
+4. Update logsheet time - per minute
