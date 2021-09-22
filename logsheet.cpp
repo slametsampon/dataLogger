@@ -83,10 +83,6 @@ String Logsheet::getHourlyAvg(int dWeek){
 }
 
 void Logsheet::setTime(struct tm tmVal){
-  //set to proper time config
-  tmVal.tm_year += 1900;
-  tmVal.tm_mon +=1;
-
   //set local time _tm
   _tm = tmVal;
   

@@ -19,27 +19,23 @@ Logsheet logsheet("logsheet");
 
 #### 2. Setup - STEP:
 #####
-1. Serial
-2. Initialize LittleFS
-3. listAllFilesInDir in LittleFS
-4. setup samplingTime to default value
-5. load Engineer and Operator from littleFS
-6. setup active user to default (guest)
-7. setup pin
-8. Initialize loghseet (
+1. Initialize OLED, display logo & welcome
+2. Initialize pin and serial comm
+3. Initialize LittleFS & list directories and files
+4. Load Engineer, Operator and default active users from littleFS
+5. Initialize loghseet:(Initialize dhtSensor,
   logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
   logsheet.AttachSensor(&dht);
   logsheet.AttachDisplay(&display);
-  logsheet.info();)
-9. Start WiFi
+  logsheet.info(); setTime - initial)
+6. Start WiFi
   (if (WiFiAP) startWiFiAP();
   //else startWiFiClient();
   else startWiFiMulti();)
+7. start mDNS
+8. urlController() include static files;
+9. Start server
 10. Get time from NTP Server
-11. logsheet setTime - initial
-12. start mDNS
-13. urlController();
-14. Start server
 
 #### 3. Loop
 ####

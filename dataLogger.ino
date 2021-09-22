@@ -20,6 +20,9 @@
 #include "SequenceTimer.h"
 #include "logsheet.h"
 #include "start_up.h"
+#include "do.h"
+
+Do led(BUILTIN_LED);
 
 StartUp startUp("startUp");
 
@@ -34,7 +37,7 @@ AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
 
 Adafruit_SSD1306 display(OLED_RESET);
-DHT dht(DHTPIN, DHTTYPE);
+DHT dhtSensor(DHTPIN, DHTTYPE);
 Logsheet logsheet("logsheet");
 
 ESP8266WiFiMulti wifiMulti;     // Create an instance of the ESP8266WiFiMulti class, called 'wifiMulti'
@@ -56,11 +59,6 @@ void loadStaticFile();//css, js
 void listAllFilesInDir(String);//list files in all dir's
 
 void setup(){
-  pinMode(ledPin, OUTPUT);
-  // Serial port for debugging purposes
-  Serial.begin(115200);
-  while (!Serial) {;}
-  if (DEBUG) { Serial.print(F("\n\nSerial started at 115200\n" ));   }
 
   //init Oled display
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)
@@ -69,10 +67,21 @@ void setup(){
   startUp.logoDisplay();
   //welcome display
   startUp.welcomeDisplay();
-
   //init step
-  int step = 0;
+  int step = 1;
   startUp.diagDisplay(step);
+
+  //Setp up pin and serial
+  pinMode(ledPin, OUTPUT);
+  pinMode(BUILTIN_LED, OUTPUT);
+
+  Serial.begin(115200);
+  while (!Serial) {;}
+  if (DEBUG) { Serial.print(F("\n\nSerial started at 115200\n" ));   }
+  /*increase step & display*/
+  step += 1;
+  startUp.diagDisplay(step);
+
   // Initialize LittleFS
   Serial.println("Begin LittleFS");
   if(!LittleFS.begin()){
@@ -80,63 +89,67 @@ void setup(){
     return;
   }
   listAllFilesInDir("/");
+  /*increase step & display*/
   step += 1;
   startUp.diagDisplay(step);
 
-  //setup samplingTime
-  samplingTime = SAMPLING_TIME;//default value
-  Serial.printf("setup samplingTime : %3d\n", samplingTime);
-
-  //load Engineer and Operator from littleFS
+  //load Engineer, Operator and active user from littleFS
   loadUsers();
   accessEngineer.info();
   accessOperator.info();
-
   //setup default active user
   setupDefaultUser();
   activeUser.info();
-  startUp.diagDisplay(step);
+  /*increase step & display*/
   step += 1;
   startUp.diagDisplay(step);
 
   // Initialize the sensor
+  //dhtSensor.begin();
   logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
-  logsheet.AttachSensor(&dht);
+  logsheet.AttachSensor(&dhtSensor);
   logsheet.AttachDisplay(&display);
+  //logsheet setTime
+  logsheet.setTime(getTimeNtp());
   logsheet.info();
+  /*increase step & display*/
   step += 1;
   startUp.diagDisplay(step);
+
 
   // Start WiFi
   if (WiFiAP) startWiFiAP();
   //else startWiFiClient();
   else startWiFiMulti();
-  step += 1;
-  startUp.diagDisplay(step);
-
-  struct tm tmstruct = getTimeNtp();
-  tmstruct.tm_year += 1900;
-  tmstruct.tm_mon +=1;
-  Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", tmstruct.tm_year, tmstruct.tm_mon, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
-  Serial.println("");
-
-  //logsheet setTime
-  logsheet.setTime(getTimeNtp());
+  /*increase step & display*/
   step += 1;
   startUp.diagDisplay(step);
 
   //start mDNS
   startMDNS();
+  /*increase step & display*/
   step += 1;
   startUp.diagDisplay(step);
 
-  //url controller
+  //url controller included load static css, js, images
   urlController();
+  /*increase step & display*/
   step += 1;
   startUp.diagDisplay(step);
 
   // Start server
   server.begin();
+  /*increase step & display*/
+  step += 1;
+  startUp.diagDisplay(step);
+
+  struct tm tmstruct = getTimeNtp();
+  Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", tmstruct.tm_year, tmstruct.tm_mon, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
+  Serial.println("");
+  //setup samplingTime
+  samplingTime = SAMPLING_TIME;//default value
+  Serial.printf("setup samplingTime : %3d\n", samplingTime);
+  /*increase step & display*/
   step += 1;
   startUp.diagDisplay(step);
 
@@ -146,6 +159,7 @@ void loop(){
 
   //Logsheet action
   logsheet.execute(samplingTime);
+  led.blink(BLINK_NORMAL);
 
   mainSequence.execute();
   
@@ -160,6 +174,10 @@ struct tm getTimeNtp(){
   delay(2000);
   tmstruct.tm_year = 0;
   getLocalTime(&tmstruct, 5000);
+
+  //set offset to 1900, month +1
+  tmstruct.tm_year += 1900;
+  tmstruct.tm_mon +=1;
   return tmstruct;
 }
 
