@@ -159,11 +159,16 @@ void loop(){
 
   //Logsheet action
   logsheet.execute(samplingTime);
-  led.blink(BLINK_NORMAL);
 
   mainSequence.execute();
   
   if (mainSequence.isAMinuteEvent())logsheet.setTime(getTimeNtp());
+
+  //led status
+  if ((accessParamTemperature.getParam(PARAMETER_ALARM) != NO_ALARM) || (accessParamHumidity.getParam(PARAMETER_ALARM) != NO_ALARM)){
+    led.blink(BLINK_WARNING);
+  }
+  else led.blink(BLINK_NORMAL);
   
 }
 
@@ -604,7 +609,6 @@ void setupDefaultUser(){
   userDt.level = 0;
   activeUser.setUser(userDt);
 }
-
 
 //NTP
 bool getLocalTime(struct tm * info, uint32_t ms) {

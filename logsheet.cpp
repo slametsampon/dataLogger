@@ -20,7 +20,6 @@ void Logsheet::AttachSensor(DHT *dht){
 void Logsheet::AttachDisplay(Adafruit_SSD1306 *display){
     _display = display;
     //_display->begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)
-
 }
 
 void Logsheet::AttachParameter(AccessParam *paramTemperature, AccessParam *paramHumidity){
