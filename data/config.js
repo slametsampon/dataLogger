@@ -115,4 +115,67 @@ function getSamplingTime(data){
   element.value = element.placeholder;
 }
 
+function validateForm() {
+  
+  //sampling time
+  var data = document.forms["configForm"]["samplingTime"];
+  if (data.value =="")data.value = data.placeholder;
+  var x = parseInt(data.value);
+  if (x < 2000) {
+    alert("Sampling time min 2000");
+    return false;
+  }
+
+  //afaEma
+  data = document.forms["configForm"]["alfaEma"];
+  if (data.value =="")data.value = data.placeholder;
+  x = parseInt(data.value);
+  if (x < 10) {
+    alert("afaEma time min 10");
+    return false;
+  }
+
+  else if (x > 100) {
+    alert("afaEma time max 100");
+    return false;
+  }
+
+  //alarm
+  data = document.forms["configForm"]["alarmH"];
+  if (data.value =="")data.value = data.placeholder;
+  var aH = parseInt(data.value);
+
+  data = document.forms["configForm"]["alarmL"];
+  if (data.value =="")data.value = data.placeholder;
+  var aL = parseInt(data.value);
+
+  data = document.forms["configForm"]["indicatorH"];
+  if (data.value =="")data.value = data.placeholder;
+  var rH = parseInt(data.value);
+
+  data = document.forms["configForm"]["indicatorL"];
+  if (data.value =="")data.value = data.placeholder;
+  var rL = parseInt(data.value);
+  
+  if (aL > aH) {
+    alert("alarmL GT alarmH");
+    return false;
+  }
+  else if (aL < rL) {
+    alert("alarmL LT indicatorL");
+    return false;
+  }
+  else if (aH > rH) {
+    alert("alarmH GT indicatorH");
+    return false;
+  }
+  else if (rL > rH) {
+    alert("indicatorL GT indicatorH");
+    return false;
+  }
+
+  //confirmation submit
+  return confirm('Are you, sure you want to submit this parameters ?');  
+}
+
 document.addEventListener('DOMContentLoaded', setupConfig, false);

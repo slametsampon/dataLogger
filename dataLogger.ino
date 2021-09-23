@@ -149,7 +149,7 @@ void setup(){
   Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", tmstruct.tm_year, tmstruct.tm_mon, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
   Serial.println("");
   //setup samplingTime
-  samplingTime = SAMPLING_TIME;//default value
+  samplingTime = SAMPLING_TIME_DEFAULT;//default value
   Serial.printf("setup samplingTime : %3d\n", samplingTime);
   /*increase step & display*/
   step += 1;
