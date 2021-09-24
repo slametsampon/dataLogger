@@ -25,6 +25,7 @@
   const int MINUTE_60 = 60;
   const int SECOND_6 = 6;//average at last one
   const int SECOND_60 = 60;//average at last one
+  const int TRENDING_24 = 24;//for trending data
 
   const String PATH_LS = "/logsheet/";
   const String SENSOR_FILE_CFG = "sensors.cfg";
@@ -46,6 +47,7 @@
       void AttachDisplay(Adafruit_SSD1306*);
       void AttachLed(Do*);
       String getHourlyAvg(int);
+      String getTrendingData();
       String getCfgParameter();
       void setTime(struct tm);
       void execute(unsigned long);//sampling periode ms
@@ -79,7 +81,7 @@
       String _id;
       float _prevT, _prevH;//temperature and humidity
       unsigned long _prevMilli, _samplingTime;
-      int _samplingSec, _nbrSamplingSec;
+      int _samplingSec, _nbrSamplingSec, _samplingTrend;
       boolean _minuteEvent, _hourEvent, _dayEvent;
       boolean _saveHourlyEvent, _saveDailyEvent;
       boolean _synchronized = false;
@@ -92,6 +94,7 @@
       AccessParam *_paramTemperature, *_paramHumidity;
       logsheetData _logsheetSecond[SECOND_60];
       logsheetData _logsheetMinute[MINUTE_60];
+      logsheetData _logsheetTrending[TRENDING_24];
   };
 
 #endif

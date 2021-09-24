@@ -18,6 +18,7 @@
 
     String welcomeMsg[year+1] = {"GMF","AeroAsia","IoT", "DataLogger", "Ver: ", "Salman", "Alfarisi", "Oct,2021"} ;
     const String VERSION = "01.00";
+    const int STEP_WAIT_TIME = 1000;//milli second, maximum value
 
     //logo gmf
     // 'gmf', 64x48px
@@ -226,5 +227,5 @@ void StartUp::stepDisplay(int step){
     _display->print(stepStr);
 
     _display->display();
-    delay (1000);
+    delay (STEP_WAIT_TIME);
 }

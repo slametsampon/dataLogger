@@ -243,6 +243,7 @@ void urlController(){
     loginSts = "FIRST_TIME";
   });
   
+  // route to hourly average
   server.on("/hourlyAvgDay", HTTP_GET, [](AsyncWebServerRequest * request){
     if(request->hasArg("days")){
         String arg = request->arg("days");
@@ -256,6 +257,13 @@ void urlController(){
     } else {
         Serial.println("Post did not have a 'samplingTime' field.");
     }
+  });
+
+  // route to trending data
+  server.on("/getTrendingData", HTTP_GET, [](AsyncWebServerRequest * request){
+
+    String trendData = logsheet.getTrendingData();
+    request->send(200, "application/json", trendData);
   });
 
   // route to active user

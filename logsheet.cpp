@@ -9,6 +9,7 @@ by : Sam 04/09/2021
 
 Logsheet::Logsheet(String id): _id(id){
 	_prevMilli = millis();
+  _samplingTrend = 0;
 }
 
 void Logsheet::AttachSensor(DHT *dht){
@@ -82,6 +83,44 @@ String Logsheet::getValues(){
 String Logsheet::getHourlyAvg(int dWeek){
   //return (this->_initRandomJson());
   return (this->_readFileJson(dWeek));
+}
+
+String Logsheet::getTrendingData(){
+  /*
+    {
+    "Time": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+    "Temperature": [20.00, 20.01, 20.02, 20.03, 20.04, 20.05, 20.06, 20.07, 20.08, 20.09,
+                 20.10, 20.11, 20.12, 20.13, 20.14, 20.15, 20.16, 20.17, 20.18, 20.19, 20.20, 20.21, 20.22, 20.23],
+    "Humidity": [70.00, 70.01, 70.02, 70.03, 70.04, 70.05, 70.06, 70.07, 70.08, 70.09,
+                 70.10, 70.11, 70.12, 70.13, 70.14, 70.15, 70.16, 70.17, 70.18, 70.19, 70.20, 70.21, 70.22, 70.23]
+    }
+
+    DynamicJsonDocument doc(1536);    
+  */
+
+  //Json assembling
+  String output;
+  DynamicJsonDocument doc(1536);
+  float h, t;
+  doc.clear();
+  JsonArray time = doc.createNestedArray("time");
+  JsonArray temperature = doc.createNestedArray("temperature");
+  JsonArray humidity = doc.createNestedArray("humidity");
+
+  for(int row = 0; row < TRENDING_24; row++) {
+
+    String Ti= String(_logsheetTrending[row].time);
+    String T = String(_logsheetTrending[row].temperature);
+    String H = String(_logsheetTrending[row].humidity);
+
+    time.add(Ti.toInt());
+    temperature.add(T.toFloat());
+    humidity.add(H.toFloat());
+  }
+
+  serializeJson(doc, output);
+  return output;
 }
 
 void Logsheet::setTime(struct tm tmVal){
@@ -474,6 +513,13 @@ void Logsheet::_getSensorValue(){
 
 void Logsheet::_recordEvent(){
 
+  //handle trending sample
+  if (_samplingTrend >= (TRENDING_24 - 1)){
+    _samplingTrend = 0;
+  }
+  else _samplingTrend++;
+
+
   //handle sampling second
   if (_samplingSec >= (_nbrSamplingSec - 1)){
     _samplingSec = 0;
@@ -511,6 +557,10 @@ void Logsheet::_recordLogsheet(){
   last.time = _getTimeStr(_samplingSec);
 
   _shiftArray(_nbrSamplingSec, last);
+
+  //fill up trending data
+  last.time = _getTimeStr(_samplingTrend);
+  _shiftArray(TRENDING_24, last);
 
   //handle record Second
   if (_minuteEvent){
@@ -697,6 +747,24 @@ void Logsheet::_shiftArray(int size, logsheetData last){
 
       //print to serial
       //_print(_logsheetSecond[size - 1]);
+    break;
+
+  case TRENDING_24:
+      for (int i =0; i < (size - 1) ;i++){
+        _logsheetTrending[i].temperature = _logsheetTrending[i+1].temperature;
+        _logsheetTrending[i].humidity = _logsheetTrending[i+1].humidity;
+        _logsheetTrending[i].time = _logsheetTrending[i+1].time;
+
+        //print to serial
+        //_print(_logsheetTrending[i]);
+
+      }
+      _logsheetTrending[size - 1].temperature = last.temperature;
+      _logsheetTrending[size - 1].humidity = last.humidity;
+      _logsheetTrending[size - 1].time = last.time;
+
+      //print to serial
+      //_print(_logsheetTrending[size - 1]);
     break;
 
   case MINUTE_60:
@@ -887,15 +955,7 @@ String Logsheet::_readFileJson(int day_Week){
   JsonArray humidity = doc.createNestedArray("humidity");
 
   for(int row = 0; row < cp.getRowsCount(); row++) {
-    if (SIMULATION){
-      Serial.print(row, DEC);
-      Serial.print(" => ");
-      Serial.print(strTime[row]);
-      Serial.print(" ; ");
-      Serial.print(strT[row]);
-      Serial.print(" ; ");
-      Serial.println(strH[row]);
-    }
+
     String Ti= String(strTime[row]);
     String T = String(strT[row]);
     String H = String(strH[row]);
