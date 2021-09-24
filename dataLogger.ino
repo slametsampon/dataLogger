@@ -106,7 +106,7 @@ void setup(){
   startUp.stepDisplay(step);
 
   // Initialize the sensor
-  //dhtSensor.begin();
+  dhtSensor.begin();
   logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
   logsheet.AttachSensor(&dhtSensor);
   logsheet.AttachDisplay(&display);
