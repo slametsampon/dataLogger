@@ -544,9 +544,13 @@ void loadStaticFile()
   server.on("/config.js", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/config.js", "text/js"); });
 
-  // Route to load widgets.js file
-  server.on("/widgets.js", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(LittleFS, "/widgets.js", "text/js"); });
+  // Route to load widgetsClass.js file
+  server.on("/widgetsClass.js", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/widgetsClass.js", "text/js"); });
+
+  // Route to load modal-dialog.js file
+  server.on("/modal-dialog.js", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/modal-dialog.js", "text/js"); });
 
   // Route to load logoGMF file
   server.on("/logoGMF", HTTP_GET, [](AsyncWebServerRequest *request)

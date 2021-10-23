@@ -21,9 +21,8 @@
                 <li id = "config"><a href="/config">Config</a></li>   
                 <li id = "login"><a href="/login" class="disabled-link">Login</a></li>   
                 <li id = "logout"><a href="/logout" onclick="return confirm('Are you sure to logout ?')">Logout</a></li>   
-                <li id="activeUser">
-                    <p>User</p>
-                </li>
+                <li id="about"><a href="#">About</a></li>
+                <li id="activeUser">User</li>
             </ul>
         </div>
       
@@ -41,10 +40,29 @@
                 </form>
             </div>
             <div id = "loginStatus"></div>
+            <!-- The Modal -->
+            <div id="myModal" class="modal">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <h2>IoT Data Logger</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>It's for Final Task of</p>
+                        <p>Mercu Buana - University</p>
+                        <p>Electronic - Engineering</p>
+                    </div>
+                    <div class="modal-footer">
+                        <h5>By : Salman Alfarisi - 583379</h5>
+                    </div>
+                </div>
+            </div>
         </div>
         
     </body>
 
     <script src="authentication.js"></script>
+    <script src="modal-dialog.js"></script>
     <script src="login.js"></script>
 </html>
