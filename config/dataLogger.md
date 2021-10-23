@@ -11,6 +11,7 @@
 8. Wire
 9. SPI
 10. ArduinoJson
+11. CSV-Parser-for-Arduino
 
 ### Libraries - download from third party:
 1. [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer/archive/master.zip)
@@ -19,6 +20,8 @@
 
 ### Local Libraries :
 1. SequenceTimer
+2. start_up - Welcome and step tracking during setup
+3. Do - Digital Output
 
 ### References ESP8266:
 

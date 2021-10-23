@@ -163,28 +163,35 @@ function getHourlyAvg(){
 }
 
 function setupReport(){
-  var url_day = "hourlyAvgDay?days="+document.getElementById("days").value;
-  var index_url = ["getActiveUser", url_day];
-  var request = new XMLHttpRequest();
-  (function loop(i, length) {
-      if (i>= length) {
-          return;
+
+  if (SIMULATION) {
+    userAccess(activeUser);
+  }
+
+  else {
+    var url_day = "hourlyAvgDay?days=" + document.getElementById("days").value;
+    var index_url = ["getActiveUser", url_day];
+    var request = new XMLHttpRequest();
+    (function loop(i, length) {
+      if (i >= length) {
+        return;
       }
       var url = "/" + index_url[i];
-  
+    
       request.open("GET", url, true);
-      request.onreadystatechange = function() {
-          if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-            if(i == 0)userAccess(this.responseText);
-            else if(i == 1){
-              fillDataTable(this.responseText);
-              generateReportTable(table);
-            }
-            loop(i + 1, length);
+      request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
+          if (i == 0) userAccess(this.responseText);
+          else if (i == 1) {
+            fillDataTable(this.responseText);
+            generateReportTable(table);
           }
+          loop(i + 1, length);
+        }
       }
       request.send();
-  })(0, index_url.length);
+    })(0, index_url.length);
+  }
 }
 
 function downloadAsPDF() {

@@ -18,7 +18,7 @@
   #include "model.h"
   #include "do.h"
 
-  const boolean SIMULATION = false;
+  const boolean SIMULATION = true;
   const int ALFA_EMA = 80;
   const int DAY_366 = 366;
   const int HOUR_24 = 24;

@@ -24,6 +24,9 @@
         <li id = "config"><a href="/config">Config</a></li>   
         <li id = "login"><a href="/login">Login</a></li>   
         <li id = "logout"><a href="/logout" onclick="return confirm('Are you sure to logout ?')">Logout</a></li>   
+        <li id="activeUser">
+          <p>User</p>
+        </li>
       </ul>
     </div>
   
@@ -47,15 +50,11 @@
         <div id='dial_1'> 
           <h3>Temperature</h3>
           <canvas id='canvasTemp' width='150' height='125'  style='border:1px solid #000000;' > </canvas>
-          <p class='noMargin bigText'><span id='temp'>20</span> °C</p>
-          <p class='noMargin bigText'>Status : <span id='StatusTemp'>Normal</span></p>
       </div>    
 
         <div id='dial_2'> 
           <h3>Humidity</h3>
           <canvas id='canvasHumid' width='150' height='125'  style='border:1px solid #000000;' > </canvas>
-          <p class='noMargin bigText'><span id='humd'>60</span> %</p>
-          <p class='noMargin bigText'>Status : <span id='StatusHumd'>Normal</span></p>
         </div>
       </div>  <!--  'dialContainer'  -->
 
@@ -65,19 +64,12 @@
           <div> <div class='box red'></div> Temperature</div>
           <div> <div class='box blue'></div> Humidity</div>
         </div>
-        <!--
-        <p>
-          <a class="btn btn-success" role="button">Current</a>
-          <a class="btn btn-success" role="button">Hist-Hour</a>
-          <a class="btn btn-success" role="button">Hist-Day</a>
-        </p>   
-        -->
       </div>      
  
     </div> <!--  'wrapper'  -->
   </body>
  
   <script src="authentication.js"></script>
-  <script src="index.js"></script> 
-  <script src="widgets.js"></script> 
+  <script src="widgetsClass.js"></script> 
+  <script src="index.js"></script>
 </html> 
