@@ -16,94 +16,94 @@ class Dial{
     }
     
     drawBody() {
-    let oneDegreeInRadians = Math.PI/180;
-    if (this.stopAngle < this.startAngle) { this.stopAngle = this.stopAngle + 360;}
+        let oneDegreeInRadians = Math.PI/180;
+        if (this.stopAngle < this.startAngle) { this.stopAngle = this.stopAngle + 360;}
 
-    // map the almVal to a degree
-    let almAngle =  (this.almVal - this.minVal) *  ((this.stopAngle - this.startAngle) / (this.maxVal - this.minVal)) + this.startAngle  ;
-    let arcAlarmAngleInRadians =  oneDegreeInRadians * almAngle;
+        // map the almVal to a degree
+        let almAngle =  (this.almVal - this.minVal) *  ((this.stopAngle - this.startAngle) / (this.maxVal - this.minVal)) + this.startAngle  ;
+        let arcAlarmAngleInRadians =  oneDegreeInRadians * almAngle;
 
-    let arcStartAngleInRadians =  oneDegreeInRadians * (this.startAngle-5);
-    let arcStopAngleInRadians  =  oneDegreeInRadians * (this.stopAngle+5); 
+        let arcStartAngleInRadians =  oneDegreeInRadians * (this.startAngle-5);
+        let arcStopAngleInRadians  =  oneDegreeInRadians * (this.stopAngle+5); 
 
 
-    let c = document.getElementById(this.canvasID);
-    let ctx = c.getContext('2d');
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.save();
+        let c = document.getElementById(this.canvasID);
+        let ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, c.width, c.height);
+        ctx.save();
 
-    let H = c.height;
-    let W = c.width;
+        let H = c.height;
+        let W = c.width;
 
-    let arcLineWidth = W / 5;
-    ctx.translate(W/2, W/2);        // move coordinates 0,0 to the centre of the canvas
+        let arcLineWidth = W / 5;
+        ctx.translate(W/2, W/2);        // move coordinates 0,0 to the centre of the canvas
 
-    // draw arc
-    ctx.beginPath();
-    let radius = W/2 - (arcLineWidth/2) - (W/100);      
-    ctx.lineWidth = arcLineWidth;
-    ctx.lineCap = 'butt';
-    ctx.strokeStyle = this.color;
-    ctx.arc(0, 0, radius, arcStartAngleInRadians, arcStopAngleInRadians, false);
-    ctx.stroke();
-
-    // draw Alarm arc
-    ctx.beginPath();
-    ctx.strokeStyle = '#ff0000';
-    ctx.arc(0, 0, radius, arcAlarmAngleInRadians, arcStopAngleInRadians, false);
-    ctx.stroke();
-
-    // draw centre circle
-    ctx.beginPath();
-    let centerCircleRadius = W/100*3.5
-    ctx.strokeStyle = '#000000';
-    ctx.fillStyle = '#222222';
-    ctx.lineWidth = 2;
-    ctx.arc(0, 0, centerCircleRadius, 0, 2 * Math.PI, true);
-    ctx.stroke();
-    ctx.fill();
-
-    // draw ticks 
-    ctx.beginPath();
-    ctx.lineWidth = 1;
-    ctx.lineCap = 'butt';
-    ctx.strokeStyle = '#333333';
-
-    ctx.font = '12px Arial';
-    ctx.fillStyle = '#333333';
-    ctx.textAlign = 'center'; 
-    ctx.textBaseline = 'top'; 
-
-    let tickStartPoint = radius - (arcLineWidth/2) ;   // bottom of the arc
-    let tickLength =  5/8 * arcLineWidth - 5; 
-
-    let labelPos = radius + (arcLineWidth / 2) - 2;
-    
-    let dialStep = 10;
-    let incAngle = (this.maxVal - this.minVal) / dialStep;
-    if (incAngle <= 5) { incAngle = 5; }
-    else { incAngle = 10;}
-
-    for (let angle = this.minVal; angle <= this.maxVal; angle = angle + incAngle)
-    {   
-        let angleInDegrees =  (angle - this.minVal) *  ((this.stopAngle - this.startAngle) / (this.maxVal - this.minVal)) + this.startAngle  ;
-        let angleInRadians = angleInDegrees * oneDegreeInRadians;
-
-        ctx.rotate(angleInRadians );  
-        ctx.moveTo(tickStartPoint, 0 );                   
-        ctx.lineTo(tickStartPoint + tickLength, 0 );
+        // draw arc
+        ctx.beginPath();
+        let radius = W/2 - (arcLineWidth/2) - (W/100);      
+        ctx.lineWidth = arcLineWidth;
+        ctx.lineCap = 'butt';
+        ctx.strokeStyle = this.color;
+        ctx.arc(0, 0, radius, arcStartAngleInRadians, arcStopAngleInRadians, false);
         ctx.stroke();
 
-        // draw the label at the right angle.
-        // rotate the dial - 90 degree, draw the text at the new top of the dial, then rotate +90.
-        // this means we use the - y axis.
+        // draw Alarm arc
+        ctx.beginPath();
+        ctx.strokeStyle = '#ff0000';
+        ctx.arc(0, 0, radius, arcAlarmAngleInRadians, arcStopAngleInRadians, false);
+        ctx.stroke();
 
-        ctx.rotate(90*oneDegreeInRadians); 
-        ctx.fillText(angle.toString(), 0, -labelPos );        
-        ctx.rotate(-90*oneDegreeInRadians); 
+        // draw centre circle
+        ctx.beginPath();
+        let centerCircleRadius = W/100*3.5
+        ctx.strokeStyle = '#000000';
+        ctx.fillStyle = '#222222';
+        ctx.lineWidth = 2;
+        ctx.arc(0, 0, centerCircleRadius, 0, 2 * Math.PI, true);
+        ctx.stroke();
+        ctx.fill();
 
-        ctx.rotate(-angleInRadians);  //  this puts the dial back where it was.     
-    }
+        // draw ticks 
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.lineCap = 'butt';
+        ctx.strokeStyle = '#333333';
+
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#333333';
+        ctx.textAlign = 'center'; 
+        ctx.textBaseline = 'top'; 
+
+        let tickStartPoint = radius - (arcLineWidth/2) ;   // bottom of the arc
+        let tickLength =  5/8 * arcLineWidth - 5; 
+
+        let labelPos = radius + (arcLineWidth / 2) - 2;
+        
+        let dialStep = 10;
+        let incAngle = (this.maxVal - this.minVal) / dialStep;
+        if (incAngle <= 5) { incAngle = 5; }
+        else { incAngle = 10;}
+
+        for (let angle = this.minVal; angle <= this.maxVal; angle = angle + incAngle)
+        {   
+            let angleInDegrees =  (angle - this.minVal) *  ((this.stopAngle - this.startAngle) / (this.maxVal - this.minVal)) + this.startAngle  ;
+            let angleInRadians = angleInDegrees * oneDegreeInRadians;
+
+            ctx.rotate(angleInRadians );  
+            ctx.moveTo(tickStartPoint, 0 );                   
+            ctx.lineTo(tickStartPoint + tickLength, 0 );
+            ctx.stroke();
+
+            // draw the label at the right angle.
+            // rotate the dial - 90 degree, draw the text at the new top of the dial, then rotate +90.
+            // this means we use the - y axis.
+
+            ctx.rotate(90*oneDegreeInRadians); 
+            ctx.fillText(angle.toString(), 0, -labelPos );        
+            ctx.rotate(-90*oneDegreeInRadians); 
+
+            ctx.rotate(-angleInRadians);  //  this puts the dial back where it was.     
+        }
     }
 
     drawPointer(dialValue, alarm) {

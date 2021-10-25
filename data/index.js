@@ -24,6 +24,17 @@ var sensorCfg = {
     }
 };
   
+var sensor = {
+    "Temperature": {
+      "value":20.25,
+      "alarm":0
+    },
+    "Humidity": {
+      "value":80.75,
+      "alarm":0
+    }
+};
+
 let dialTemp = new Dial('canvasTemp', '#0b9106', 160, 20,
   sensorCfg.Temperature.lowRange,
   sensorCfg.Temperature.highRange,
@@ -52,19 +63,12 @@ function simulateSensor() {
   if (t >= sensorCfg.Temperature.highLimit) alarmT = 2;
   if (h >= sensorCfg.Humidity.highLimit) alarmH = 2;
 
-  let sensorValues = {
-      "Temperature": {
-        "value":t,
-        "alarm":alarmT
-      },
-      "Humidity": {
-        "value":h,
-        "alarm":alarmH
-      }
-  };
+  sensor.Temperature.value = t;
+  sensor.Humidity.value = h;
+  sensor.Temperature.alarm = alarmT;
+  sensor.Humidity.alarm = alarmH;
 
-  return sensorValues;
-
+  return sensor;
 }
 
 function updateGraph(t, h)
@@ -104,26 +108,37 @@ function setupWidgets(data) {
 }
 
 function initTrendingData(data) {
+  let lastTemp = 0;
+  let lastHumd = 0;
   if (SIMULATION) {
     //init trending values
     for (let index = 0; index < tempArray.length; index++) {
-      let sensor = simulateSensor();
+      simulateSensor();
       tempArray[index] = sensor.Temperature.value;
       humdArray[index] = sensor.Humidity.value;
+      lastTemp = tempArray[index];
+      lastHumd = humdArray[index];
     }    
   }
   else {
+    console.log('data : ', data);
     let initData = JSON.parse(data);
+    console.log('initData : ', initData);
     for (let index = 0; index < tempArray.length; index++) {
-      tempArray[index] = initData.Temperature[index];
-      humdArray[index] = initData.Humidity[index];
+      if (initData.humidity[index] > 0) {
+        tempArray[index] = initData.temperature[index];
+        humdArray[index] = initData.humidity[index];
+        lastTemp = tempArray[index];
+        lastHumd = humdArray[index];
+      }
     }    
   }
+  trendHT.drawLine(lastTemp, lastHumd);
 }
 
 function updateValues(data) {
-  if (SIMULATION) var sensor = data;
-  else var sensor = JSON.parse(data);
+  if (SIMULATION) sensor = data;
+  else sensor = JSON.parse(data);
 
   dialTemp.drawBody();
   dialHumid.drawBody();
@@ -160,7 +175,6 @@ function setupIndex() {
     userAccess(activeUser);
     setupWidgets(sensorCfg);
     initTrendingData('dummy-data-simulation');
-    trendHT.drawLine(sensorCfg.Temperature.value, sensorCfg.Humidity.value);
   }
 
   else {
