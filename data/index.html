@@ -24,6 +24,8 @@
         <li id = "config"><a href="/config">Config</a></li>   
         <li id = "login"><a href="/login">Login</a></li>   
         <li id = "logout"><a href="/logout" onclick="return confirm('Are you sure to logout ?')">Logout</a></li>   
+        <li id="about"><a href="#">About</a></li>
+        <li id="activeUser">User</li>
       </ul>
     </div>
   
@@ -45,39 +47,49 @@
 
       <div id='dialContainer'> 
         <div id='dial_1'> 
-          <h3>Temperature</h3>
+          <h4>Temperature</h4>
           <canvas id='canvasTemp' width='150' height='125'  style='border:1px solid #000000;' > </canvas>
-          <p class='noMargin bigText'><span id='temp'>20</span> °C</p>
-          <p class='noMargin bigText'>Status : <span id='StatusTemp'>Normal</span></p>
       </div>    
 
         <div id='dial_2'> 
-          <h3>Humidity</h3>
+          <h4>Humidity</h4>
           <canvas id='canvasHumid' width='150' height='125'  style='border:1px solid #000000;' > </canvas>
-          <p class='noMargin bigText'><span id='humd'>60</span> %</p>
-          <p class='noMargin bigText'>Status : <span id='StatusHumd'>Normal</span></p>
         </div>
       </div>  <!--  'dialContainer'  -->
 
       <div id='graphContainer'> 
+        <h4>Trending</h4>
         <canvas id='graph' width='340' height='150'  style='border:1px solid #000000; background-color:white;' > </canvas>
         <div id='key'>
           <div> <div class='box red'></div> Temperature</div>
           <div> <div class='box blue'></div> Humidity</div>
         </div>
-        <!--
-        <p>
-          <a class="btn btn-success" role="button">Current</a>
-          <a class="btn btn-success" role="button">Hist-Hour</a>
-          <a class="btn btn-success" role="button">Hist-Day</a>
-        </p>   
-        -->
-      </div>      
- 
+      </div>
+      
+      <!-- The Modal -->
+      <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="close">&times;</span>
+            <h2>IoT Data Logger</h2>
+          </div>
+          <div class="modal-body">
+            <p>It's for Final Task of</p>
+            <p>Mercu Buana - University</p>
+            <p>Electronic - Engineering</p>
+          </div>
+          <div class="modal-footer">
+            <h5>By : Salman Alfarisi - 583379</h5>
+          </div>
+        </div>
+      </div>
+     
     </div> <!--  'wrapper'  -->
   </body>
  
   <script src="authentication.js"></script>
-  <script src="index.js"></script> 
-  <script src="widgets.js"></script> 
+  <script src="widgetsClass.js"></script> 
+  <script src="modal-dialog.js"></script>
+  <script src="index.js"></script>
 </html> 

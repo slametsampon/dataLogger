@@ -2,7 +2,8 @@
 #define dataLogger_h
 
     // #define DHTPIN D5     // ????
-    #define DHTPIN D4     // what pin we're connected to ????
+    //#define DHTPIN D4     // what pin we're connected to ????
+    #define DHTPIN 2     // what pin we're connected to ????
 
     #define DHTTYPE DHT11   
     #define OLED_RESET 0  // GPIO0

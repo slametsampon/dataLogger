@@ -1,10 +1,23 @@
-  function userAccess(data){
-    const operatorLevel = 1;
-    const engineerLevel = 9;
+const SIMULATION = false;
+const OPERATOR_LEVEL = 1;
+const ENGINEER_LEVEL = 9;
+
+var activeUser ={
+      "username":"engineer",
+      "password":"123456",
+      "email":"engineer@example.com",
+      "level":9
+    };
+
+function userAccess(data) {
+
+    if (SIMULATION) activeUser = data;
+    else activeUser = JSON.parse(data);
     
-    let activeUsr = JSON.parse(data);
-    let level = parseInt(activeUsr.level)
-    if (level == engineerLevel) {
+    let user = 'GST';
+    let level = parseInt(activeUser.level)
+    if (level == ENGINEER_LEVEL) {
+        user = 'ENG';
         // Selecting element
         var elem = document.getElementById("report");     
         elem.className = "enable-link";  // Add or replace all classes with note class
@@ -22,7 +35,8 @@
         elem.className = "enable-link";  // Add or replace all classes with note class
     }
 
-    else if (level == operatorLevel){
+    else if (level == OPERATOR_LEVEL){
+        user = 'OPR';
         // Selecting element
         var elem = document.getElementById("report");     
         elem.className = "enable-link";  // Add or replace all classes with note class
@@ -40,7 +54,8 @@
         elem.className = "enable-link";  // Add or replace all classes with note class
     }
 
-    else{
+    //default user = guest
+    else {
         // Selecting element
         var elem = document.getElementById("report");     
         elem.className = "disabled-link";  // Add or replace all classes with note class
@@ -57,5 +72,9 @@
         var elem = document.getElementById("logout");     
         elem.className = "disabled-link";  // Add or replace all classes with note class
     }
+
+    //display active user
+    document.getElementById('activeUser').innerHTML = user;
+
 }
 
