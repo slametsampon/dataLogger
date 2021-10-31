@@ -995,9 +995,8 @@ String Logsheet::_readFile(const char *path)
   {
     c = file.read();
     message += (char)c;
-    //Serial.write(file.read());
   }
-  Serial.println("");
+  Serial.println(message);
   file.close();
 
   return message;
@@ -1020,6 +1019,13 @@ String Logsheet::_readFileJson(int day_Week)
   //parse data
   char contentsChar[DAILY_SIZE];
   fileContents.toCharArray(contentsChar, DAILY_SIZE);
+
+  //debug
+  if (SIMULATION)
+  {
+    Serial.println("contentsChar : ");
+    Serial.println(contentsChar);
+  }
 
   CSV_Parser cp(contentsChar, /**TIME;TEMPERATURE;HUMIDITY*/ "sss", true, /*delimiter*/ ';');
 
@@ -1049,6 +1055,15 @@ String Logsheet::_readFileJson(int day_Week)
     String T = String(strT[row]);
     String H = String(strH[row]);
 
+    //debug
+    if (SIMULATION)
+    {
+      Serial.print(row);
+      Serial.print("=>");
+      Serial.print(T);
+      Serial.print(":");
+      Serial.println(H);
+    }
     time.add(Ti.toInt());
     temperature.add(T.toFloat());
     humidity.add(H.toFloat());
