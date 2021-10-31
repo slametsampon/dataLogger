@@ -426,10 +426,16 @@ String Logsheet::_initRandomJson()
   JsonArray temperature = doc.createNestedArray("temperature");
   JsonArray humidity = doc.createNestedArray("humidity");
 
+  float tempHighLimit = _paramTemperature->getParam(PARAMETER_HIGH_LIMIT) * 10.0;
+  float tempLowLimit = _paramTemperature->getParam(PARAMETER_LOW_LIMIT) * 10.0;
+
+  float humidityHighLimit = _paramHumidity->getParam(PARAMETER_HIGH_LIMIT) * 10.0;
+  float humidityLowLimit = _paramHumidity->getParam(PARAMETER_LOW_LIMIT) * 10.0;
+
   for (int i = 0; i < 24; i++)
   {
-    h = random(400.0, 950) / 10.0;
-    t = random(200.0, 455) / 10.0;
+    t = random(tempLowLimit, tempHighLimit) / 10.0;
+    h = random(humidityLowLimit, humidityHighLimit) / 10.0;
 
     time.add(i);
     temperature.add(t);
@@ -499,6 +505,12 @@ void Logsheet::_getSensorValue()
   float humidityAlarmH = _paramHumidity->getParam(PARAMETER_HIGH_LIMIT);
   float temperatureAlarmH = _paramTemperature->getParam(PARAMETER_HIGH_LIMIT);
 
+  float tempHighLimit = _paramTemperature->getParam(PARAMETER_HIGH_LIMIT) * 10.0;
+  float tempLowLimit = _paramTemperature->getParam(PARAMETER_LOW_LIMIT) * 10.0;
+
+  float humidityHighLimit = _paramHumidity->getParam(PARAMETER_HIGH_LIMIT) * 10.0;
+  float humidityLowLimit = _paramHumidity->getParam(PARAMETER_LOW_LIMIT) * 10.0;
+
   // get raw values from sensor
   if (!SIMULATION)
   {
@@ -507,8 +519,8 @@ void Logsheet::_getSensorValue()
   }
   else
   {
-    tRaw = random(200, 455) / 10.0;
-    hRaw = random(400.0, 950) / 10.0;
+    tRaw = random(tempLowLimit, tempHighLimit) / 10.0;
+    hRaw = random(humidityLowLimit, humidityHighLimit) / 10.0;
   }
 
   //filtering raw value : AlfaEma filter
@@ -983,9 +995,8 @@ String Logsheet::_readFile(const char *path)
   {
     c = file.read();
     message += (char)c;
-    //Serial.write(file.read());
   }
-  Serial.println("");
+  Serial.println(message);
   file.close();
 
   return message;
@@ -1008,6 +1019,13 @@ String Logsheet::_readFileJson(int day_Week)
   //parse data
   char contentsChar[DAILY_SIZE];
   fileContents.toCharArray(contentsChar, DAILY_SIZE);
+
+  //debug
+  if (SIMULATION)
+  {
+    Serial.println("contentsChar : ");
+    Serial.println(contentsChar);
+  }
 
   CSV_Parser cp(contentsChar, /**TIME;TEMPERATURE;HUMIDITY*/ "sss", true, /*delimiter*/ ';');
 
@@ -1037,6 +1055,15 @@ String Logsheet::_readFileJson(int day_Week)
     String T = String(strT[row]);
     String H = String(strH[row]);
 
+    //debug
+    if (SIMULATION)
+    {
+      Serial.print(row);
+      Serial.print("=>");
+      Serial.print(T);
+      Serial.print(":");
+      Serial.println(H);
+    }
     time.add(Ti.toInt());
     temperature.add(T.toFloat());
     humidity.add(H.toFloat());

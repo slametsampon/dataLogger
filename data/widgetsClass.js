@@ -3,7 +3,7 @@
 class Dial{
     constructor(canvasID, color,
         startAngle, stopAngle, minVal, maxVal,
-        almVal, unit) {
+        lowAlarm, highAlarm, unit) {
         
         this.canvasID = canvasID;
         this.color = color;
@@ -11,7 +11,8 @@ class Dial{
         this.stopAngle = stopAngle;
         this.minVal = minVal;
         this.maxVal = maxVal;
-        this.almVal = almVal;
+        this.lowAlarm = lowAlarm;
+        this.highAlarm = highAlarm;
         this.unit = unit;       
     }
     
@@ -19,9 +20,13 @@ class Dial{
         let oneDegreeInRadians = Math.PI/180;
         if (this.stopAngle < this.startAngle) { this.stopAngle = this.stopAngle + 360;}
 
-        // map the almVal to a degree
-        let almAngle =  (this.almVal - this.minVal) *  ((this.stopAngle - this.startAngle) / (this.maxVal - this.minVal)) + this.startAngle  ;
-        let arcAlarmAngleInRadians =  oneDegreeInRadians * almAngle;
+        // map the highAlarm to a degree
+        let highAlarmAngle =  (this.highAlarm - this.minVal) *  ((this.stopAngle - this.startAngle) / (this.maxVal - this.minVal)) + this.startAngle  ;
+        let arcHighAlarmAngleInRadians =  oneDegreeInRadians * highAlarmAngle;
+
+        // map the lowAlarm to a degree
+        let lowAlarmAngle =  (this.lowAlarm - this.minVal) *  ((this.stopAngle - this.startAngle) / (this.maxVal - this.minVal)) + this.startAngle  ;
+        let arcLowAlarmAngleInRadians =  oneDegreeInRadians * lowAlarmAngle;
 
         let arcStartAngleInRadians =  oneDegreeInRadians * (this.startAngle-5);
         let arcStopAngleInRadians  =  oneDegreeInRadians * (this.stopAngle+5); 
@@ -47,10 +52,16 @@ class Dial{
         ctx.arc(0, 0, radius, arcStartAngleInRadians, arcStopAngleInRadians, false);
         ctx.stroke();
 
-        // draw Alarm arc
+        // draw High Alarm arc
         ctx.beginPath();
         ctx.strokeStyle = '#ff0000';
-        ctx.arc(0, 0, radius, arcAlarmAngleInRadians, arcStopAngleInRadians, false);
+        ctx.arc(0, 0, radius, arcHighAlarmAngleInRadians, arcStopAngleInRadians, false);
+        ctx.stroke();
+
+        // draw Low Alarm arc
+        ctx.beginPath();
+        ctx.strokeStyle = '#fcfc00';
+        ctx.arc(0, 0, radius, arcStartAngleInRadians, arcLowAlarmAngleInRadians, false);
         ctx.stroke();
 
         // draw centre circle
@@ -84,8 +95,7 @@ class Dial{
         if (incAngle <= 5) { incAngle = 5; }
         else { incAngle = 10;}
 
-        for (let angle = this.minVal; angle <= this.maxVal; angle = angle + incAngle)
-        {   
+        for (let angle = this.minVal; angle <= this.maxVal; angle = angle + incAngle){   
             let angleInDegrees =  (angle - this.minVal) *  ((this.stopAngle - this.startAngle) / (this.maxVal - this.minVal)) + this.startAngle  ;
             let angleInRadians = angleInDegrees * oneDegreeInRadians;
 

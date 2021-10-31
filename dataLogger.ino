@@ -12,11 +12,11 @@
 // Import required libraries
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <Hash.h>
+//#include <Hash.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <ESP8266WiFiMulti.h>
-#include <ESP8266mDNS.h>
+//#include <ESP8266mDNS.h>
 
 #include "dataLogger.h"
 #include "SequenceTimer.h"
@@ -51,7 +51,7 @@ AsyncWebServer server(80);
 void startWiFiAP();
 void startWiFiClient();
 void startWiFiMulti();
-void startMDNS();
+//void startMDNS();
 void loadUsers();
 void setupDefaultUser();
 
@@ -143,7 +143,7 @@ void setup()
   startUp.stepDisplay(step);
 
   //start mDNS
-  startMDNS();
+  //startMDNS();
   /*increase step & display*/
   step += 1;
   startUp.stepDisplay(step);
@@ -243,7 +243,7 @@ void startWiFiAP()
   Serial.println("AP started");
   Serial.println("IP address: " + WiFi.softAPIP().toString());
 }
-
+/*
 void startMDNS()
 {                       // Start the mDNS responder
   MDNS.begin(mdnsName); // start the multicast domain name server
@@ -251,7 +251,7 @@ void startMDNS()
   Serial.print(mdnsName);
   Serial.println(".local");
 }
-
+*/
 void urlController()
 {
 

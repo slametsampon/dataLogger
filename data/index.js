@@ -6,9 +6,9 @@ var sensorCfg = {
       "unit":"°C",
       "value":20.25,
       "highRange":50.0,
-      "lowRange":10.0,
-      "highLimit":40.0,
-      "lowLimit":10.0,
+      "lowRange":0.0,
+      "highLimit":26.0,
+      "lowLimit":16.0,
       "alfaEma":80.0,
       "alarm":0
     },
@@ -17,7 +17,7 @@ var sensorCfg = {
       "value":80.75,
       "highRange":100.0,
       "lowRange":0.0,
-      "highLimit":90.0,
+      "highLimit":65.0,
       "lowLimit":40.0,
       "alfaEma":80.0,
       "alarm":0
@@ -38,12 +38,14 @@ var sensor = {
 let dialTemp = new Dial('canvasTemp', '#0b9106', 160, 20,
   sensorCfg.Temperature.lowRange,
   sensorCfg.Temperature.highRange,
+  sensorCfg.Temperature.lowLimit,
   sensorCfg.Temperature.highLimit,
   sensorCfg.Temperature.unit);
 
 let dialHumid = new Dial('canvasHumid',  '#aaaaff', 160, 20,
   sensorCfg.Humidity.lowRange,
   sensorCfg.Humidity.highRange,
+  sensorCfg.Humidity.lowLimit,
   sensorCfg.Humidity.highLimit,
   sensorCfg.Humidity.unit);
 
@@ -55,8 +57,11 @@ function random(min, max) {
 }
 
 function simulateSensor() {
-  let t = random(0, 5) + 20;
-  let h = random(0, 5) + 70;
+  let deltaT = sensorCfg.Temperature.highLimit - sensorCfg.Temperature.lowLimit;
+  let deltaH = sensorCfg.Humidity.highLimit - sensorCfg.Humidity.lowLimit;
+
+  let t = random(0, deltaT) + sensorCfg.Temperature.lowLimit;
+  let h = random(0, deltaH) + sensorCfg.Humidity.lowLimit;
   let alarmT = 0;
   let alarmH = 0;
 
