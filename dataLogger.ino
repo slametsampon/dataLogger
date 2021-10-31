@@ -1,23 +1,14 @@
 /*
-  Rui Santos
-  Complete project details at https://randomnerdtutorials.com/esp8266-web-server-spiffs-nodemcu/
-  
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files.
-  
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
+dataLogger - IoT data logger
+by : Salman Alfarisi
 */
 
 // Import required libraries
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-//#include <Hash.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <ESP8266WiFiMulti.h>
-//#include <ESP8266mDNS.h>
-
 #include "dataLogger.h"
 #include "SequenceTimer.h"
 #include "logsheet.h"
@@ -88,6 +79,7 @@ void setup()
   {
     ;
   }
+
   if (DEBUG)
   {
     Serial.print(F("\n\nSerial started at 115200\n"));
@@ -138,12 +130,6 @@ void setup()
   //else startWiFiClient();
   else
     startWiFiMulti();
-  /*increase step & display*/
-  step += 1;
-  startUp.stepDisplay(step);
-
-  //start mDNS
-  //startMDNS();
   /*increase step & display*/
   step += 1;
   startUp.stepDisplay(step);
