@@ -35,22 +35,6 @@ var sensor = {
     }
 };
 
-let dialTemp = new Dial('canvasTemp', '#0b9106', 160, 20,
-  sensorCfg.Temperature.lowRange,
-  sensorCfg.Temperature.highRange,
-  sensorCfg.Temperature.lowLimit,
-  sensorCfg.Temperature.highLimit,
-  sensorCfg.Temperature.unit);
-
-let dialHumid = new Dial('canvasHumid',  '#aaaaff', 160, 20,
-  sensorCfg.Humidity.lowRange,
-  sensorCfg.Humidity.highRange,
-  sensorCfg.Humidity.lowLimit,
-  sensorCfg.Humidity.highLimit,
-  sensorCfg.Humidity.unit);
-
-let trendHT = new Trending('graph', sensorCfg.Temperature.lowRange, sensorCfg.Humidity.highRange);
-
 function random(min, max) {
   const num = Math.floor(Math.random() * (max - min + 1)) + min;
   return num;
@@ -101,6 +85,23 @@ function setupWidgets(data) {
   if (SIMULATION) sensorCfg = data;
   else sensorCfg = JSON.parse(data);
 
+  console.log('sensorCfg : ', sensorCfg);
+
+  let dialTemp = new Dial('canvasTemp', '#0b9106', 160, 20,
+    sensorCfg.Temperature.lowRange,
+    sensorCfg.Temperature.highRange,
+    sensorCfg.Temperature.lowLimit,
+    sensorCfg.Temperature.highLimit,
+    sensorCfg.Temperature.unit);
+
+  let dialHumid = new Dial('canvasHumid',  '#aaaaff', 160, 20,
+    sensorCfg.Humidity.lowRange,
+    sensorCfg.Humidity.highRange,
+    sensorCfg.Humidity.lowLimit,
+    sensorCfg.Humidity.highLimit,
+    sensorCfg.Humidity.unit);
+  let trendHT = new Trending('graph', sensorCfg.Temperature.lowRange, sensorCfg.Humidity.highRange);
+
   dialTemp.drawBody();
   dialHumid.drawBody();
   trendHT.drawFrame();
@@ -113,6 +114,7 @@ function setupWidgets(data) {
 }
 
 function initTrendingData(data) {
+  let trendHT = new Trending('graph', sensorCfg.Temperature.lowRange, sensorCfg.Humidity.highRange);
   let lastTemp = 0;
   let lastHumd = 0;
   if (SIMULATION) {
@@ -144,6 +146,21 @@ function initTrendingData(data) {
 function updateValues(data) {
   if (SIMULATION) sensor = data;
   else sensor = JSON.parse(data);
+
+  let dialTemp = new Dial('canvasTemp', '#0b9106', 160, 20,
+    sensorCfg.Temperature.lowRange,
+    sensorCfg.Temperature.highRange,
+    sensorCfg.Temperature.lowLimit,
+    sensorCfg.Temperature.highLimit,
+    sensorCfg.Temperature.unit);
+
+  let dialHumid = new Dial('canvasHumid',  '#aaaaff', 160, 20,
+    sensorCfg.Humidity.lowRange,
+    sensorCfg.Humidity.highRange,
+    sensorCfg.Humidity.lowLimit,
+    sensorCfg.Humidity.highLimit,
+    sensorCfg.Humidity.unit);
+  let trendHT = new Trending('graph', sensorCfg.Temperature.lowRange, sensorCfg.Humidity.highRange);
 
   dialTemp.drawBody();
   dialHumid.drawBody();

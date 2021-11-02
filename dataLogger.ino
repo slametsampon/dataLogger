@@ -417,7 +417,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
       samplingTime = (unsigned long)SAMPLING_TIME_MAX;
   }
 
-  else if (request->hasArg("indicatorL"))
+  if (request->hasArg("indicatorL"))
   {
     String argData = request->arg("indicatorL");
     Serial.print("The indicatorL is: ");
@@ -427,17 +427,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
     dtParam.lowRange = val;
   }
 
-  else if (request->hasArg("indicatorL"))
-  {
-    String argData = request->arg("indicatorL");
-    Serial.print("The indicatorL is: ");
-    Serial.println(argData);
-
-    float val = argData.toFloat();
-    dtParam.lowRange = val;
-  }
-
-  else if (request->hasArg("indicatorH"))
+  if (request->hasArg("indicatorH"))
   {
     String argData = request->arg("indicatorH");
     Serial.print("The indicatorH is: ");
@@ -447,7 +437,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
     dtParam.highRange = val;
   }
 
-  else if (request->hasArg("alarmL"))
+  if (request->hasArg("alarmL"))
   {
     String argData = request->arg("alarmL");
     Serial.print("The alarmL is: ");
@@ -457,7 +447,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
     dtParam.lowLimit = val;
   }
 
-  else if (request->hasArg("alarmH"))
+  if (request->hasArg("alarmH"))
   {
     String argData = request->arg("alarmH");
     Serial.print("The alarmH is: ");
@@ -467,7 +457,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
     dtParam.highLimit = val;
   }
 
-  else if (request->hasArg("alfaEma"))
+  if (request->hasArg("alfaEma"))
   {
     String argData = request->arg("alfaEma");
     Serial.print("The alfaEma is: ");
@@ -477,7 +467,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
     dtParam.alfaEma = val;
   }
 
-  else if (request->hasArg("config"))
+  if (request->hasArg("config"))
   {
     String argData = request->arg("config");
     Serial.print("The config is: ");
@@ -494,11 +484,6 @@ boolean validateParameter(AsyncWebServerRequest *request)
       status = true;
       accessParamHumidity.setParam(dtParam);
     }
-  }
-
-  else
-  {
-    Serial.println("Post did not have a 'samplingTime' field.");
   }
 
   return status;

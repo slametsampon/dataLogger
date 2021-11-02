@@ -148,6 +148,7 @@ String Logsheet::getCfgParameter()
     {
     "Temperature": {
       "unit":"°C",
+      "value": 70.86,
       "highRange":50.0,
       "lowRange":0.0,
       "highLimit":40.0,
@@ -156,6 +157,7 @@ String Logsheet::getCfgParameter()
     },
     "Humidity": {
       "unit":"%",
+      "value": 70.86,
       "highRange":100.0,
       "lowRange":0.0,
       "highLimit":90.0,
@@ -164,7 +166,7 @@ String Logsheet::getCfgParameter()
     }
   }
 
-  StaticJsonDocument<256> doc;
+  StaticJsonDocument<384> doc;
 
   JsonObject Temperature = doc.createNestedObject("Temperature");
   Temperature["unit"] = "°C";
@@ -186,7 +188,7 @@ String Logsheet::getCfgParameter()
 
   */
 
-  StaticJsonDocument<256> doc;
+  StaticJsonDocument<384> doc;
 
   param dtParam = _paramTemperature->getParam();
   JsonObject Temperature = doc.createNestedObject("Temperature");
