@@ -18,7 +18,7 @@ const char *password3 = "muwa7x06";
 const char *ssid4 = "Fariyo Ganteng";
 const char *password4 = "Fariyoganteng";
 
-bool WiFiAP = false; // Do yo want the ESP as AP?
+bool AP_MODE = false; // Do yo want the ESP as AP?
 
 const String PATH_ROOT = "/";
 const String FILE_USER = "users.cfg";

@@ -15,6 +15,7 @@ by : Salman Alfarisi
 #include "start_up.h"
 #include "do.h"
 
+// variables and objects declaration - global
 Do led(BUILTIN_LED);
 
 StartUp startUp("startUp");
@@ -37,22 +38,20 @@ Logsheet logsheet("logsheet");
 ESP8266WiFiMulti wifiMulti; // Create an instance of the ESP8266WiFiMulti class, called 'wifiMulti'
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
+boolean authenticationUser(AsyncWebServerRequest *);
+boolean validateParameter(AsyncWebServerRequest *);
 
 //functions prototype
-void startWiFiAP();
+void startWIFI_AP();
 void startWiFiClient();
 void startWiFiMulti();
-//void startMDNS();
 void loadUsers();
 void setupDefaultUser();
-
 void urlController();
 void handleLogin();
 void handleConfig();
 void loadStaticFile();          //css, js
 void listAllFilesInDir(String); //list files in all dir's
-boolean authenticationUser(AsyncWebServerRequest *);
-boolean validateParameter(AsyncWebServerRequest *);
 
 void setup()
 {
@@ -125,8 +124,8 @@ void setup()
   startUp.stepDisplay(step);
 
   // Start WiFi
-  if (WiFiAP)
-    startWiFiAP();
+  if (AP_MODE)
+    startWIFI_AP();
   //else startWiFiClient();
   else
     startWiFiMulti();
@@ -222,7 +221,7 @@ void startWiFiClient()
   Serial.println("IP address: " + WiFi.localIP().toString());
 }
 
-void startWiFiAP()
+void startWIFI_AP()
 {
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid1, password1);
