@@ -16,7 +16,7 @@ const char *password2 = "sampon170466";
 const char *ssid3 = "SamFamily";
 const char *password3 = "muwa7x06";
 const char *ssid4 = "Fariyo Ganteng";
-const char *password4 = "Fariyoganteng";
+const char *password4 = "Faryganteng";
 
 bool AP_MODE = false; // Do yo want the ESP as AP?
 
