@@ -25,11 +25,6 @@ void Logsheet::AttachDisplay(Adafruit_SSD1306 *display)
   _display = display;
 }
 
-void Logsheet::AttachLed(Do *led)
-{
-  _led = led;
-}
-
 void Logsheet::AttachParameter(AccessParam *paramTemperature, AccessParam *paramHumidity)
 {
   _paramTemperature = paramTemperature;
@@ -371,13 +366,6 @@ void Logsheet::_setupFileCfgParameter(String fileName)
   }
   else
   {
-    /*
-    Serial.println("Contents : ");
-    while (file.available()) {
-      Serial.write(file.read());
-    }
-    Serial.println("");
-    */
 
     StaticJsonDocument<512> doc;
 
@@ -487,14 +475,6 @@ void Logsheet::execute(unsigned long samplingTime)
     //record logsheet
     this->_recordLogsheet();
   }
-
-  //led status
-  if ((_paramTemperature->getParam(PARAMETER_ALARM) != NO_ALARM) || (_paramHumidity->getParam(PARAMETER_ALARM) != NO_ALARM))
-  {
-    _led->blink(BLINK_WARNING);
-  }
-  else
-    _led->blink(BLINK_NORMAL);
 }
 
 void Logsheet::_getSensorValue()

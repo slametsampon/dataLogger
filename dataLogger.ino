@@ -13,10 +13,8 @@ by : Salman Alfarisi
 #include "SequenceTimer.h"
 #include "logsheet.h"
 #include "start_up.h"
-#include "do.h"
 
 // variables and objects declaration - global
-Do led(BUILTIN_LED);
 
 StartUp startUp("startUp");
 
@@ -115,8 +113,6 @@ void setup()
   logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
   logsheet.AttachSensor(&dhtSensor);
   logsheet.AttachDisplay(&display);
-  logsheet.AttachLed(&led);
-  //logsheet setTime
   logsheet.setTime(getTimeNtp());
   logsheet.info();
   /*increase step & display*/
@@ -228,15 +224,6 @@ void startWIFI_AP()
   Serial.println("AP started");
   Serial.println("IP address: " + WiFi.softAPIP().toString());
 }
-/*
-void startMDNS()
-{                       // Start the mDNS responder
-  MDNS.begin(mdnsName); // start the multicast domain name server
-  Serial.print("mDNS responder started: http://");
-  Serial.print(mdnsName);
-  Serial.println(".local");
-}
-*/
 void urlController()
 {
 

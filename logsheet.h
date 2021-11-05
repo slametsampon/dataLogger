@@ -18,7 +18,6 @@
 #include <LittleFS.h>
 
 #include "model.h"
-#include "do.h"
 
 const boolean SIMULATION = true;
 const int ALFA_EMA = 80;
@@ -55,7 +54,6 @@ public:
   void AttachParameter(AccessParam *, AccessParam *);
   void AttachSensor(DHT *);
   void AttachDisplay(Adafruit_SSD1306 *);
-  void AttachLed(Do *);
   String getHourlyAvg(int);
   String getTrendingData();
   String getCfgParameter();
@@ -99,7 +97,6 @@ private:
 
   DHT *_dht;
   Adafruit_SSD1306 *_display;
-  Do *_led;
 
   AccessParam *_paramTemperature, *_paramHumidity;
   logsheetData _logsheetSecond[SECOND_60];
