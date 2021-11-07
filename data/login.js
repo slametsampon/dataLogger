@@ -1,11 +1,18 @@
 
+
+function loginStatus(data){
+
+  if (data == "INVALID_LOGIN"){
+    document.getElementById("loginStatus").innerHTML = "Invalid username or password";
+  }
+
+}
+  
 // This is executed after the document has finished loading.
 function setupLogin() {
-
   if (SIMULATION) {
     userAccess(activeUser);
   }
-
   else {
     var index_url = ["getActiveUser", "loginStatus"];
     var request = new XMLHttpRequest();
@@ -13,8 +20,7 @@ function setupLogin() {
       if (i >= length) {
         return;
       }
-      var url = "/" + index_url[i];
-    
+      var url = "/" + index_url[i];    
       request.open("GET", url, true);
       request.onreadystatechange = function () {
         if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
@@ -27,13 +33,4 @@ function setupLogin() {
     })(0, index_url.length);
   }
 }
-
-function loginStatus(data){
-
-  if (data == "INVALID_LOGIN"){
-    document.getElementById("loginStatus").innerHTML = "Invalid username or password";
-  }
-
-}
-  
 document.addEventListener('DOMContentLoaded', setupLogin, false);

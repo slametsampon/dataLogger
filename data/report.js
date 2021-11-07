@@ -162,38 +162,6 @@ function getHourlyAvg(){
   xhttp.send();
 }
 
-function setupReport(){
-
-  if (SIMULATION) {
-    userAccess(activeUser);
-  }
-
-  else {
-    var url_day = "hourlyAvgDay?days=" + document.getElementById("days").value;
-    var index_url = ["getActiveUser", url_day];
-    var request = new XMLHttpRequest();
-    (function loop(i, length) {
-      if (i >= length) {
-        return;
-      }
-      var url = "/" + index_url[i];
-    
-      request.open("GET", url, true);
-      request.onreadystatechange = function () {
-        if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-          if (i == 0) userAccess(this.responseText);
-          else if (i == 1) {
-            fillDataTable(this.responseText);
-            generateReportTable(table);
-          }
-          loop(i + 1, length);
-        }
-      }
-      request.send();
-    })(0, index_url.length);
-  }
-}
-
 function downloadAsPDF() {
   let d = new Date();
   var dName = dayName(d.getDay());
@@ -229,20 +197,33 @@ function downloadAsPDF() {
   html2pdf().set(opt).from(element).save();
 }
 
-//index.js  
-function sendEmail() {
-	Email.send({
-	Host: "smtp.gmail.com",
-	Username : "slametsambwi@gmail.com",
-	Password : "sambwi170466",
-	To : "alumni86smansagtg@gmail.com",
-	From : "slametsambwi@gmail.com",
-	Subject : "Testing email javascript",
-	Body : "It's just testing",
-	}).then(
-		message => alert("mail sent successfully")
-	);
+// This is executed after the document has finished loading.
+function setupReport(){
+  if (SIMULATION) {
+    userAccess(activeUser);
+  }
+  else {
+    var url_day = "hourlyAvgDay?days=" + document.getElementById("days").value;
+    var index_url = ["getActiveUser", url_day];
+    var request = new XMLHttpRequest();
+    (function loop(i, length) {
+      if (i >= length) {
+        return;
+      }
+      var url = "/" + index_url[i];    
+      request.open("GET", url, true);
+      request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
+          if (i == 0) userAccess(this.responseText);
+          else if (i == 1) {
+            fillDataTable(this.responseText);
+            generateReportTable(table);
+          }
+          loop(i + 1, length);
+        }
+      }
+      request.send();
+    })(0, index_url.length);
+  }
 }
-
-//document.addEventListener('DOMContentLoaded', reportBuildingSimul, false);
 document.addEventListener('DOMContentLoaded', setupReport, false);
