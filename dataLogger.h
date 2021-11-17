@@ -9,14 +9,14 @@
 const boolean DEBUG = true;
 
 // Replace with your network credentials
-const char *ssid1 = "Sam-Laptop";
-const char *password1 = "sampon170466";
-const char *ssid2 = "SamMobile";
-const char *password2 = "sampon170466";
-const char *ssid3 = "SamFamily";
-const char *password3 = "muwa7x06";
-const char *ssid4 = "Fariyo Ganteng";
-const char *password4 = "Faryganteng";
+const char *SSID1 = "Sam-Laptop";
+const char *PASSWORD1 = "sampon170466";
+const char *SSID2 = "SamMobile";
+const char *PASSWORD2 = "sampon170466";
+const char *SSID3 = "SamFamily";
+const char *PASSWORD3 = "muwa7x06";
+const char *SSID4 = "Fariyo Ganteng";
+const char *PASSWORD4 = "Faryganteng";
 
 bool AP_MODE = false; // Do yo want the ESP as AP?
 

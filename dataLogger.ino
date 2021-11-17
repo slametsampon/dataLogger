@@ -181,10 +181,10 @@ struct tm getTimeNtp()
 
 void startWiFiMulti()
 {                                    // Try to connect to some given access points. Then wait for a connection
-  wifiMulti.addAP(ssid1, password1); // add Wi-Fi networks you want to connect to
-  wifiMulti.addAP(ssid2, password2);
-  wifiMulti.addAP(ssid3, password3);
-  wifiMulti.addAP(ssid4, password4);
+  wifiMulti.addAP(SSID1, PASSWORD1); // add Wi-Fi networks you want to connect to
+  wifiMulti.addAP(SSID2, PASSWORD2);
+  wifiMulti.addAP(SSID3, PASSWORD3);
+  wifiMulti.addAP(SSID4, PASSWORD4);
 
   Serial.println("Connecting");
   while (wifiMulti.run() != WL_CONNECTED)
@@ -202,9 +202,9 @@ void startWiFiMulti()
 
 void startWiFiClient()
 {
-  Serial.println("Connecting to " + (String)ssid1);
+  Serial.println("Connecting to " + (String)SSID1);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid1, password1);
+  WiFi.begin(SSID1, PASSWORD1);
 
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -220,7 +220,7 @@ void startWiFiClient()
 void startWIFI_AP()
 {
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(ssid1, password1);
+  WiFi.softAP(SSID1, PASSWORD1);
   Serial.println("AP started");
   Serial.println("IP address: " + WiFi.softAPIP().toString());
 }
