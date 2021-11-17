@@ -1,0 +1,8 @@
+nama library : DHT.h
+cara import : #include <DHT.h>
+sumber : Third party
+nama class : DHT
+
+cara membuat object :
+
+*DHT dhtSensor(DHTPIN, DHTTYPE);//lihat dataLogger.ino baris ke 33*
