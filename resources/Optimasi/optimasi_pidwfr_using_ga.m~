@@ -1,0 +1,266 @@
+clc, clear all, close all;
+it=1;
+maxit=1;
+Npop=3;
+individu=floor(rand(Npop,24)*2);
+[row,col]=size(individu);
+% x=individu(1:Npop,1:8  );
+% y=individu(1:Npop,9:16 );
+% z=individu(1:Npop,17:24);
+% x=bin2dec(num2str(x)).*1/255;
+% y=bin2dec(num2str(y)).*1/255;
+% z=bin2dec(num2str(z)).*1/255;
+% % .*repmat((batas atas-batas bawah),N,1)+repmat(batas bawah,N,1);
+% Kp = x.*repmat((10-0),Npop,1)+repmat(0,Npop,1);
+% Ki = y.*repmat((5-0),Npop,1)+repmat(0,Npop,1);
+% Kd = z.*repmat((1-0),Npop,1)+repmat(0,Npop,1);
+% f = [];
+while it<=maxit
+    % fitness
+    [Kp,Ki,Kd] = ind2gain(individu,Npop);
+    parent = [Kp,Ki,Kd];
+    pipi=parent;
+    for i=1:Npop
+        % fitness for all chromosome
+        f(i,:)=ga_pid(parent(i,1),parent(i,2),parent(i,3));
+    end
+    [pbest,idx1] = min(f);
+    gbest = parent(idx1,:);
+    
+    % 1/fitness
+    overfit = 1./f;
+    % sum(1/fitness);
+    sumoverfit = sum(overfit);
+    % relative fitness
+    rel_fit = overfit./sumoverfit;
+    %proof=sum(rel_fit);
+    % expected count
+    exp_count = rel_fit.*Npop;
+    angle = rel_fit./sum(rel_fit)*360;
+    cum_angle = cumsum(angle);
+    % generate random prob
+    [a1,a2,a3] = ind2gain(individu,Npop);
+    % select chromosome with lowest fitness using roullete wheel selection
+    % method
+    for j=1:Npop
+        rand_prob(i) = rand(1)*360;
+        [val,idx] = min(abs(cum_angle-rand_prob(i)));
+        if rand_prob(i)>cum_angle(idx)
+            individu(j) = individu(idx+1);
+        else
+            individu(j)=individu(idx);
+        end
+    end
+    [b1,b2,b3] = ind2gain(individu,Npop);
+    child = individu;
+    m=floor(Npop/2);
+    probCO=0.3; % Probabilitas Cross Over
+    for i=1:m
+        p=rand;
+        if p<probCO
+            r1=floor(24*rand)+1;
+            r2=floor((24-r1)*rand)+r1;
+            child(2*i-1,r1:r2)=child(2*i,r1:r2);
+            child(2*i,r1:r2)=child(2*i-1,r1:r2);
+        end
+    end
+    [c1,c2,c3] = ind2gain(child,Npop);
+    probMut=0.5; %Probabilitas mutasi
+    for i=1:Npop
+        p=rand;
+        if p<probMut
+            r=floor(rand*24)+1;
+            child(i,r)=1-child(i,r);
+        end
+    end
+    individu = child;
+    [Kp,Ki,Kd]=ind2gain(individu,Npop);
+    parent = [Kp,Ki,Kd];
+    popo2 = parent;
+    for i=1:Npop
+        % fitness for all chromosome
+        f2(i,:)=ga_pid(parent(i,1),parent(i,2),parent(i,3));
+    end
+    [val2,idx2] = min(f2);
+    solusi2 = f2(idx2);
+    [inipbest,idx21] = min(f2);
+    gbest = parent(idx2,:);
+end
+
+% % var1 = x-0.6;
+% % var2 = y-1;
+% % var3 = z;
+% % for i=1:row
+% %     if var1(i)>var2(i) && var2(i)>var3(i)
+% %         var1(i) = var3(i);
+% %         var2(i) = var2(i);
+% %         var3(i) = var1(i);
+% %     elseif var1(i)>var2(i) && var2(i)<var3(i)
+% %         var1(i) = var2(i);
+% %         var2(i) = var1(i);
+% %         var3(i) = var3(i);
+% %     elseif var1(i)<var2(i) && var2(i)<var3(i)
+% %         var1(i) = var1(i);
+% %         var2(i) = var2(i);
+% %         var3(i) = var3(i);
+% %     elseif var1(i)<var2(i) && var2(i)>var3(i)
+% %         var1(i) = var1(i);
+% %         var2(i) = var3(i);
+% %         var3(i) = var2(i);
+% %     else
+% %         var1(i) = var1(i);
+% %         var2(i) = var2(i);
+% %         var3(i) = var3(i);
+% %     end
+% % end
+% % parent = [var1 var2 var3]
+% % lwbound=-1;
+% % upbound= 1;
+% % for i=1:Npop
+% %     f(i) = ga_pid(parent(i,:));
+% % end
+% [pbest,idk]=min(f);
+% gbest = parent(idk,:);
+% % initialFitness = 1/1+f';
+% % f = initialFitness;
+% disp('----------------HERU SUWOYO 2820150083------------------');
+% disp(['InitFitness:' num2str(pbest)]);
+% disp(['Chromosome :' num2str(gbest)]);
+% disp('--------------------------------------------------------');
+% stop
+% fbest=pbest;
+% while it<maxit
+%     %Seleksi
+%     if it<=1
+%         individu = individu;
+%     else
+%         individu = child;
+%     end
+%     notdone=true;
+%     while notdone
+%         x=individu(1:Npop,1:8  );
+%         y=individu(1:Npop,9:16 );
+%         z=individu(1:Npop,17:24);
+%         individu = [x y z];
+%         [minf,idk] = min(f);
+%         Jfitness=sum(f);
+%         prosenfitness=floor(100*f/Jfitness);
+%         k=0;
+%         for i=1:Npop
+%             for j=1:prosenfitness(i)
+%                 k=k+1;
+%                 rolet(k)=i;
+%             end
+%         end
+%         for i=1:Npop
+%             r=floor(k*rand)+1;
+%             pilih=rolet(r);
+%             induk(i,:)=individu(pilih,:);
+%         end
+%         %Cross Over
+% child=induk;
+% m=floor(Npop/2);
+% probCO=0.85; % Probabilitas Cross Over
+% for i=1:m
+%     p=rand;
+%     if p<probCO
+%         r1=floor(24*rand)+1;
+%         r2=floor((24-r1)*rand)+r1;
+%         child(2*i-1,r1:r2)=induk(2*i,r1:r2);
+%         child(2*i,r1:r2)=induk(2*i-1,r1:r2);
+%     end
+% end
+% probMut=0.1; %Probabilitas mutasi
+% for i=1:Npop
+%     p=rand;
+%     if p<probMut
+%         r=floor(rand*24)+1;
+%         anak(i,r)=1-anak(i,r);
+%     end
+% end
+%         child = anak;
+%         x=child(1:Npop,1:8  );
+%         y=child(1:Npop,9:16 );
+%         z=child(1:Npop,17:24);
+%         x=bin2dec(num2str(x))*1/255;
+%         y=bin2dec(num2str(y))*1/255;
+%         z=bin2dec(num2str(z))*1/255;
+%         var1 = x-0.6;
+%         var2 = y-1;
+%         var3 = z;
+%         for i=1:row
+%             if var1(i)>var2(i) && var2(i)>var3(i)
+%                 var1(i) = var3(i);
+%                 var2(i) = var2(i);
+%                 var3(i) = var1(i);
+%             elseif var1(i)>var2(i) && var2(i)<var3(i)
+%                 var1(i) = var2(i);
+%                 var2(i) = var1(i);
+%                 var3(i) = var3(i);
+%             elseif var1(i)<var2(i) && var2(i)<var3(i)
+%                 var1(i) = var1(i);
+%                 var2(i) = var2(i);
+%                 var3(i) = var3(i);
+%             elseif var1(i)<var2(i) && var2(i)>var3(i)
+%                 var1(i) = var1(i);
+%                 var2(i) = var3(i);
+%                 var3(i) = var2(i);
+%             elseif var1(i)>var2(i) && var2(i)==var3(i)
+%                 var1(i) = var2(i);
+%                 var2(i) = var3(i);
+%                 var3(i) = var1(i);
+%             elseif var1(i)==var2(i) && var2(i)>var3(i)
+%                 var1(i) = var3(i);
+%                 var2(i) = var1(i);
+%                 var3(i) = var2(i);
+%             else
+%                 var1(i) = var1(i);
+%                 var2(i) = var2(i);
+%                 var3(i) = var3(i);
+%             end
+%             if var1(i)>0
+%                 var1(i)=0;
+%             end
+%             if var1(i)<-1
+%                 var1(i)=-1;
+%             end
+%             if var2(i)<-0.8
+%                 var2(i)=-0.8;
+%             end
+%             if var2(i)>1
+%                 var2(i)=1;
+%             end
+%             if var3(i)<0
+%                 var3(i)=0;
+%             end
+%             if var3(i)>1
+%                 var3(i)=1;
+%             end
+%         end
+%         offspring = [var1 var2 var3];
+%         for step=1:Npop
+%             f(step) = heruflc(offspring(step,:));
+%             disp([' Iteration: ' num2str(it)]);
+%         end
+%         % picking data up;
+%         [fitness,idk]=min(f);
+%         ch = offspring(idk,:);
+%         changerow = fitness<fbest;
+%         fbest=fbest.*(1-changerow)+fitness.*(changerow);
+%         if changerow
+%             notdone = false;
+%         else
+%             notdone = true;
+%         end
+%     end
+%     disp(['Generation :' num2str(it)]);
+%     disp(['Fitness    :' num2str(fitness)]);
+%     disp(['Chromosome :' num2str(ch)]);
+%     disp('--------------------------------------------------------');
+%     it = it+1;
+%     if it>=maxit
+%         break
+%     end
+% end
+% disp(['Best Fitness :' num2str(min(fbest))]);
+% disp('---------------------DONE-------------------------------');
