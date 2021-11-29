@@ -785,19 +785,6 @@ void Logsheet::_shiftArray(int size, logsheetData last)
 
   switch (size)
   {
-  case SECOND_6:
-    for (int i = 0; i < (size - 1); i++)
-    {
-      _logsheetSecond[i].temperature = _logsheetSecond[i + 1].temperature;
-      _logsheetSecond[i].humidity = _logsheetSecond[i + 1].humidity;
-      _logsheetSecond[i].time = _logsheetSecond[i + 1].time;
-    }
-    _logsheetSecond[size - 1].temperature = last.temperature;
-    _logsheetSecond[size - 1].humidity = last.humidity;
-    _logsheetSecond[size - 1].time = last.time;
-
-    break;
-
   case TRENDING_24:
     for (int i = 0; i < (size - 1); i++)
     {

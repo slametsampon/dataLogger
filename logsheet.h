@@ -24,7 +24,6 @@ const int ALFA_EMA = 80;
 const int DAY_366 = 366;
 const int HOUR_24 = 24;
 const int MINUTE_60 = 60;
-const int SECOND_6 = 6;     //average at last one
 const int SECOND_60 = 60;   //average at last one
 const int TRENDING_24 = 24; //for trending data
 
