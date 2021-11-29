@@ -791,16 +791,11 @@ void Logsheet::_shiftArray(int size, logsheetData last)
       _logsheetSecond[i].temperature = _logsheetSecond[i + 1].temperature;
       _logsheetSecond[i].humidity = _logsheetSecond[i + 1].humidity;
       _logsheetSecond[i].time = _logsheetSecond[i + 1].time;
-
-      //print to serial
-      //_print(_logsheetSecond[i]);
     }
     _logsheetSecond[size - 1].temperature = last.temperature;
     _logsheetSecond[size - 1].humidity = last.humidity;
     _logsheetSecond[size - 1].time = last.time;
 
-    //print to serial
-    //_print(_logsheetSecond[size - 1]);
     break;
 
   case TRENDING_24:
@@ -809,16 +804,11 @@ void Logsheet::_shiftArray(int size, logsheetData last)
       _logsheetTrending[i].temperature = _logsheetTrending[i + 1].temperature;
       _logsheetTrending[i].humidity = _logsheetTrending[i + 1].humidity;
       _logsheetTrending[i].time = _logsheetTrending[i + 1].time;
-
-      //print to serial
-      //_print(_logsheetTrending[i]);
     }
     _logsheetTrending[size - 1].temperature = last.temperature;
     _logsheetTrending[size - 1].humidity = last.humidity;
     _logsheetTrending[size - 1].time = last.time;
 
-    //print to serial
-    //_print(_logsheetTrending[size - 1]);
     break;
 
   case MINUTE_60:
@@ -827,18 +817,23 @@ void Logsheet::_shiftArray(int size, logsheetData last)
       _logsheetMinute[i].temperature = _logsheetMinute[i + 1].temperature;
       _logsheetMinute[i].humidity = _logsheetMinute[i + 1].humidity;
       _logsheetMinute[i].time = _logsheetMinute[i + 1].time;
-
-      //print to serial
-      //_print(_logsheetMinute[i]);
     }
     _logsheetMinute[size - 1].temperature = last.temperature;
     _logsheetMinute[size - 1].humidity = last.humidity;
     _logsheetMinute[size - 1].time = last.time;
 
-    //print to serial
-    //_print(_logsheetMinute[size - 1]);
     break;
   default:
+    for (int i = 0; i < (size - 1); i++)
+    {
+      _logsheetSecond[i].temperature = _logsheetSecond[i + 1].temperature;
+      _logsheetSecond[i].humidity = _logsheetSecond[i + 1].humidity;
+      _logsheetSecond[i].time = _logsheetSecond[i + 1].time;
+    }
+    _logsheetSecond[size - 1].temperature = last.temperature;
+    _logsheetSecond[size - 1].humidity = last.humidity;
+    _logsheetSecond[size - 1].time = last.time;
+
     break;
   }
 }
