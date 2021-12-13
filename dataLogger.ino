@@ -14,18 +14,18 @@ by : Salman Alfarisi
 #include "logsheet.h"
 #include "start_up.h"
 
-// variables and objects declaration - global
+// variables declaration - global
+String loginSts = "FIRST_TIME";
+unsigned long samplingTime = 0;
 
+// objects declaration - global
 StartUp startUp("startUp");
 
-String loginSts = "FIRST_TIME";
 AccesUser accessEngineer("accessEngineer");
 AccesUser accessOperator("accessOperator");
 AccesUser activeUser("activeUser");
 
 SequenceTimer mainSequence("mainSequence");
-unsigned long samplingTime = 0;
-
 AccessParam accessParamTemperature("accessParamTemperature");
 AccessParam accessParamHumidity("accessParamHumidity");
 
@@ -36,20 +36,20 @@ Logsheet logsheet("logsheet");
 ESP8266WiFiMulti wifiMulti; // Create an instance of the ESP8266WiFiMulti class, called 'wifiMulti'
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
-boolean authenticationUser(AsyncWebServerRequest *);
-boolean validateParameter(AsyncWebServerRequest *);
 
 //functions prototype
+boolean authenticationUser(AsyncWebServerRequest *);
+boolean validateParameter(AsyncWebServerRequest *);
 void startWIFI_AP();
 void startWiFiClient();
 void startWiFiMulti();
 void loadUsers();
 void setupDefaultUser();
-void urlController();
 void handleLogin();
 void handleConfig();
-void loadStaticFile();          //css, js
 void listAllFilesInDir(String); //list files in all dir's
+void urlController();
+void loadStaticFile(); //css, js
 
 void setup()
 {
@@ -155,13 +155,13 @@ void setup()
 void loop()
 {
 
+  if (mainSequence.isAMinuteEvent())
+    logsheet.setTime(getTimeNtp());
+
   //Logsheet action
   logsheet.execute(samplingTime);
 
   mainSequence.execute();
-
-  if (mainSequence.isAMinuteEvent())
-    logsheet.setTime(getTimeNtp());
 }
 
 struct tm getTimeNtp()
