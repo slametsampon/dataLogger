@@ -26,7 +26,6 @@ function fillDataTable(data){
   const dataJson = JSON.parse(data);
   let dataLen = dataJson.time.length;
 
-  text = "<ul>";
   for (let i = 0; i < dataLen; i++) {
     if (i<10){
       i_str = i;

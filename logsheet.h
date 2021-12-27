@@ -16,6 +16,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <LittleFS.h>
+#include <CSV_Parser.h>
 
 #include "model.h"
 
@@ -35,6 +36,8 @@ const int DAILY_SIZE = 425; //26 + (16*24) = 410
 const int BLINK_NORMAL = 1000; //milli second
 const int BLINK_WARNING = 250; //milli second
 const int BLINK_ERROR = 125;   //milli second
+
+const float DEFAULT_VALUE = 0.0; //default value for temperature & humidity
 
 enum DayOfWeek
 {
@@ -56,6 +59,7 @@ public:
   String getHourlyAvg(int);
   String getTrendingData();
   String getCfgParameter();
+  void saveSimData(String);
   void setTime(struct tm);
   void execute(unsigned long); //sampling periode ms
   String getValues();          //return string in format Json for Temp, Humidity
@@ -83,7 +87,9 @@ private:
   void _appendFile(const char *path, const char *message);
   void _writeFile(const char *path, const char *message);
   String _readFile(const char *path);
-  String _readFileJson(int); //read file day of week, return json
+  CSV_Parser _readCsv(String);           //read file csv
+  void _updateCsv(String, logsheetData); //read csv, update and write back to csv file
+  String _readFileJson(int);             //read file day of week, return json
 
   String _id;
   float _prevT, _prevH; //temperature and humidity
