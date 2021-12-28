@@ -24,20 +24,24 @@ function initRandomDataTable(){
 
 function fillDataTable(data){
   const dataJson = JSON.parse(data);
-  let dataLen = dataJson.time.length;
+  //let dataLen = dataJson.time.length;
+  let dataLen = 24;
 
   for (let i = 0; i < dataLen; i++) {
-    if (i<10){
+    if (i < 10) {
       i_str = i;
       timeArray[i] = "0" + i.toString() + ":00";
-      }
-      else{
-          timeArray[i] = i.toString() + ":00";
-      }
-      tempArray[i] = dataJson.temperature[i];
-      humdArray[i] = dataJson.humidity[i];
+    }
+    else {
+      timeArray[i] = i.toString() + ":00";
+    }
+    tempArray[i] = dataJson.temperature[i];
+    humdArray[i] = dataJson.humidity[i];
+    if (typeof dataJson.temperature[i] === "undefined") {
+      tempArray[i] = 0.0;
+      humdArray[i] = 0.0;
+    }
   }
-  
 }
 
 let table = document.querySelector("table");

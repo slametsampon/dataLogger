@@ -167,7 +167,7 @@ void loop()
 struct tm getTimeNtp()
 {
   Serial.println("Contacting Time Server");
-  configTime(3600 * timezone, daysavetime * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
+  configTime(3600 * TIME_ZONE, DAY_SAVE_TIME * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
   struct tm tmstruct;
   delay(2000);
   tmstruct.tm_year = 0;

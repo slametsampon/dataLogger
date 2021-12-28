@@ -10,6 +10,12 @@ Logsheet::Logsheet(String id) : _id(id)
 {
   _prevMilli = millis();
   _samplingTrend = 0;
+
+  for (size_t i = 0; i < MINUTE_60; i++)
+  {
+    _logsheetMinute[i].temperature = 0.0;
+    _logsheetMinute[i].humidity = 0.0;
+  }
 }
 
 void Logsheet::AttachSensor(DHT *dht)
@@ -687,7 +693,29 @@ void Logsheet::_hourlyLogsheet()
   fileName.toCharArray(fileNameChar, 31);
   HEADER.toCharArray(headerChar, 50);
 
+  /*
+  if (!SIMULATION)
+  {
+    //create new file and clear data inside
+    if (_tm.tm_hour == 0)
+      _writeFile(fileNameChar, headerChar);
+    else
+    {
+      String data = _getCsv(avgHour);
+      char dataChar[50];
+      data.toCharArray(dataChar, 50);
+      //check filename
+      if (!LittleFS.exists(fileNameChar))
+      {
+        _writeFile(fileNameChar, headerChar);
+        _appendFile(fileNameChar, dataChar);
+      }
+      else
+        _appendFile(fileNameChar, dataChar);
+    }
+  }
   //create new file and put default value
+  */
   if (_tm.tm_hour == 0)
   {
     _writeFile(fileNameChar, headerChar);
@@ -942,7 +970,7 @@ void Logsheet::_shiftArray(int size, logsheetData last)
 
 logsheetData Logsheet::_calculateAverage(logsheetData data[], int size)
 {
-  float totalT, totalH;
+  float totalT = 0.0, totalH = 0.0;
   logsheetData avg;
   int nbrData = 0;
 
@@ -960,7 +988,7 @@ logsheetData Logsheet::_calculateAverage(logsheetData data[], int size)
     }
   }
 
-  float avgT, avgH;
+  float avgT = 0.0, avgH = 0.0;
   if ((nbrData > 0) && (nbrData <= size))
   {
     avgT = totalT / nbrData;
