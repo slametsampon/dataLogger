@@ -9,6 +9,8 @@ by : Salman Alfarisi
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <ESP8266WiFiMulti.h>
+#include <RTClib.h>
+
 #include "dataLogger.h"
 #include "SequenceTimer.h"
 #include "logsheet.h"
@@ -19,6 +21,9 @@ String loginSts = "FIRST_TIME";
 unsigned long samplingTime = 0;
 
 // objects declaration - global
+//software RTC
+RTC_Millis rtc;
+
 StartUp startUp("startUp");
 
 AccesUser accessEngineer("accessEngineer");
@@ -38,6 +43,7 @@ ESP8266WiFiMulti wifiMulti; // Create an instance of the ESP8266WiFiMulti class,
 AsyncWebServer server(80);
 
 //functions prototype
+void setupRtc();
 boolean authenticationUser(AsyncWebServerRequest *);
 boolean validateParameter(AsyncWebServerRequest *);
 void startWIFI_AP();
@@ -113,7 +119,7 @@ void setup()
   logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
   logsheet.AttachSensor(&dhtSensor);
   logsheet.AttachDisplay(&display);
-  logsheet.setTime(getTimeNtp());
+  //logsheet.setTime(getTime());
   logsheet.info();
   /*increase step & display*/
   step += 1;
@@ -141,7 +147,10 @@ void setup()
   step += 1;
   startUp.stepDisplay(step);
 
-  struct tm tmstruct = getTimeNtp();
+  //setup RTC
+  setupRtc();
+
+  struct tm tmstruct = getTime();
   Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", tmstruct.tm_year, tmstruct.tm_mon, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
   Serial.println("");
   //setup samplingTime
@@ -156,7 +165,7 @@ void loop()
 {
 
   if (mainSequence.isAMinuteEvent())
-    logsheet.setTime(getTimeNtp());
+    logsheet.setTime(getTime());
 
   //Logsheet action
   logsheet.execute(samplingTime);
@@ -164,18 +173,33 @@ void loop()
   mainSequence.execute();
 }
 
-struct tm getTimeNtp()
+struct tm getTime()
 {
-  Serial.println("Contacting Time Server");
-  configTime(3600 * TIME_ZONE, DAY_SAVE_TIME * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
   struct tm tmstruct;
-  delay(2000);
-  tmstruct.tm_year = 0;
-  getLocalTime(&tmstruct, 5000);
+  if (NTP_AVAILABLE)
+  {
+    Serial.println("Contacting Time Server");
+    configTime(3600 * TIME_ZONE, DAY_SAVE_TIME * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
+    delay(2000);
+    tmstruct.tm_year = 0;
+    getLocalTime(&tmstruct, 5000);
 
-  //set offset to 1900, month +1
-  tmstruct.tm_year += 1900;
-  tmstruct.tm_mon += 1;
+    //set offset to 1900, month +1
+    tmstruct.tm_year += 1900;
+    tmstruct.tm_mon += 1;
+  }
+  else
+  {
+    Serial.println("get time from RTC");
+    DateTime now = rtc.now();
+    tmstruct.tm_year = now.year();
+    tmstruct.tm_mon = now.month();
+    tmstruct.tm_mday = now.day();
+    tmstruct.tm_hour = now.hour();
+    tmstruct.tm_min = now.minute();
+    tmstruct.tm_sec = now.second();
+  }
+
   return tmstruct;
 }
 
@@ -414,7 +438,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
 
   if (request->hasArg("samplingTime"))
   {
-    String argData = request->arg("samplingTime");
+    argData = request->arg("samplingTime");
     Serial.print("The samplingTime is: ");
     Serial.println(argData);
 
@@ -425,9 +449,45 @@ boolean validateParameter(AsyncWebServerRequest *request)
       samplingTime = (unsigned long)SAMPLING_TIME_MAX;
   }
 
+  if (request->hasArg("enable_record"))
+  {
+    argData = request->arg("enable_record");
+    Serial.print("The enable_record is: ");
+    Serial.println(argData);
+
+    if (argData == "Record")
+      logsheet.setEnableRecord(true);
+    else
+      logsheet.setEnableRecord(false);
+  }
+
+  if (request->hasArg("date_time"))
+  {
+    argData = request->arg("date_time");
+    Serial.print("The date_time is: ");
+    Serial.println(argData);
+
+    //set date and time
+    int idx = argData.indexOf("T");
+
+    String dateStr = argData.substring(0, idx);
+    String timeStr = argData.substring(idx + 1);
+
+    int yr = dateStr.substring(0, 4).toInt();
+    int mt = dateStr.substring(5, 7).toInt();
+    int dt = dateStr.substring(8).toInt();
+    int hr = timeStr.substring(0, 2).toInt();
+    int mn = timeStr.substring(3).toInt();
+
+    // This line sets the RTC with an explicit date & time, for example to set
+    // January 21, 2014 at 3am you would call:
+    //rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+    rtc.adjust(DateTime(yr, mt, dt, hr, mn, 0));
+  }
+
   if (request->hasArg("indicatorL"))
   {
-    String argData = request->arg("indicatorL");
+    argData = request->arg("indicatorL");
     Serial.print("The indicatorL is: ");
     Serial.println(argData);
 
@@ -437,7 +497,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
 
   if (request->hasArg("indicatorH"))
   {
-    String argData = request->arg("indicatorH");
+    argData = request->arg("indicatorH");
     Serial.print("The indicatorH is: ");
     Serial.println(argData);
 
@@ -447,7 +507,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
 
   if (request->hasArg("alarmL"))
   {
-    String argData = request->arg("alarmL");
+    argData = request->arg("alarmL");
     Serial.print("The alarmL is: ");
     Serial.println(argData);
 
@@ -457,7 +517,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
 
   if (request->hasArg("alarmH"))
   {
-    String argData = request->arg("alarmH");
+    argData = request->arg("alarmH");
     Serial.print("The alarmH is: ");
     Serial.println(argData);
 
@@ -467,7 +527,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
 
   if (request->hasArg("alfaEma"))
   {
-    String argData = request->arg("alfaEma");
+    argData = request->arg("alfaEma");
     Serial.print("The alfaEma is: ");
     Serial.println(argData);
 
@@ -477,7 +537,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
 
   if (request->hasArg("config"))
   {
-    String argData = request->arg("config");
+    argData = request->arg("config");
     Serial.print("The config is: ");
     Serial.println(argData);
 
@@ -688,6 +748,16 @@ bool getLocalTime(struct tm *info, uint32_t ms)
     }
   }
   return false;
+}
+
+//setup RTC
+void setupRtc()
+{
+  // following line sets the RTC to the date & time this sketch was compiled
+  rtc.begin(DateTime(F(__DATE__), F(__TIME__)));
+  // This line sets the RTC with an explicit date & time, for example to set
+  // January 21, 2014 at 3am you would call:
+  // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
 }
 
 /*  
