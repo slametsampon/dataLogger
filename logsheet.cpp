@@ -476,6 +476,11 @@ String Logsheet::_initRandomJson()
   return output;
 }
 
+void Logsheet::setEnableRecord(boolean enable_record)
+{
+  _enable_record = enable_record;
+}
+
 void Logsheet::execute(unsigned long samplingTime)
 {
 
@@ -681,6 +686,9 @@ void Logsheet::_hourlyLogsheet()
   //calculate average hour & put average to bottom
   logsheetData avgHour = _calculateAverage(_logsheetMinute, MINUTE_60);
 
+  if (!_enable_record)
+    return;
+
   //save hourly average to file : /logsheet/dayofweek_ls.csv (max 31 char) for 7 days
   String dayOfWeek = _getDayOfWeek(_tm.tm_wday);
   String fileName = dayOfWeek + "_ls.csv";
@@ -881,6 +889,9 @@ void Logsheet::_dailyLogsheet()
 
   //calculate average
   logsheetData avgDay = _calculateAverage(hourlyAvg, HOUR_24);
+
+  if (!_enable_record)
+    return;
 
   //save daily average to file : /logsheet/ls_YYYY.csv (max 31 char)
   String year = _getTimeStr(_tm.tm_year);

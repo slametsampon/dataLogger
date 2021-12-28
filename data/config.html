@@ -32,8 +32,12 @@
                 <form name="configForm" action="/config" method="POST" onsubmit="return validateForm()">
                     <div>
 
+                        <label for="date_time">Date - Time</label><br>
+                        <input type="datetime-local" id="date_time" name="date_time"><br><br>
                         <label for="id_samplingTime">Sampling (ms)</label><br>
-                        <input type="text" id="id_samplingTime" name="samplingTime" placeholder="6000">
+                        <input type="text" id="id_samplingTime" name="samplingTime" placeholder="6000"><br><br>
+                        <input type="checkbox" id="enable_record" onchange="enableRecord()" name="enable_record" value="Record">
+                        <label for="enable_record"> Enable Record</label><br>
                       
                     </div>
                     <hr style="height:2px;border-width:0;color:gray;background-color:gray">

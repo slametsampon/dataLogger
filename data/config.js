@@ -31,6 +31,12 @@ function getSensorCfg(){
   })(0, index_url.length);
 }
 
+function enableRecord() {
+  let enCheck = document.getElementById("enable_record");
+  if (enCheck.checked) enCheck.value = "Record";
+  else enCheck.value = "ProhibiteRecord";
+}
+
 function fillUpParameter(data){
   
   let sensorCfg = JSON.parse(data);
@@ -79,6 +85,7 @@ function fillUpParameter(data){
     element.placeholder = sensorCfg.Humidity.lowRange.toString();
     element.value = element.placeholder;
   }
+
 }
 
 function getSamplingTime(data){
@@ -152,6 +159,7 @@ function validateForm() {
 
 // This is executed after the document has finished loading.
 function setupConfig(){
+  enableRecord();
   if (SIMULATION) {
     userAccess(activeUser);
   }

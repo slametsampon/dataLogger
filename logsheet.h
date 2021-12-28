@@ -21,6 +21,8 @@
 #include "model.h"
 
 const boolean SIMULATION = true;
+const boolean ENABLE_RECORD = true;
+const boolean PROHIBITE_RECORD = false;
 const int ALFA_EMA = 80;
 const int DAY_366 = 366;
 const int HOUR_24 = 24;
@@ -63,6 +65,7 @@ public:
   void setTime(struct tm);
   void execute(unsigned long); //sampling periode ms
   String getValues();          //return string in format Json for Temp, Humidity
+  void setEnableRecord(boolean);
   void info();
 
 private:
@@ -98,6 +101,7 @@ private:
   boolean _minuteEvent, _hourEvent, _dayEvent;
   boolean _saveHourlyEvent, _saveDailyEvent;
   boolean _synchronized = false;
+  boolean _enable_record = PROHIBITE_RECORD;
   struct tm _tm;
 
   DHT *_dht;
