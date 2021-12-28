@@ -24,8 +24,8 @@ const String PATH_ROOT = "/";
 const String FILE_USER = "users.cfg";
 
 //NTP : Network Time Protokol
-const long timezone = 6; //for jakarta time
-const byte daysavetime = 1;
+const long TIME_ZONE = 6; //for jakarta time
+const byte DAY_SAVE_TIME = 1;
 
 // Set LED GPIO
 const int ledPin = LED_BUILTIN;

@@ -167,7 +167,7 @@ void loop()
 struct tm getTimeNtp()
 {
   Serial.println("Contacting Time Server");
-  configTime(3600 * timezone, daysavetime * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
+  configTime(3600 * TIME_ZONE, DAY_SAVE_TIME * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
   struct tm tmstruct;
   delay(2000);
   tmstruct.tm_year = 0;
@@ -232,6 +232,7 @@ void urlController()
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/index.html", "text/html"); });
 
+  // route to report
   server.on("/report", HTTP_GET, [](AsyncWebServerRequest *request)
             {
               request->send(LittleFS, "/report.html", "text/html");
@@ -255,6 +256,27 @@ void urlController()
               else
               {
                 Serial.println("Post did not have a 'samplingTime' field.");
+              }
+            });
+
+  // route to saveSimData
+  server.on("/saveSimData", HTTP_POST, [](AsyncWebServerRequest *request)
+            {
+              if (request->hasArg("dayName"))
+              {
+                String arg = request->arg("dayName");
+                Serial.print("The days is: ");
+                Serial.println(arg);
+
+                //save data to LittleFS base on dayName
+                //1.convert request to string => JSON like
+                logsheet.saveSimData("simData");
+
+                request->send(200, "application/json", "saveSimData - OK");
+              }
+              else
+              {
+                Serial.println("Post did not have a 'dayName' field.");
               }
             });
 

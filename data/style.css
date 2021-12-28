@@ -101,7 +101,6 @@ address {
 table {
   table-layout: fixed;
   width: 100%;
-  height: 60%;
   border-collapse: collapse;
 }
 

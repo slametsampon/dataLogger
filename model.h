@@ -44,98 +44,103 @@ float increment = doc["increment"]; // 1.1
 #define model_h
 
 #include <Arduino.h>
-#include  <ArduinoJson.h>
+#include <ArduinoJson.h>
 
-  const int USER_NAME = 0;
-  const int USER_PASSWORD = 1;
-  const int USER_EMAIL = 2;
-  const int USER_LEVEL = 3;
+const int USER_NAME = 0;
+const int USER_PASSWORD = 1;
+const int USER_EMAIL = 2;
+const int USER_LEVEL = 3;
 
-  const int PARAMETER_VALUE = 0;
-  const int PARAMETER_LOW_RANGE = 1;
-  const int PARAMETER_HIGH_RANGE = 2;
-  const int PARAMETER_LOW_LIMIT = 3;
-  const int PARAMETER_HIGH_LIMIT = 4;
-  const int PARAMETER_ALFA_EMA = 5;
-  const int PARAMETER_ALARM = 6;
+const int PARAMETER_VALUE = 0;
+const int PARAMETER_LOW_RANGE = 1;
+const int PARAMETER_HIGH_RANGE = 2;
+const int PARAMETER_LOW_LIMIT = 3;
+const int PARAMETER_HIGH_LIMIT = 4;
+const int PARAMETER_ALFA_EMA = 5;
+const int PARAMETER_ALARM = 6;
 
-  //commSer header code
-  const int DATA_OPERATION = 0;
-  const int DATA_PARAMETER = 1;
-  const int REMOTE_PARAMETER = 2;
-  const int REMOTE_OPERATION = 3;
+//commSer header code
+const int DATA_OPERATION = 0;
+const int DATA_PARAMETER = 1;
+const int REMOTE_PARAMETER = 2;
+const int REMOTE_OPERATION = 3;
 
-  const int NO_ALARM = 0;
-  const int HIGH_ALARM = 1;
-  const int LOW_ALARM = 2;
+const int NO_ALARM = 0;
+const int HIGH_ALARM = 1;
+const int LOW_ALARM = 2;
 
-  const int LEVEL_ENGINEER = 0;
-  const int LEVEL_OPERATOR = 9;
+const int LEVEL_ENGINEER = 0;
+const int LEVEL_OPERATOR = 9;
 
-  typedef struct userData{
-      String username;//engineer
-      String password;//123456
-      String email;//exampla@example.com
-      int level;
-  }userData;
-  class AccesUser{
-  
-  public:
-      AccesUser(String);
-      String getJson();
-      userData getUser();
-      String getUser(int);
-      void setUserJson(JsonObject);
-      void setUser(userData);
-      void setUser(int, String);
-      String getId();
-      void info();
+typedef struct userData
+{
+    String username; //engineer
+    String password; //123456
+    String email;    //exampla@example.com
+    int level;
+} userData;
+class AccesUser
+{
 
-  private:
-      String    _id;
-      userData _userData;
+public:
+    AccesUser(String);
+    String getJson();
+    userData getUser();
+    String getUser(int);
+    void setUserJson(JsonObject);
+    void setUser(userData);
+    void setUser(int, String);
+    String getId();
+    void info();
 
-  };//end of class
+private:
+    String _id;
+    userData _userData;
 
-  typedef struct logsheetData{
-      String time;//HH:00:00 or DD_MM_YY
-      float temperature;
-      float humidity;
-  }logsheetData;
+}; //end of class
 
-  typedef struct param{
-      String unit;//unit
-      float value;
-      float highRange;
-      float lowRange;
-      float highLimit;//for alarm high
-      float lowLimit;//for alarm low
-      float alfaEma;//alfa for EMA Filter (0 - 100) in percentage
-      int alarm;
-  }param;
+typedef struct logsheetData
+{
+    String time; //HH:00:00 or DD_MM_YY
+    float temperature;
+    float humidity;
+} logsheetData;
 
-  class AccessParam{
-  
-  public:
-      AccessParam(String);
-      void init(String, param);
-      String getJson();
-      JsonObject getOperation();
-      void setOperationJson(JsonObject);
-      param getParam();
-      float getParam(int);
-      void setParamJson(JsonObject);
-      void setParam(param);
-      void setParam(int, float);
-      boolean isChangeAble(int);
-      void setAlarm(int);
-      String toString();
-      String getId();
-      void info();
+typedef struct param
+{
+    String unit; //unit
+    float value;
+    float highRange;
+    float lowRange;
+    float highLimit; //for alarm high
+    float lowLimit;  //for alarm low
+    float alfaEma;   //alfa for EMA Filter (0 - 100) in percentage
+    int alarm;
+} param;
 
-  private:
-      String    _id;
-      param _dataParam;
+class AccessParam
+{
 
-  };//end of class
+public:
+    AccessParam(String);
+    void init(String, param);
+    String getJson();
+    JsonObject getOperation();
+    void setOperationJson(JsonObject);
+    param getParam();
+    float getParam(int);
+    void setParamJson(JsonObject);
+    void setParam(param);
+    void setParam(int, float);
+    boolean isChangeAble(int);
+    void setAlarm(int);
+    String toString();
+    String getId();
+    void info();
+
+private:
+    String _id;
+    param _dataParam;
+
+}; //end of class
 #endif
