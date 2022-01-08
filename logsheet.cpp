@@ -173,6 +173,14 @@ void Logsheet::setTime(struct tm tmVal)
   Serial.println("Logsheet::setTime(struct tm tmVal)");
   Serial.printf("Now is : %d-%02d-%02d %02d:%02d:%02d\n", _tm.tm_year, _tm.tm_mon, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
   Serial.println("");
+
+  //need to be synchronized
+  if (_samplingSec > 0)
+  {
+    Serial.println("Need to be synchronized");
+    Serial.print("_samplingSec : ");
+    Serial.println(_samplingSec);
+  }
 }
 
 String Logsheet::getCfgParameter()
@@ -479,6 +487,11 @@ String Logsheet::_initRandomJson()
 void Logsheet::setEnableRecord(boolean enable_record)
 {
   _enable_record = enable_record;
+}
+
+boolean Logsheet::isEnableRecord()
+{
+  return _enable_record;
 }
 
 void Logsheet::execute(unsigned long samplingTime)

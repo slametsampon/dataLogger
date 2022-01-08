@@ -4,6 +4,9 @@ var timeArray = [];
 var tempArray = [];
 var humdArray = [];
 
+var reportDate = new Date();
+var dateTimeSim = "2022-01-04T06:59";
+
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
   }
@@ -62,11 +65,12 @@ function dayName(dayVal){
 
 function calcDate(){
   var difDay = 0;
-  if(document.getElementById("days").value != ""){
-    let reqDay = parseInt(document.getElementById("days").value);
+  if(document.getElementById("select_days").value != ""){
+    let reqDay = parseInt(document.getElementById("select_days").value);
     //let reqDay = 5;
   
-    let d = new Date();
+    //let d = new Date();
+    let d = reportDate;
     let currDay = d.getDay();
   
     difDay = currDay - reqDay;
@@ -91,8 +95,32 @@ function createCaption(table, dateVal){
   caption.textContent = 'Hourly Average : ' + t;
 }
 
-function createHeaderDate(dateVal){
-  var d = new Date();
+function setReportDate(data){
+  dateTimeSim = data;
+  let arrDT = dateTimeSim.split("T");
+  let dateVal = arrDT[0];
+  let timeVal = arrDT[1];
+
+  let arrDate = dateVal.split("-");
+  let year = arrDate[0];
+  let month = arrDate[1] - 1;
+  let dtVal = arrDate[2];
+
+  //var d = new Date();
+  reportDate.setFullYear(year);
+  reportDate.setMonth(month);
+  reportDate.setDate(dtVal);
+  
+  //set select day
+  let day = reportDate.getDay();
+  document.getElementById("select_days").value = day;
+
+}
+
+function createHeaderDate(dateVal) {
+  
+  //var d = new Date();
+  let d = reportDate;
   let currDate = d.getDate();
   d.setDate(currDate - dateVal);
 
@@ -138,6 +166,29 @@ function generateReportTable(table) {
   //createCaption(table,calcDate());
 }
 
+function getDay(date) {
+  let arrDate = date.split("-");
+  let year = arrDate[0];
+  let month = arrDate[1] - 1;
+  let dateVal = arrDate[2];
+
+  var d = new Date();
+  d.setFullYear(year);
+  d.setMonth(month);
+  d.setDate(dateVal);
+
+  return d.getDay();
+
+}
+
+function setDay() {
+  let selectDay = document.querySelector('#select_days');
+  let simDate = document.querySelector('#simDate').value;
+
+  selectDay.value = getDay(simDate);
+
+}
+
 function reportBuildingSimul() {
 
   //clear table
@@ -161,15 +212,16 @@ function getHourlyAvg(){
       generateReportTable(table);
     }
   };
-  xhttp.open("GET", "/hourlyAvgDay?days="+document.getElementById("days").value, true);
+  xhttp.open("GET", "/hourlyAvgDay?days="+document.getElementById("select_days").value, true);
   xhttp.send();
 }
 
 function downloadAsPDF() {
-  let d = new Date();
+  //let d = new Date();
+  let d = reportDate;
   var dName = dayName(d.getDay());
-  if(document.getElementById("days").value != ""){
-    dName = dayName(parseInt(document.getElementById("days").value));
+  if(document.getElementById("select_days").value != ""){
+    dName = dayName(parseInt(document.getElementById("select_days").value));
   }
   var fileName = dName + '_ls.pdf';
   //generateToPdf('report_form', fileName,'canvas');
@@ -205,9 +257,11 @@ function setupReport(){
   if (SIMULATION) {
     userAccess(activeUser);
   }
+  //set current day
+
   else {
-    var url_day = "hourlyAvgDay?days=" + document.getElementById("days").value;
-    var index_url = ["getActiveUser", url_day];
+    var url_day = "hourlyAvgDay?days=" + document.getElementById("select_days").value;
+    var index_url = ["getActiveUser", "getDateTime",url_day];
     var request = new XMLHttpRequest();
     (function loop(i, length) {
       if (i >= length) {
@@ -219,6 +273,11 @@ function setupReport(){
         if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
           if (i == 0) userAccess(this.responseText);
           else if (i == 1) {
+            setReportDate(this.responseText);
+            url_day = "hourlyAvgDay?days=" + document.getElementById("select_days").value;
+            index_url = ["getActiveUser", "getDateTime",url_day];
+          } 
+          else if (i == 2) {
             fillDataTable(this.responseText);
             generateReportTable(table);
           }

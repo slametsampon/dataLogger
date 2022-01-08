@@ -56,6 +56,9 @@ void handleConfig();
 void listAllFilesInDir(String); //list files in all dir's
 void urlController();
 void loadStaticFile(); //css, js
+String getBasicConfig();
+String getDateTime();
+void rtcSettingDT(String);
 
 void setup()
 {
@@ -119,7 +122,6 @@ void setup()
   logsheet.AttachParameter(&accessParamTemperature, &accessParamHumidity);
   logsheet.AttachSensor(&dhtSensor);
   logsheet.AttachDisplay(&display);
-  //logsheet.setTime(getTime());
   logsheet.info();
   /*increase step & display*/
   step += 1;
@@ -149,6 +151,8 @@ void setup()
 
   //setup RTC
   setupRtc();
+  rtcSettingDT(DEFAULT_RTC_DATE_TIME);
+  logsheet.setTime(getTime());
 
   struct tm tmstruct = getTime();
   Serial.printf("\nNow is : %d-%02d-%02d %02d:%02d:%02d\n", tmstruct.tm_year, tmstruct.tm_mon, tmstruct.tm_mday, tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec);
@@ -283,27 +287,6 @@ void urlController()
               }
             });
 
-  // route to saveSimData
-  server.on("/saveSimData", HTTP_POST, [](AsyncWebServerRequest *request)
-            {
-              if (request->hasArg("dayName"))
-              {
-                String arg = request->arg("dayName");
-                Serial.print("The days is: ");
-                Serial.println(arg);
-
-                //save data to LittleFS base on dayName
-                //1.convert request to string => JSON like
-                logsheet.saveSimData("simData");
-
-                request->send(200, "application/json", "saveSimData - OK");
-              }
-              else
-              {
-                Serial.println("Post did not have a 'dayName' field.");
-              }
-            });
-
   // route to trending data
   server.on("/getTrendingData", HTTP_GET, [](AsyncWebServerRequest *request)
             {
@@ -325,6 +308,21 @@ void urlController()
               String sensorCfg = logsheet.getCfgParameter();
               request->send(200, "application/json", sensorCfg);
               Serial.println(sensorCfg);
+            });
+
+  // route to basic config
+  server.on("/getBasicConfig", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              String basicCfg = getBasicConfig();
+              request->send(200, "application/json", basicCfg);
+              Serial.println(basicCfg);
+            });
+
+  // route to getDateTime
+  server.on("/getDateTime", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              request->send_P(200, "text/plain", getDateTime().c_str());
+              Serial.printf("getDateTime is:", getDateTime());
             });
 
   server.on("/getSamplingTime", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -430,6 +428,26 @@ boolean authenticationUser(AsyncWebServerRequest *request)
   return status;
 }
 
+void rtcSettingDT(String dtValue)
+{
+  //set date and time
+  int idx = dtValue.indexOf("T");
+
+  String dateStr = dtValue.substring(0, idx);
+  String timeStr = dtValue.substring(idx + 1);
+
+  int yr = dateStr.substring(0, 4).toInt();
+  int mt = dateStr.substring(5, 7).toInt();
+  int dt = dateStr.substring(8).toInt();
+  int hr = timeStr.substring(0, 2).toInt();
+  int mn = timeStr.substring(3).toInt();
+
+  // This line sets the RTC with an explicit date & time, for example to set
+  // January 21, 2014 at 3am you would call:
+  //rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+  rtc.adjust(DateTime(yr, mt, dt, hr, mn, 0));
+}
+
 boolean validateParameter(AsyncWebServerRequest *request)
 {
   boolean status = false;
@@ -467,22 +485,7 @@ boolean validateParameter(AsyncWebServerRequest *request)
     Serial.print("The date_time is: ");
     Serial.println(argData);
 
-    //set date and time
-    int idx = argData.indexOf("T");
-
-    String dateStr = argData.substring(0, idx);
-    String timeStr = argData.substring(idx + 1);
-
-    int yr = dateStr.substring(0, 4).toInt();
-    int mt = dateStr.substring(5, 7).toInt();
-    int dt = dateStr.substring(8).toInt();
-    int hr = timeStr.substring(0, 2).toInt();
-    int mn = timeStr.substring(3).toInt();
-
-    // This line sets the RTC with an explicit date & time, for example to set
-    // January 21, 2014 at 3am you would call:
-    //rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
-    rtc.adjust(DateTime(yr, mt, dt, hr, mn, 0));
+    rtcSettingDT(argData);
   }
 
   if (request->hasArg("indicatorL"))
@@ -758,6 +761,64 @@ void setupRtc()
   // This line sets the RTC with an explicit date & time, for example to set
   // January 21, 2014 at 3am you would call:
   // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+}
+
+String getBasicConfig()
+{
+  /*
+    {
+      "dateTime": "2022-01-04T06:59",
+      "samplingTime": 10000,
+      "enable_record": "prohibited"
+    }  
+  */
+  String output;
+
+  StaticJsonDocument<96> doc;
+
+  //set date time
+  doc["dateTime"] = getDateTime();
+
+  //set sampling time
+  doc["samplingTime"] = samplingTime;
+
+  //set enable record
+  doc["enable_record"] = "Prohibited";
+  if (logsheet.isEnableRecord())
+    doc["enable_record"] = "Record";
+
+  serializeJson(doc, output);
+
+  return output;
+}
+
+String getDateTime()
+{
+  //set date time
+  String date_time;
+  struct tm currDT = getTime();
+
+  date_time = String(currDT.tm_year) + "-";
+  if (currDT.tm_mon < 10)
+    date_time = date_time + "0";
+  date_time = date_time + String(currDT.tm_mon);
+  date_time = date_time + "-";
+
+  if (currDT.tm_mday < 10)
+    date_time = date_time + "0";
+  date_time = date_time + String(currDT.tm_mday);
+  date_time = date_time + "T";
+
+  if (currDT.tm_hour < 10)
+    date_time = date_time + "0";
+  date_time = date_time + String(currDT.tm_hour);
+  date_time = date_time + ":";
+
+  if (currDT.tm_min < 10)
+    date_time = date_time + "0";
+  date_time = date_time + String(currDT.tm_min);
+
+  return date_time;
 }
 
 /*  

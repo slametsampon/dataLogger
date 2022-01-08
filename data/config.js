@@ -34,7 +34,7 @@ function getSensorCfg(){
 function enableRecord() {
   let enCheck = document.getElementById("enable_record");
   if (enCheck.checked) enCheck.value = "Record";
-  else enCheck.value = "ProhibiteRecord";
+  else enCheck.value = "Prohibited";
 }
 
 function fillUpParameter(data){
@@ -92,6 +92,25 @@ function getSamplingTime(data){
   var element = document.getElementById("id_samplingTime");
   element.placeholder = data;
   element.value = element.placeholder;
+}
+
+function getBasicConfig(data){
+  let basicCfg = JSON.parse(data);
+
+  let element;
+  element = document.getElementById("date_time");
+  element.placeholder = basicCfg.dateTime;
+  element.value = element.placeholder;
+
+  element = document.getElementById("id_samplingTime");
+  element.placeholder = basicCfg.samplingTime.toString();
+  element.value = element.placeholder;
+
+  element = document.getElementById("enable_record");
+  if(basicCfg.enable_record === "Record")
+    element.checked = true;
+  
+  enableRecord();
 }
 
 function validateForm() {
@@ -159,7 +178,7 @@ function validateForm() {
 
 // This is executed after the document has finished loading.
 function setupConfig(){
-  enableRecord();
+  //enableRecord();
   if (SIMULATION) {
     userAccess(activeUser);
   }
@@ -167,7 +186,7 @@ function setupConfig(){
     //init prevCfg
     if (document.getElementById("configT").checked) prevCfg = "configT";
     else if (document.getElementById("configH").checked) prevCfg = "configH";
-    var index_url = ["getActiveUser", "getSensorCfg", "getSamplingTime"];
+    var index_url = ["getActiveUser", "getSensorCfg", "getBasicConfig"];
     var request = new XMLHttpRequest();
     (function loop(i, length) {
       if (i >= length) {
@@ -180,7 +199,7 @@ function setupConfig(){
           var respText = this.responseText;
           if (i == 0) userAccess(respText);
           else if (i == 1) fillUpParameter(respText);
-          else if (i == 2) getSamplingTime(respText);
+          else if (i == 2) getBasicConfig(respText);
           loop(i + 1, length);
         }
       }

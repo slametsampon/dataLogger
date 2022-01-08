@@ -127,6 +127,7 @@ th {
 td {
   letter-spacing: 1px;
   font-size: 100%;
+  font-weight: bold;
 }
 
 thead th {
