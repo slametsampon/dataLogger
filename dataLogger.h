@@ -27,6 +27,7 @@ const String FILE_USER = "users.cfg";
 const long TIME_ZONE = 6; //for jakarta time
 const byte DAY_SAVE_TIME = 1;
 const boolean NTP_AVAILABLE = false;
+const String DEFAULT_RTC_DATE_TIME = "2022-01-04T08:00";
 
 // Set LED GPIO
 const int ledPin = LED_BUILTIN;

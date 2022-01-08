@@ -66,6 +66,7 @@ public:
   void execute(unsigned long); //sampling periode ms
   String getValues();          //return string in format Json for Temp, Humidity
   void setEnableRecord(boolean);
+  boolean isEnableRecord();
   void info();
 
 private:

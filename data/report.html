@@ -58,41 +58,40 @@
                         <!-- here goes our data! -->
                     </table>
                 </main>
-            </report_form>
-            <br>
-                <label for="days">Choose a Day :</label>
-                <select name="days" id="days" onchange="calcDate(this)">
-                    <option value="">Select a day</option>
-                    <option value="0">Sunday</option>
-                    <option value="1">Monday</option>
-                    <option value="2">Tuesday</option>
-                    <option value="3">Wednesday</option>
-                    <option value="4">Thursday</option>
-                    <option value="5">Friday</option>
-                    <option value="6">Saturday</option>
-                </select>
-                <a class="btn btn-primary" role="button" onclick="getHourlyAvg()">Get Data</a>
-                <p>
-                    <a class="btn btn-success" role="button" onclick="downloadAsPDF()">Download as PDF</a>
-                </p>         
-                <!-- The Modal -->
-                <div id="myModal" class="modal">
-                    <!-- Modal content -->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <span class="close">&times;</span>
-                            <h2>IoT Data Logger</h2>
-                        </div>
-                        <div class="modal-body">
-                            <p>It's for Final Task of</p>
-                            <p>Mercu Buana - University</p>
-                            <p>Electronic - Engineering</p>
-                        </div>
-                        <div class="modal-footer">
-                            <h5>By : Salman Alfarisi - 583379</h5>
-                        </div>
+            </report_form><br>
+            <label for="days">Choose a Day :</label>
+            <select name="days" id="select_days" onchange="calcDate(this)">
+                <option value="">Select a day</option>
+                <option value="0">Sunday</option>
+                <option value="1">Monday</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thursday</option>
+                <option value="5">Friday</option>
+                <option value="6">Saturday</option>
+            </select>
+            <a class="btn btn-primary" role="button" onclick="getHourlyAvg()">Get Data</a>
+            <p>
+                <a class="btn btn-success" role="button" onclick="downloadAsPDF()">Download as PDF</a>
+            </p>         
+            <!-- The Modal -->
+            <div id="myModal" class="modal">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <h2>IoT Data Logger</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>It's for Final Task of</p>
+                        <p>Mercu Buana - University</p>
+                        <p>Electronic - Engineering</p>
+                    </div>
+                    <div class="modal-footer">
+                        <h5>By : Salman Alfarisi - 583379</h5>
                     </div>
                 </div>
+            </div>
         </div>
     </body>
 
