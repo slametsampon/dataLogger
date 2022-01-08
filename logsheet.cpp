@@ -177,6 +177,7 @@ void Logsheet::setTime(struct tm tmVal)
   //need to be synchronized
   if (_samplingSec > 0)
   {
+    _synchronized = true;
     Serial.println("Need to be synchronized");
     Serial.print("_samplingSec : ");
     Serial.println(_samplingSec);
@@ -501,10 +502,10 @@ void Logsheet::execute(unsigned long samplingTime)
   _samplingTime = samplingTime;
 
   //synchronize sampling time
-  if (!_synchronized)
+  if (_synchronized)
   {
     _samplingSec = 0;
-    _synchronized = true;
+    _synchronized = false;
   }
 
   //calculate sampling per minute
