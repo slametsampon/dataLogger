@@ -172,7 +172,7 @@ void Logsheet::setTime(struct tm tmVal)
 
   Serial.println("Logsheet::setTime(struct tm tmVal)");
   Serial.printf("Now is : %d-%02d-%02d %02d:%02d:%02d\n", _tm.tm_year, _tm.tm_mon, _tm.tm_mday, _tm.tm_hour, _tm.tm_min, _tm.tm_sec);
-  Serial.println("");
+  Serial.printf("Week_no : %d, Week is : %s\n", _tm.tm_wday, _getDayOfWeek(_tm.tm_wday));
 
   //need to be synchronized
   if (_samplingSec > 0)

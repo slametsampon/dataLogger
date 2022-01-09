@@ -4,8 +4,8 @@ var timeArray = [];
 var tempArray = [];
 var humdArray = [];
 
-var reportDate = new Date();
-var dateTimeSim = "2022-01-04T06:59";
+var baseReportDate = new Date();
+var DEFAULT_DATE_TIME = "2022-01-04T06:59";
 
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
@@ -67,11 +67,7 @@ function calcDate(){
   var difDay = 0;
   if(document.getElementById("select_days").value != ""){
     let reqDay = parseInt(document.getElementById("select_days").value);
-    //let reqDay = 5;
-  
-    //let d = new Date();
-    let d = reportDate;
-    let currDay = d.getDay();
+    let currDay = baseReportDate.getDay();
   
     difDay = currDay - reqDay;
   
@@ -81,23 +77,9 @@ function calcDate(){
   return difDay;
 }
 
-function createCaption(table, dateVal){
-  var d = new Date();
-  let currDate = d.getDate();
-  d.setDate(currDate - dateVal);
-
-  let day = d.getDay();
-
-  var t = d.toLocaleDateString();
-  t = dayName(day) + ", " + t;
-  
-  let caption = table.createCaption();
-  caption.textContent = 'Hourly Average : ' + t;
-}
-
-function setReportDate(data){
-  dateTimeSim = data;
-  let arrDT = dateTimeSim.split("T");
+function setBaseReportDate(data){
+  DEFAULT_DATE_TIME = data;
+  let arrDT = DEFAULT_DATE_TIME.split("T");
   let dateVal = arrDT[0];
   let timeVal = arrDT[1];
 
@@ -107,22 +89,21 @@ function setReportDate(data){
   let dtVal = arrDate[2];
 
   //var d = new Date();
-  reportDate.setFullYear(year);
-  reportDate.setMonth(month);
-  reportDate.setDate(dtVal);
+  baseReportDate.setFullYear(year);
+  baseReportDate.setMonth(month);
+  baseReportDate.setDate(dtVal);
   
   //set select day
-  let day = reportDate.getDay();
+  let day = baseReportDate.getDay();
   document.getElementById("select_days").value = day;
 
 }
 
 function createHeaderDate(dateVal) {
   
-  //var d = new Date();
-  let d = reportDate;
-  let currDate = d.getDate();
-  d.setDate(currDate - dateVal);
+  var d = new Date();
+  let baseDate = baseReportDate.getDate();
+  d.setDate(baseDate - dateVal);
 
   let day = d.getDay();
 
@@ -163,7 +144,6 @@ function generateReportTable(table) {
   }
 
   generateReportTableHead(table, headerArray);
-  //createCaption(table,calcDate());
 }
 
 function getDay(date) {
@@ -178,14 +158,6 @@ function getDay(date) {
   d.setDate(dateVal);
 
   return d.getDay();
-
-}
-
-function setDay() {
-  let selectDay = document.querySelector('#select_days');
-  let simDate = document.querySelector('#simDate').value;
-
-  selectDay.value = getDay(simDate);
 
 }
 
@@ -217,9 +189,7 @@ function getHourlyAvg(){
 }
 
 function downloadAsPDF() {
-  //let d = new Date();
-  let d = reportDate;
-  var dName = dayName(d.getDay());
+  var dName = dayName(baseReportDate.getDay());
   if(document.getElementById("select_days").value != ""){
     dName = dayName(parseInt(document.getElementById("select_days").value));
   }
@@ -273,7 +243,7 @@ function setupReport(){
         if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
           if (i == 0) userAccess(this.responseText);
           else if (i == 1) {
-            setReportDate(this.responseText);
+            setBaseReportDate(this.responseText);
             url_day = "hourlyAvgDay?days=" + document.getElementById("select_days").value;
             index_url = ["getActiveUser", "getDateTime",url_day];
           } 

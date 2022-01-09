@@ -199,6 +199,7 @@ struct tm getTime()
     tmstruct.tm_year = now.year();
     tmstruct.tm_mon = now.month();
     tmstruct.tm_mday = now.day();
+    tmstruct.tm_wday = now.dayOfTheWeek();
     tmstruct.tm_hour = now.hour();
     tmstruct.tm_min = now.minute();
     tmstruct.tm_sec = now.second();
