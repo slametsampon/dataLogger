@@ -94,6 +94,7 @@ String AccesUser::getUser(int idUser){
       break;
     
     default:
+      return String ("Unknwon Id");
       break;
   }
 }
@@ -235,6 +236,7 @@ float AccessParam::getParam(int idParam){
       break;
 
     default:
+      return -1.0;
       break;
   }
 }

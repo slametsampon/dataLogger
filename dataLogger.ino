@@ -186,7 +186,7 @@ struct tm getTime()
     configTime(3600 * TIME_ZONE, DAY_SAVE_TIME * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
     delay(2000);
     tmstruct.tm_year = 0;
-    getLocalTime(&tmstruct, 5000);
+    ambilWaktuLokal(&tmstruct, 5000);
 
     //set offset to 1900, month +1
     tmstruct.tm_year += 1900;
@@ -728,7 +728,7 @@ void setupDefaultUser()
 }
 
 //NTP
-bool getLocalTime(struct tm *info, uint32_t ms)
+bool ambilWaktuLokal(struct tm *info, uint32_t ms)
 {
   uint32_t count = ms / 10;
   time_t now;
